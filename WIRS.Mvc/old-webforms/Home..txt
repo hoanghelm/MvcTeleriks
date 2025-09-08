@@ -1,0 +1,405 @@
+using System;
+using System.Configuration;
+using System.Data;
+using System.IO;
+using System.Text;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using WIRS.BusinessComponents;
+using WIRS.CommonUtilities;
+using WIRS.DAL;
+using WIRS.Entities;
+
+
+
+namespace WIRS.Website
+{
+    public partial class Home : System.Web.UI.Page
+    {
+        private readonly UserBC userBC = new UserBC();
+        private DataSet ds = new DataSet();
+        private DataSet useraccess = new DataSet();
+        private readonly CommonFun appHelper = new CommonFun();
+        private readonly BasePage baseHelper = new BasePage();
+        private readonly IncidentDAL dal = new IncidentDAL();
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                if (Request.QueryString["page_id"] != null)
+                {
+                    string page_id = Request.QueryString["page_id"];
+                    RedirectToApprove(page_id);
+                }
+                //GetInstructionInfo();
+                string errorCode = string.Empty;
+                UserBE userLogin = (UserBE)AppSession.GetSession("SESSION_OBJ_USERLOGIN");
+                if (userLogin != null)
+                {
+
+                    lblusername.Text = userLogin.UserName;
+                    if (!IsPostBack)
+                    {
+                        // UserCredentialsBC usercredentialsBC = new UserCredentialsBC();
+                        // usercredentialsBC.GetUsersAccessSBU(userLogin.UserId, userLogin.UserRole, userLogin.sbaname, out useraccess, out errorCode);
+
+                        if (!string.IsNullOrEmpty(errorCode))
+                        {
+                            baseHelper.PopUpMessageRedirect(Page, "Error", errorCode, "AzureADLogin.aspx");
+                        }
+                        else
+                        {
+                            //ds = userBC.GetInfoByUserID(userLogin.UserId, userLogin.UserRole, useraccess.Tables[0]);//(userLogin.UserId);
+                            ds = userBC.GetInfoByUserID(userLogin.UserId, userLogin.UserRole);
+                            BindData();
+                        }
+                    }
+
+                }
+                else
+                {
+                    Response.Redirect("AzureADLogin.aspx");
+                }
+            }
+            catch (Exception ex)
+            {
+                baseHelper.PopUpClosingWindow(Page, "Error", ex.Message);
+            }
+        }
+
+        private void RedirectToApprove(string page_id)
+        {
+            string passwordHash = ConfigurationManager.AppSettings["PasswordHash"].ToString();
+            string saltKey = ConfigurationManager.AppSettings["SaltKey"].ToString();
+            string viKey = ConfigurationManager.AppSettings["VIKey"].ToString();
+
+            string page_idDecrypt = appHelper.Decrypt(page_id, passwordHash, saltKey, viKey);
+
+            string[] substrings = page_idDecrypt.Split('|');
+
+            string incId = substrings[0].Split('=')[1];
+            string userId = substrings[1].Split('=')[1];
+            string statusCode = substrings[2].Split('=')[1];
+            string modifyDate = substrings[3].Split('=')[1];
+
+
+            UserBC ubc = new UserBC();
+            UserBE userBE = ubc.GetUserByUserID(userId);
+            AppSession.SetSession("SESSION_OBJ_USERLOGIN", userBE);
+            //FormsAuthentication.RedirectFromLoginPage(userId, false);
+
+            WorkflowIncidentBC ibc = new WorkflowIncidentBC();
+            //WorkflowIncidentBE incidentBE = new WorkflowIncidentBE();
+            //DataSet ds = new DataSet();
+            //incidentBE.incident_id = incId;
+            //ds = ibc.get_incident_by_id(incidentBE);
+            //AppSession.SetSession("SESSION_OBJ_INCIDENT", incidentBE);
+            //string incident_status = ds.Tables[0].Rows[0]["status"].ToString();
+
+            ////Disable button
+            DataSet vds = ibc.validate_workflowuser(incId, userId);
+            DataSet whshods = ibc.validate_user_to_edit_inc(incId, userId, string.Empty);
+
+            string incIdFirstDecrypt = appHelper.Encrypt(incId, passwordHash, saltKey, viKey);
+            if (whshods.Tables[0].Rows.Count > 0)
+            {
+                //Response.Redirect("Change_Incident_Report.aspx?incident_id=" + incidentid, false);
+                Response.Redirect("Create_Incident_Report.aspx?incident_id=" + incId, false);
+            }
+            else
+            if (vds.Tables[0].Rows.Count > 0)
+            {
+                Response.Redirect("Create_Incident_Report.aspx?incident_id=" + incId, false);
+            }
+            else
+            {
+                Response.Redirect("View_Incident_Report.aspx?incident_id=" + incIdFirstDecrypt, false);
+            }
+        }
+        private void BindData()
+        {
+            //DataTable dt = new DataTable();
+            try
+            {
+                if (ds != null)
+                {
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        lblincidentinfo.Visible = true;
+                        gvIncident.DataSource = ds.Tables[0];
+                        gvIncident.DataBind();
+                    }
+                    else
+                    {
+                        lblincidentinfo.Visible = false;
+                    }
+
+                    if (ds.Tables[1].Rows.Count > 0)
+                    {
+                        lblInvestigation.Visible = true;
+                        gvInvestigation.DataSource = ds.Tables[1];
+                        gvInvestigation.DataBind();
+                    }
+
+                    else
+                    {
+                        lblInvestigation.Visible = false;
+                        // lblincidentinfo.Visible = true;
+                        //dt = ds.Tables[0];
+                        //dt.Rows.Add(dt.NewRow());
+                        //gvIncident.DataSource = dt;
+                        //gvIncident.DataBind();
+                        //int totalcolums = gvIncident.Rows[0].Cells.Count;
+                        //gvIncident.Rows[0].Cells.Clear();
+                        //gvIncident.Rows[0].Cells.Add(new TableCell());
+                        //gvIncident.Rows[0].Cells[0].ColumnSpan = totalcolums;
+                        // gvIncident.Rows[0].Cells[0].Text = "No Data Found";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                baseHelper.PopUpMessage(Page, "Error", ex.Message);
+            }
+        }
+
+        protected void gvIncident_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void gvIncident_ItemCommand(object sender, ListViewCommandEventArgs e)
+        {
+            try
+            {
+                if (e.CommandName == "Print")
+                {
+                    string incidentid = e.CommandArgument.ToString();
+                    UserBE userLogin = (UserBE)AppSession.GetSession("SESSION_OBJ_USERLOGIN");
+
+                    string passwordHash = ConfigurationManager.AppSettings["PasswordHash"].ToString();
+                    string saltKey = ConfigurationManager.AppSettings["SaltKey"].ToString();
+                    string viKey = ConfigurationManager.AppSettings["VIKey"].ToString();
+
+                    //String url = "View_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    string url = "Print_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    Response.Redirect(url);
+                }
+            }
+            catch (Exception ex)
+            {
+                baseHelper.PopUpMessage(gvIncident, "Error", ex.Message);
+            }
+        }
+        protected void gvIncident_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            try
+            {
+                if (e.CommandName == "Select")
+                {
+                    UserBE userLogin = (UserBE)AppSession.GetSession("SESSION_OBJ_USERLOGIN");
+                    if (userLogin != null)
+                    {
+                        string incidentid = e.CommandArgument.ToString();
+
+
+                        WorkflowIncidentBC ibc = new WorkflowIncidentBC();
+                        WorkflowIncidentBE ibe = new WorkflowIncidentBE();
+                        //DataSet ds = new DataSet();
+                        //ibe.incident_id = incidentid;
+                        //ds = ibc.get_incident_by_id(ibe);
+                        //AppSession.SetSession("SESSION_OBJ_INCIDENT", ibe);
+
+                        string passwordHash = ConfigurationManager.AppSettings["PasswordHash"].ToString();
+                        string saltKey = ConfigurationManager.AppSettings["SaltKey"].ToString();
+                        string viKey = ConfigurationManager.AppSettings["VIKey"].ToString();
+
+                        //string incident_status = ds.Tables[0].Rows[0]["status"].ToString();
+
+                        //Disable button
+                        DataSet vds = ibc.validate_workflowuser(incidentid, userLogin.UserId);
+                        DataSet whshods = ibc.validate_user_to_edit_inc(incidentid, userLogin.UserId, string.Empty);
+
+                        if (whshods.Tables[0].Rows.Count > 0)
+                        {
+                            //Response.Redirect("Change_Incident_Report.aspx?incident_id=" + incidentid, false);
+                            Response.Redirect("Create_Incident_Report.aspx?incident_id=" + incidentid, false);
+                        }
+                        else
+                        if (vds.Tables[0].Rows.Count > 0)
+                        {
+                            //Response.Redirect("New_Incident_Report .aspx?incid=" + incidentid, false);
+                            Response.Redirect("Create_Incident_Report.aspx?incident_id=" + incidentid, false);
+                        }
+                        else
+                        {
+                            Response.Redirect("View_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey), false);
+                        }
+
+                        //if (incidentBE.CreatorEmpNo == userLogin.UserId && (incidentBE.Status == "1" || incidentBE.Status == "1R"))
+                        //{
+                        //    Response.Redirect("UpdateIncident.aspx",false);
+                        //}
+                        //else if (incidentBE.CreatorEmpNo == userLogin.UserId && (incidentBE.Status == "2" || incidentBE.Status == "3"))
+                        //{
+                        //    //Go to view
+                        //    Response.Redirect("IncidentReportViewer.aspx", false);
+                        //}                       
+
+                    }
+                }
+                if (e.CommandName == "Print")
+                {
+                    string incidentid = e.CommandArgument.ToString();
+                    UserBE userLogin = (UserBE)AppSession.GetSession("SESSION_OBJ_USERLOGIN");
+
+                    string passwordHash = ConfigurationManager.AppSettings["PasswordHash"].ToString();
+                    string saltKey = ConfigurationManager.AppSettings["SaltKey"].ToString();
+                    string viKey = ConfigurationManager.AppSettings["VIKey"].ToString();
+
+                    //String url = "View_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    //String url = "Print_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    string url = "PrintView.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    ScriptManager.RegisterStartupScript(this, typeof(string), "OPEN_WINDOW", "var Mleft = (screen.width/2)-(760/2);var Mtop = (screen.height/2)-(700/2);window.open( '" + url + "', null, 'height=700,width=960,status=yes,toolbar=no,scrollbars=yes,menubar=no,location=no,top=\'+Mtop+\', left=\'+Mleft+\'' );", true);
+                    //baseHelper.PopUpMessageRedirect(Page, "View", url);
+                    //Response.Redirect(url);
+                }
+            }
+            catch (Exception ex)
+            {
+                baseHelper.PopUpMessage(gvIncident, "Error", ex.Message);
+            }
+        }
+
+        private void GetInstructionInfo()
+        {
+            try
+            {
+                string TandCPath = ConfigurationManager.AppSettings["Instruction"].ToString();
+                StringBuilder str = new StringBuilder();
+                //Literal ltTC = (Literal)Master.FindControl("ltTC");
+                DataTable table = new DataTable();
+                table.Columns.Add("Instruction");
+
+
+                using (StreamReader sr = new StreamReader(HttpContext.Current.Server.MapPath(TandCPath), Encoding.Default))
+                {
+                    //str.AppendLine("<p class=post>");
+                    while (!sr.EndOfStream)
+                    {
+                        str.AppendLine(sr.ReadLine());
+                        // str.AppendLine("<br/>");
+                        // str.AppendLine("<br/>");
+                    }
+                    //str.AppendLine("</p>");
+                }
+                appHelper.BindRecordToLiteral(literalInstruction, str.ToString(), "SESSION_INSTRUCTIONS");
+            }
+            catch (Exception ex)
+            {
+                baseHelper.PopUpMessage(Page, "Error", ex.Message);
+            }
+
+        }
+
+        protected void gvInvestigation_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            try
+            {
+                if (e.CommandName == "Select")
+                {
+                    UserBE userLogin = (UserBE)AppSession.GetSession("SESSION_OBJ_USERLOGIN");
+                    if (userLogin != null)
+                    {
+                        string incidentid = e.CommandArgument.ToString();
+
+                        string passwordHash = ConfigurationManager.AppSettings["PasswordHash"].ToString();
+                        string saltKey = ConfigurationManager.AppSettings["SaltKey"].ToString();
+                        string viKey = ConfigurationManager.AppSettings["VIKey"].ToString();
+
+                        //Response.Redirect("New_Incident_Report .aspx?incid=" + incidentid, false);
+                        //Response.Redirect("Create_Incident_Report.aspx?incident_id=" + incidentid, false);
+                        WorkflowIncidentBC ibc = new WorkflowIncidentBC();
+                        DataSet vds = ibc.validate_workflowuser(incidentid, userLogin.UserId);
+
+                        DataSet whshods = ibc.validate_user_to_edit_inc(incidentid, userLogin.UserId, string.Empty);
+
+                        if (whshods.Tables[0].Rows.Count > 0)
+                        {
+                            //Response.Redirect("Change_Incident_Report.aspx?incident_id=" + incidentid, false);
+                            Response.Redirect("Create_Incident_Report.aspx?incident_id=" + incidentid, false);
+                        }
+                        else
+                        if (vds.Tables[0].Rows.Count > 0)
+                        {
+                            //Response.Redirect("New_Incident_Report .aspx?incid=" + incidentid, false);
+                            Response.Redirect("Create_Incident_Report.aspx?incident_id=" + incidentid, false);
+                        }
+                        else
+                        {
+                            Response.Redirect("View_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey), false);
+                        }
+
+                        //if (userLogin.UserRole == "3" || userLogin.UserRole == "4")
+                        //{
+                        //    if (incidentBE.Status == "5")
+                        //    {
+                        //        Response.Redirect("InvestigationReportViewer.aspx", false);
+                        //    }
+                        //    else
+                        //    {
+                        //        Response.Redirect("UpdateInvestigation.aspx", false);
+                        //    }
+                        //}
+
+                    }
+                }
+                if (e.CommandName == "Print")
+                {
+                    string incidentid = e.CommandArgument.ToString();
+                    UserBE userLogin = (UserBE)AppSession.GetSession("SESSION_OBJ_USERLOGIN");
+
+                    string passwordHash = ConfigurationManager.AppSettings["PasswordHash"].ToString();
+                    string saltKey = ConfigurationManager.AppSettings["SaltKey"].ToString();
+                    string viKey = ConfigurationManager.AppSettings["VIKey"].ToString();
+
+                    //String url = "View_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    //String url = "Print_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    //Response.Redirect(url);
+
+                    string url = "PrintView.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    ScriptManager.RegisterStartupScript(this, typeof(string), "OPEN_WINDOW", "var Mleft = (screen.width/2)-(760/2);var Mtop = (screen.height/2)-(700/2);window.open( '" + url + "', null, 'height=700,width=960,status=yes,toolbar=no,scrollbars=yes,menubar=no,location=no,top=\'+Mtop+\', left=\'+Mleft+\'' );", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                baseHelper.PopUpMessage(gvInvestigation, "Error", ex.Message);
+            }
+        }
+        protected void gvInvestigation_ItemCommand(object sender, ListViewCommandEventArgs e)
+        {
+            try
+            {
+                if (e.CommandName == "Print")
+                {
+                    string incidentid = e.CommandArgument.ToString();
+                    UserBE userLogin = (UserBE)AppSession.GetSession("SESSION_OBJ_USERLOGIN");
+
+                    string passwordHash = ConfigurationManager.AppSettings["PasswordHash"].ToString();
+                    string saltKey = ConfigurationManager.AppSettings["SaltKey"].ToString();
+                    string viKey = ConfigurationManager.AppSettings["VIKey"].ToString();
+
+                    //String url = "View_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    string url = "Print_Incident_Report.aspx?incident_id=" + appHelper.Encrypt(incidentid, passwordHash, saltKey, viKey) + "&ijpname=" + appHelper.Encrypt(userLogin.UserId, passwordHash, saltKey, viKey);
+                    Response.Redirect(url);
+                }
+            }
+            catch (Exception ex)
+            {
+                baseHelper.PopUpMessage(gvInvestigation, "Error", ex.Message);
+            }
+        }
+    }
+}

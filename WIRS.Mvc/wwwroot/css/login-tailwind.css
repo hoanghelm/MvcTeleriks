@@ -1,0 +1,30 @@
+/* Simple Login Page Styles */
+
+/* Basic input styling */
+.login-input {
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Simple button styling */
+.login-button {
+    transition: background-color 0.2s;
+}
+
+.login-button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Form validation styles */
+.input-error {
+    border-color: #ef4444;
+}
+
+.input-error:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}

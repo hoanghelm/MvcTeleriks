@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="old-webforms\**" />
+    <Content Remove="old-webforms\**" />
+    <EmbeddedResource Remove="old-webforms\**" />
+    <None Remove="old-webforms\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Telerik.UI.for.AspNet.Core" Version="2025.3.825" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WIRS.Services\WIRS.Services.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,60 @@
+/* Custom Tailwind CSS additions for WIRS */
+
+/* Kendo Grid customizations */
+.k-grid {
+    border: none !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.k-grid-header {
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    font-weight: 600 !important;
+}
+
+.k-grid-content {
+    background-color: white !important;
+}
+
+.k-grid tr:hover {
+    background-color: #f1f5f9 !important;
+}
+
+.k-grid .k-button {
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* Custom animations for cards */
+@keyframes cardSelectPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.dashboard-card.selected {
+    animation: cardSelectPulse 0.3s ease-in-out;
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-card {
+        transform: none !important;
+    }
+    
+    .dashboard-card:hover {
+        transform: none !important;
+    }
+}
