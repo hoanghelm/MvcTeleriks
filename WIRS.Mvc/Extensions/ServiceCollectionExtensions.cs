@@ -129,6 +129,7 @@ namespace WIRS.Mvc.Extensions
 			services.AddScoped<IMasterDataService, MasterDataService>();
 			services.AddScoped<IMaintenanceService, MaintenanceService>();
 			services.AddScoped<IIncidentService, IncidentService>();
+			services.AddScoped<IWorkflowService, WorkflowService>();
 			services.AddScoped<IEncryptionService, EncryptionService>();
 			services.AddScoped<IDataMapperService, DataMapperService>();
 			services.AddScoped<IUrlGeneratorService, UrlGeneratorService>();

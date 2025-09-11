@@ -1,0 +1,237 @@
+@model IncidentCreateViewModel
+@{
+    ViewData["Title"] = "Create Incident Report";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/incident/incident-create.css" />
+}
+
+<div class="p-6 max-w-7xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-900 mb-2">Create Incident Report</h1>
+        <p class="text-gray-600 text-sm">Fields marked with <span class="text-red-500 font-semibold">*</span> are required</p>
+        <div class="text-blue-600 text-sm mt-2">This form is for <strong>Part A - Initial Report</strong> only</div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ValidationMessage))
+    {
+        <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
+            @Model.ValidationMessage
+        </div>
+    }
+
+    <form id="createIncidentForm" method="post" asp-action="Create" class="space-y-6">
+        <!-- Incident Details Card -->
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h2 class="card-title">Incident Details</h2>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Incident Date -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Incident Date <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" name="IncidentDate" class="form-control" required />
+                    </div>
+
+                    <!-- Incident Time -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Incident Time <span class="text-red-500">*</span>
+                        </label>
+                        <input type="time" name="IncidentTime" class="form-control" required />
+                    </div>
+
+                    <!-- SBA -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            SBA <span class="text-red-500">*</span>
+                        </label>
+                        <select name="SbaCode" class="form-control" required>
+                            <option value="">Select SBA</option>
+                            @if (Model.SbaOptions != null)
+                            {
+                                @foreach (var option in Model.SbaOptions)
+                                {
+                                    <option value="@option.Code">@option.Value</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Department -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Department <span class="text-red-500">*</span>
+                        </label>
+                        <select name="Department" class="form-control" required>
+                            <option value="">Select Department</option>
+                            @if (Model.DepartmentOptions != null)
+                            {
+                                @foreach (var option in Model.DepartmentOptions)
+                                {
+                                    <option value="@option.Code">@option.Value</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Location <span class="text-red-500">*</span>
+                        </label>
+                        <select name="Location" class="form-control" required>
+                            <option value="">Select Location</option>
+                            @if (Model.LocationOptions != null)
+                            {
+                                @foreach (var option in Model.LocationOptions)
+                                {
+                                    <option value="@option.Code">@option.Value</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Exact Location -->
+                    <div class="space-y-2 xl:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Exact Location <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="ExactLocation" class="form-control" placeholder="Enter exact location details" maxlength="500" required />
+                    </div>
+                </div>
+
+                <!-- Incident Description -->
+                <div class="mt-6 space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Incident Description <span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="IncidentDesc" class="form-control" rows="4" placeholder="Describe the incident in detail" maxlength="2000" required></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Superior Information Card -->
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h2 class="card-title">Superior Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Superior Employee Number -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Superior Employee Number <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="SuperiorEmpNo" class="form-control" placeholder="Employee number" required />
+                    </div>
+
+                    <!-- Superior Name -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Superior Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="SuperiorName" class="form-control" placeholder="Superior's name" required />
+                    </div>
+
+                    <!-- Superior Designation -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Superior Designation
+                        </label>
+                        <input type="text" name="SuperiorDesignation" class="form-control" placeholder="Superior's designation" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information Card -->
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h2 class="card-title">Additional Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Any Eyewitness -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Any Eyewitness?
+                        </label>
+                        <select name="AnyEyewitness" class="form-control">
+                            <option value="">Select option</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+
+                    <!-- Working Overtime -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Was Working Overtime?
+                        </label>
+                        <select name="IsWorkingOvertime" class="form-control">
+                            <option value="">Select option</option>
+                            <option value="Y">Yes</option>
+                            <option value="N">No</option>
+                        </select>
+                    </div>
+
+                    <!-- Job Related -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Job Related?
+                        </label>
+                        <select name="IsJobrelated" class="form-control">
+                            <option value="">Select option</option>
+                            <option value="Y">Yes</option>
+                            <option value="N">No</option>
+                        </select>
+                    </div>
+
+                    <!-- Injured Case Type -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Injured Case Type
+                        </label>
+                        <select name="InjuredCaseType" class="form-control">
+                            <option value="">Select type</option>
+                            @if (Model.InjuredCaseTypeOptions != null)
+                            {
+                                @foreach (var option in Model.InjuredCaseTypeOptions)
+                                {
+                                    <option value="@option.Code">@option.Value</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Damage Description -->
+                <div class="mt-6 space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Damage Description
+                    </label>
+                    <textarea name="DamageDescription" class="form-control" rows="3" placeholder="Describe any damages" maxlength="1000"></textarea>
+                </div>
+
+                <!-- Hospital/Clinic Name -->
+                <div class="mt-6 space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Examined at Hospital/Clinic
+                    </label>
+                    <input type="text" name="ExaminedHospitalClinicName" class="form-control" placeholder="Hospital or clinic name" maxlength="200" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-4">
+            <button type="button" class="btn-secondary" onclick="window.history.back()">Cancel</button>
+            <button type="submit" class="btn-success">Submit Report</button>
+        </div>
+    </form>
+</div>

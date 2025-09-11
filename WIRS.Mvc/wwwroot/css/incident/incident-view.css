@@ -1,0 +1,376 @@
+/* Incident View Page Styles */
+
+.incident-view-container {
+    @apply max-w-7xl mx-auto p-6;
+}
+
+/* Header section */
+.incident-header {
+    @apply flex justify-between items-start mb-6;
+}
+
+.incident-info {
+    @apply flex-1;
+}
+
+.incident-title {
+    @apply text-xl font-bold text-gray-900 mb-2;
+}
+
+.incident-meta {
+    @apply flex items-center gap-4 text-sm text-gray-600;
+}
+
+.incident-status {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.incident-status.status-a {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.incident-status.status-b {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.incident-status.status-c {
+    @apply bg-green-100 text-green-800;
+}
+
+.incident-status.status-rejected {
+    @apply bg-red-100 text-red-800;
+}
+
+.incident-actions {
+    @apply flex gap-2;
+}
+
+/* Stage navigation tabs */
+.stage-tabs {
+    @apply flex border-b border-gray-200 mb-6;
+}
+
+.stage-tab {
+    @apply flex items-center gap-2 px-6 py-3 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors cursor-pointer;
+}
+
+.stage-tab.active {
+    @apply border-blue-500 text-blue-600;
+}
+
+.stage-tab.disabled {
+    @apply opacity-50 cursor-not-allowed;
+}
+
+.stage-indicator {
+    @apply flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold;
+}
+
+.stage-indicator.current {
+    @apply bg-blue-600 text-white;
+}
+
+.stage-indicator.completed {
+    @apply bg-green-600 text-white;
+}
+
+.stage-indicator.pending {
+    @apply bg-gray-300 text-gray-600;
+}
+
+.stage-indicator.editable {
+    @apply bg-orange-500 text-white;
+}
+
+/* Stage content */
+.stage-content {
+    @apply hidden space-y-6;
+}
+
+.stage-content.active {
+    @apply block;
+}
+
+/* Form styling in view mode */
+.form-section {
+    @apply space-y-6;
+}
+
+.readonly-field {
+    @apply bg-gray-50;
+}
+
+.readonly-field .k-textbox,
+.readonly-field .k-dropdown .k-dropdown-wrap,
+.readonly-field .k-datepicker .k-picker-wrap,
+.readonly-field .k-timepicker .k-picker-wrap {
+    @apply bg-gray-50 border-gray-200;
+}
+
+/* Edit mode styling */
+.edit-mode .editable-field {
+    @apply bg-white;
+}
+
+.edit-mode .editable-field .k-textbox,
+.edit-mode .editable-field .k-dropdown .k-dropdown-wrap,
+.edit-mode .editable-field .k-datepicker .k-picker-wrap,
+.edit-mode .editable-field .k-timepicker .k-picker-wrap {
+    @apply bg-white border-gray-300;
+}
+
+/* Workflow history */
+.workflow-history {
+    @apply space-y-4;
+}
+
+.workflow-item {
+    @apply flex items-start gap-4 p-4 bg-gray-50 rounded-lg;
+}
+
+.workflow-avatar {
+    @apply flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center;
+}
+
+.workflow-content {
+    @apply flex-grow;
+}
+
+.workflow-header {
+    @apply flex justify-between items-start mb-2;
+}
+
+.workflow-action {
+    @apply text-sm font-medium text-gray-900;
+}
+
+.workflow-user {
+    @apply text-xs text-gray-600;
+}
+
+.workflow-date {
+    @apply text-xs text-gray-500;
+}
+
+.workflow-comments {
+    @apply text-sm text-gray-700 mt-1;
+}
+
+/* Workflow actions form */
+.workflow-action-form {
+    @apply space-y-4;
+}
+
+.workflow-action-buttons {
+    @apply flex justify-end gap-2;
+}
+
+/* Attachments section */
+.attachments-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.attachment-item {
+    @apply border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer;
+}
+
+.attachment-icon {
+    @apply w-8 h-8 text-gray-400 mb-2;
+}
+
+.attachment-name {
+    @apply text-sm font-medium text-gray-900 truncate;
+}
+
+.attachment-size {
+    @apply text-xs text-gray-500;
+}
+
+.attachment-date {
+    @apply text-xs text-gray-500;
+}
+
+/* Comments section */
+.comments-section {
+    @apply space-y-4;
+}
+
+.comment-item {
+    @apply border border-gray-200 rounded-lg p-4;
+}
+
+.comment-header {
+    @apply flex justify-between items-start mb-2;
+}
+
+.comment-author {
+    @apply text-sm font-medium text-gray-900;
+}
+
+.comment-date {
+    @apply text-xs text-gray-500;
+}
+
+.comment-content {
+    @apply text-sm text-gray-700;
+}
+
+/* Print view adjustments */
+@media print {
+    .incident-actions,
+    .workflow-action-form,
+    .stage-tabs,
+    .no-print {
+        display: none !important;
+    }
+    
+    .stage-content {
+        display: block !important;
+    }
+    
+    .card {
+        @apply border border-gray-300 shadow-none mb-4;
+        break-inside: avoid;
+    }
+    
+    .workflow-history {
+        break-inside: avoid;
+    }
+}
+
+/* Permission-based visibility */
+.permission-hidden {
+    @apply hidden;
+}
+
+.permission-readonly {
+    @apply pointer-events-none opacity-60;
+}
+
+/* Progress indicators */
+.progress-bar {
+    @apply w-full bg-gray-200 rounded-full h-2;
+}
+
+.progress-fill {
+    @apply h-2 bg-blue-600 rounded-full transition-all duration-300;
+}
+
+/* Notification badges */
+.notification-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.notification-badge.info {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.notification-badge.warning {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.notification-badge.success {
+    @apply bg-green-100 text-green-800;
+}
+
+.notification-badge.error {
+    @apply bg-red-100 text-red-800;
+}
+
+/* Timeline styles for workflow */
+.timeline {
+    @apply relative;
+}
+
+.timeline::before {
+    @apply absolute left-4 top-0 bottom-0 w-px bg-gray-200;
+    content: '';
+}
+
+.timeline-item {
+    @apply relative flex items-start gap-4 pb-6;
+}
+
+.timeline-item:last-child {
+    @apply pb-0;
+}
+
+.timeline-dot {
+    @apply relative z-10 flex items-center justify-center w-8 h-8 bg-white border-2 border-gray-300 rounded-full;
+}
+
+.timeline-dot.completed {
+    @apply border-green-500 bg-green-500 text-white;
+}
+
+.timeline-dot.current {
+    @apply border-blue-500 bg-blue-500 text-white;
+}
+
+.timeline-content {
+    @apply flex-grow pt-1;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .incident-header {
+        @apply flex-col gap-4;
+    }
+    
+    .incident-actions {
+        @apply w-full justify-end;
+    }
+    
+    .stage-tabs {
+        @apply overflow-x-auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .stage-tabs::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .stage-tab {
+        @apply whitespace-nowrap;
+    }
+    
+    .workflow-item {
+        @apply flex-col gap-2;
+    }
+    
+    .workflow-header {
+        @apply flex-col gap-1;
+    }
+    
+    .attachments-grid {
+        @apply grid-cols-1;
+    }
+    
+    .timeline::before {
+        @apply left-3;
+    }
+    
+    .timeline-dot {
+        @apply w-6 h-6;
+    }
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+    .card {
+        @apply bg-gray-800 border-gray-700;
+    }
+    
+    .card-header {
+        @apply bg-gray-700 border-gray-600;
+    }
+    
+    .incident-title {
+        @apply text-white;
+    }
+    
+    .workflow-item {
+        @apply bg-gray-700;
+    }
+}

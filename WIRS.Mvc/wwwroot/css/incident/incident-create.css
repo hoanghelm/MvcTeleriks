@@ -1,0 +1,208 @@
+/* Incident Create Page Styles */
+
+.incident-create-container {
+    @apply max-w-7xl mx-auto p-6;
+}
+
+/* Card styles consistent with the existing design */
+.card {
+    @apply bg-white rounded-lg border border-gray-200 shadow-sm;
+}
+
+.card-header {
+    @apply px-6 py-4 border-b border-gray-200 bg-gray-50;
+}
+
+.card-title {
+    @apply text-lg font-semibold text-gray-900 m-0;
+}
+
+.card-body {
+    @apply p-6;
+}
+
+/* Form field groups */
+.field-group {
+    @apply space-y-6;
+}
+
+.field-row {
+    @apply grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6;
+}
+
+.field-row-full {
+    @apply grid grid-cols-1 gap-6;
+}
+
+/* Required field indicator */
+.required-indicator {
+    @apply text-red-500 font-semibold;
+}
+
+/* Validation styles */
+.validation-error {
+    @apply text-red-600 text-xs mt-1 block;
+}
+
+.field-error input,
+.field-error .k-textbox,
+.field-error .k-dropdown {
+    @apply border-red-300 focus:border-red-500 focus:ring-red-200;
+}
+
+/* Dynamic rows styling */
+.injured-person-row,
+.eyewitness-row {
+    @apply border-b border-gray-100 pb-6 mb-6 last:border-b-0 last:pb-0 last:mb-0;
+}
+
+.injured-person-row:hover,
+.eyewitness-row:hover {
+    @apply bg-gray-50 -mx-3 px-3 py-3 rounded-lg;
+}
+
+/* Button groups */
+.btn-group {
+    @apply flex gap-2 flex-wrap;
+}
+
+.btn-group .k-button {
+    @apply flex-shrink-0;
+}
+
+/* Search button styling */
+.search-btn {
+    @apply inline-flex items-center justify-center;
+}
+
+.search-btn svg {
+    @apply w-4 h-4;
+}
+
+/* Employee search integration */
+.employee-search-field {
+    @apply flex gap-2 items-end;
+}
+
+.employee-search-field .k-textbox {
+    @apply flex-1;
+}
+
+/* Section visibility */
+.section-hidden {
+    @apply hidden;
+}
+
+.section-visible {
+    @apply block;
+}
+
+/* Form actions */
+.form-actions {
+    @apply flex justify-end space-x-4 pt-6 border-t border-gray-200 mt-8;
+}
+
+/* Incident type selection */
+.incident-type-grid {
+    @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3;
+}
+
+.incident-type-item {
+    @apply p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors;
+}
+
+.incident-type-item.selected {
+    @apply bg-blue-100 border-blue-500;
+}
+
+.incident-type-item input[type="checkbox"] {
+    @apply mr-2;
+}
+
+.incident-type-item label {
+    @apply cursor-pointer text-sm;
+}
+
+/* Progressive disclosure */
+.disclosure-section {
+    @apply transition-all duration-300;
+}
+
+.disclosure-section.collapsed {
+    @apply max-h-0 overflow-hidden opacity-0;
+}
+
+.disclosure-section.expanded {
+    @apply max-h-screen opacity-100;
+}
+
+/* Step indicator */
+.step-indicator {
+    @apply flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-semibold;
+}
+
+.step-indicator.completed {
+    @apply bg-green-600;
+}
+
+.step-indicator.current {
+    @apply bg-blue-600 ring-2 ring-blue-200;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .field-row {
+        @apply grid-cols-1 gap-4;
+    }
+    
+    .form-actions {
+        @apply flex-col space-x-0 space-y-3;
+    }
+    
+    .incident-type-grid {
+        @apply grid-cols-1 gap-2;
+    }
+}
+
+/* Focus management for accessibility */
+.k-textbox:focus,
+.k-dropdown .k-dropdown-wrap:focus,
+.k-datepicker .k-picker-wrap:focus,
+.k-timepicker .k-picker-wrap:focus {
+    @apply ring-2 ring-blue-200 border-blue-500;
+}
+
+/* Loading states */
+.loading-overlay {
+    @apply absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center;
+}
+
+.loading-spinner {
+    @apply animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full;
+}
+
+/* Error states */
+.error-banner {
+    @apply bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6;
+}
+
+.error-banner .error-title {
+    @apply font-semibold mb-1;
+}
+
+.error-banner .error-message {
+    @apply text-sm;
+}
+
+/* Success states */
+.success-banner {
+    @apply bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6;
+}
+
+.success-banner .success-title {
+    @apply font-semibold mb-1;
+}
+
+.success-banner .success-message {
+    @apply text-sm;
+}

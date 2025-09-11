@@ -147,5 +147,38 @@ namespace WIRS.Mvc.Controllers
                 return Json(new { success = false, message = "Error retrieving master data", error = ex.Message });
             }
         }
+
+        [HttpGet]
+        public IActionResult GetYesNoOptions()
+        {
+            var options = new List<LookupItem>
+            {
+                new LookupItem { Code = "1", Value = "Yes" },
+                new LookupItem { Code = "0", Value = "No" }
+            };
+            return Json(options);
+        }
+
+        [HttpGet]
+        public IActionResult GetOvertimeOptions()
+        {
+            var options = new List<LookupItem>
+            {
+                new LookupItem { Code = "Y", Value = "Yes" },
+                new LookupItem { Code = "N", Value = "No" }
+            };
+            return Json(options);
+        }
+
+        [HttpGet]
+        public IActionResult GetJobRelatedOptions()
+        {
+            var options = new List<LookupItem>
+            {
+                new LookupItem { Code = "Y", Value = "Yes" },
+                new LookupItem { Code = "N", Value = "No" }
+            };
+            return Json(options);
+        }
     }
 }
