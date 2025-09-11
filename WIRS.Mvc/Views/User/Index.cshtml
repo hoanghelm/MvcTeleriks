@@ -1,0 +1,207 @@
+@{
+    ViewData["Title"] = "User Management";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/telerik-controls-standardized.css" />
+    <link rel="stylesheet" href="~/css/user/user-list.css" />
+}
+
+<div class="p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900 mb-2">User Management</h1>
+            <p class="text-gray-600 text-sm">Search and manage user accounts</p>
+        </div>
+        <div>
+            @(Html.Kendo().Button()
+                .Name("btnCreateUser")
+                .Content("<i class='k-icon k-i-plus'></i> Create New User")
+                .HtmlAttributes(new { @class = "btn-primary" })
+                .Events(e => e.Click("function() { window.location.href = '" + @Url.Action("Create", "User") + "'; }"))
+            )
+        </div>
+    </div>
+
+    <!-- Search Filters Card -->
+    <div class="card overflow-hidden mb-6">
+        <div class="card-header">
+            <h2 class="card-title">Search Filters</h2>
+        </div>
+        <div class="card-body">
+            <form id="searchForm" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Sector -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Sector</label>
+                    @(Html.Kendo().DropDownList()
+                        .Name("SearchSector")
+                        .OptionLabel("All Sectors")
+                        .DataTextField("Value")
+                        .DataValueField("Code")
+                        .DataSource(source => source.Read(read => read.Action("GetSectors", "MasterData")))
+                        .HtmlAttributes(new { id = "ddlSearchSector" })
+                        .Events(e => e.Change("onSectorChange"))
+                    )
+                </div>
+
+                <!-- LOB -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">LOB</label>
+                    @(Html.Kendo().DropDownList()
+                        .Name("SearchLOB")
+                        .OptionLabel("All LOBs")
+                        .DataTextField("Value")
+                        .DataValueField("Code")
+                        .HtmlAttributes(new { id = "ddlSearchLOB" })
+                    )
+                </div>
+
+                <!-- User Role -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">User Role</label>
+                    @(Html.Kendo().DropDownList()
+                        .Name("SearchUserRole")
+                        .OptionLabel("All Roles")
+                        .DataTextField("Value")
+                        .DataValueField("Code")
+                        .DataSource(source => source.Read(read => read.Action("GetUserRoles", "MasterData")))
+                        .HtmlAttributes(new { id = "ddlSearchUserRole" })
+                    )
+                </div>
+
+                <!-- User ID -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">User ID</label>
+                    @(Html.Kendo().TextBox()
+                        .Name("SearchUserId")
+                        .Placeholder("Enter User ID")
+                        .HtmlAttributes(new { id = "txtSearchUserId" })
+                    )
+                </div>
+
+                <!-- User Name -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">User Name</label>
+                    @(Html.Kendo().TextBox()
+                        .Name("SearchUserName")
+                        .Placeholder("Enter User Name")
+                        .HtmlAttributes(new { id = "txtSearchUserName" })
+                    )
+                </div>
+
+                <!-- Search Button -->
+                <div class="space-y-2 flex items-end">
+                    @(Html.Kendo().Button()
+                        .Name("btnSearch")
+                        .Content("<i class='k-icon k-i-search'></i> Search")
+                        .HtmlAttributes(new { @class = "btn-primary w-full" })
+                        .Events(e => e.Click("searchUsers"))
+                    )
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Card -->
+    <div class="card overflow-hidden">
+        <div class="card-header">
+            <h2 class="card-title">Users</h2>
+        </div>
+        <div class="card-body p-0">
+            @(Html.Kendo().Grid<dynamic>()
+                .Name("userGrid")
+                .Columns(columns =>
+                {
+                    columns.Bound("UserId").Title("User ID").Width(100);
+                    columns.Bound("UserName").Title("User Name").Width(200);
+                    columns.Bound("UserRoleName").Title("User Role").Width(150);
+                    columns.Bound("Email").Title("Email").Width(200);
+                    columns.Bound("AccountStatusName").Title("Status").Width(100);
+                    columns.Bound("SectorName").Title("Sector").Width(150);
+                    columns.Bound("LOBName").Title("LOB").Width(150);
+                    columns.Bound("LastLoginDate").Title("Last Login").Width(120).Format("{0:dd/MM/yyyy}");
+                    columns.Command(command => {
+                        command.Custom("Edit").Text("Edit").Click("editUser").HtmlAttributes(new { @class = "btn-sm btn-primary" });
+                    }).Title("Actions").Width(80);
+                })
+                .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PageSizes(true)
+                    .ButtonCount(5)
+                )
+                .Sortable()
+                .Filterable()
+                .NoRecords(noRecords => noRecords.Template(@"
+                    <div class='text-center p-8'>
+                        <p class='text-gray-500'>No users found. Try adjusting your search criteria or create a new user account.</p>
+                    </div>
+                "))
+                .DataSource(dataSource => dataSource
+                    .Custom()
+                    .PageSize(20)
+                    .Schema(schema => schema
+                        .Model(model => {
+                            model.Id("UserId");
+                            model.Field("UserId", typeof(string));
+                            model.Field("UserName", typeof(string));
+                            model.Field("UserRoleName", typeof(string));
+                            model.Field("Email", typeof(string));
+                            model.Field("AccountStatusName", typeof(string));
+                            model.Field("SectorName", typeof(string));
+                            model.Field("LOBName", typeof(string));
+                            model.Field("LastLoginDate", typeof(DateTime));
+                        })
+                    )
+                    .Events(events => events.Error("onGridError"))
+                )
+            )
+        </div>
+    </div>
+</div>
+
+<!-- Skeleton Loading Template (hidden by default) -->
+<script id="skeleton-template" type="text/x-kendo-template">
+    <tr class="skeleton-row">
+        <td><div class="skeleton-cell"></div></td>
+        <td><div class="skeleton-cell"></div></td>
+        <td><div class="skeleton-cell"></div></td>
+        <td><div class="skeleton-cell"></div></td>
+        <td><div class="skeleton-cell"></div></td>
+        <td><div class="skeleton-cell"></div></td>
+        <td><div class="skeleton-cell"></div></td>
+        <td><div class="skeleton-cell"></div></td>
+        <td><div class="skeleton-cell"></div></td>
+    </tr>
+</script>
+
+@section Scripts {
+    <script src="~/js/telerik-notifications.js"></script>
+    <script src="~/js/telerik-skeleton-loading.js"></script>
+    <script src="~/js/user-list-viewmodel.js"></script>
+    <script>
+        $(document).ready(function() {
+            userListViewModel.init();
+        });
+
+        function searchUsers() {
+            userListViewModel.searchUsers();
+        }
+
+        function onSectorChange() {
+            userListViewModel.onSectorChange();
+        }
+
+        function editUser(e) {
+            e.preventDefault();
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            if (dataItem) {
+                window.location.href = '@Url.Action("Update", "User")?id=' + dataItem.UserId;
+            }
+        }
+
+        function onGridError(e) {
+            console.error('Grid error:', e);
+        }
+    </script>
+}

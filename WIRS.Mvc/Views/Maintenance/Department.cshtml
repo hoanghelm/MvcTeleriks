@@ -1,0 +1,238 @@
+@{
+    ViewData["Title"] = "Maintain Departments";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/maintenance/department-maintenance.css" />
+}
+
+<div class="p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-900 mb-2">Maintain Departments</h1>
+        <p class="text-gray-600 text-sm">Manage department records by sector and LOB</p>
+    </div>
+
+    <!-- Filter Selection Card -->
+    <div class="card overflow-hidden mb-6">
+        <div class="card-header">
+            <h2 class="card-title">Filter Selection</h2>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Sector -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Sector <span class="text-red-500">*</span>
+                    </label>
+                    @(Html.Kendo().DropDownList()
+                        .Name("SectorDropDown")
+                        .OptionLabel("--Select--")
+                        .DataTextField("Value")
+                        .DataValueField("Code")
+                        .DataSource(source => source.Read(read => read.Action("GetSectors", "MasterData")))
+                        .HtmlAttributes(new { 
+                            id = "ddlSector"
+                        })
+                        .Events(e => e.Change("onSectorChange"))
+                    )
+                </div>
+
+                <!-- LOB -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        LOB <span class="text-red-500">*</span>
+                    </label>
+                    @(Html.Kendo().DropDownList()
+                        .Name("LOBDropDown")
+                        .OptionLabel("--Select--")
+                        .DataTextField("Value")
+                        .DataValueField("Code")
+                        .HtmlAttributes(new { 
+                            id = "ddlLOB"
+                        })
+                        .Events(e => e.Change("onLOBChange"))
+                    )
+                </div>
+
+                <!-- Department Search -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Department Name
+                    </label>
+                    @(Html.Kendo().TextBox()
+                        .Name("DepartmentSearch")
+                        .Placeholder("Search department...")
+                        .HtmlAttributes(new { 
+                            id = "txtDepartmentSearch"
+                        })
+                    )
+                </div>
+
+                <!-- Search Button -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">&nbsp;</label>
+                    @(Html.Kendo().Button()
+                        .Name("btnSearch")
+                        .Content("<svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'></path></svg>")
+                        .HtmlAttributes(new { @class = "btn-primary w-full" })
+                        .Events(e => e.Click("searchDepartments"))
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department List Panel -->
+    <div id="pnlDepartmentList" class="card overflow-hidden mb-6">
+        <div class="card-header">
+            <div class="flex justify-between items-center">
+                <h2 class="card-title">Department Records</h2>
+                @(Html.Kendo().Button()
+                    .Name("btnNewDepartment")
+                    .Content("New")
+                    .HtmlAttributes(new { @class = "btn-primary" })
+                    .Events(e => e.Click("newDepartmentRecord"))
+                )
+            </div>
+        </div>
+        <div class="card-body">
+            @(Html.Kendo().Grid<dynamic>()
+                .Name("departmentGrid")
+                .Columns(columns =>
+                {
+                    columns.Bound("SbaName").Title("Sector").Width(120);
+                    columns.Bound("SbuName").Title("LOB").Width(120);
+                    columns.Bound("DepartmentCode").Title("Department Code").Width(120);
+                    columns.Bound("DepartmentName").Title("Department Name").Width(200);
+                    columns.Bound("InactiveDate").Title("Inactive Date").Width(120);
+                    columns.Template("<a href='#' onclick='editDepartmentRecord(\"#=CodeType#\", \"#=SbaCode#\", \"#=SbuCode#\", \"#=DepartmentCode#\"); return false;' class='text-blue-600 hover:text-blue-800'>Edit</a>").Title("Actions").Width(80);
+                })
+                .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PageSizes(new int[] { 15, 25, 50 })
+                    .ButtonCount(5))
+                .NoRecords(noRecords => noRecords.Template(@"
+                    <div class='simple-empty-state'>
+                        <p>No department records found. Select filters and click search to view records, or click 'New' to add records.</p>
+                    </div>
+                "))
+                .DataSource(dataSource => dataSource
+                    .Custom()
+                    .PageSize(15)
+                    .Schema(schema => schema
+                        .Model(model => {
+                            model.Id("Uid");
+                            model.Field("SbaCode", typeof(string));
+                            model.Field("SbaName", typeof(string));
+                            model.Field("SbuCode", typeof(string));
+                            model.Field("SbuName", typeof(string));
+                            model.Field("DepartmentCode", typeof(string));
+                            model.Field("DepartmentName", typeof(string));
+                            model.Field("InactiveDate", typeof(string));
+                            model.Field("Uid", typeof(string));
+                            model.Field("CodeType", typeof(string));
+                        })
+                    )
+                )
+            )
+        </div>
+    </div>
+
+    <!-- Department Edit Panel -->
+    <div id="pnlDepartmentUpdate" class="card overflow-hidden" style="display: none;">
+        <div class="card-header">
+            <h2 class="card-title">Department Details</h2>
+        </div>
+        <div class="card-body">
+            <form id="departmentForm" class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Department Code -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Department Code <span class="text-red-500">*</span>
+                        </label>
+                        @(Html.Kendo().TextBox()
+                            .Name("DepartmentCode")
+                            .HtmlAttributes(new { 
+                                id = "txtDepartmentCode", 
+                                @readonly = "readonly",
+                                @class = "bg-gray-100"
+                            })
+                        )
+                        <div id="departmentCodeError" class="validation-error"></div>
+                    </div>
+
+                    <!-- Department Name -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Department Name <span class="text-red-500">*</span>
+                        </label>
+                        @(Html.Kendo().TextBox()
+                            .Name("DepartmentName")
+                            .Placeholder("Enter department name")
+                            .HtmlAttributes(new { 
+                                id = "txtDepartmentName", 
+                                required = "required",
+                                maxlength = "100"
+                            })
+                        )
+                        <div id="departmentNameError" class="validation-error"></div>
+                    </div>
+
+                    <!-- Inactive Date -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Inactive Date
+                        </label>
+                        @(Html.Kendo().DatePicker()
+                            .Name("InactiveDate")
+                            .Format("dd/MM/yyyy")
+                            .HtmlAttributes(new { 
+                                id = "txtInactiveDate"
+                            })
+                        )
+                        <div id="inactiveDateError" class="validation-error"></div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3 pt-6">
+                    @(Html.Kendo().Button()
+                        .Name("btnCancel")
+                        .Content("Cancel")
+                        .HtmlAttributes(new { @class = "btn-cancel" })
+                        .Events(e => e.Click("cancelDepartmentEdit"))
+                    )
+                    @(Html.Kendo().Button()
+                        .Name("btnSave")
+                        .Content("Save")
+                        .HtmlAttributes(new { @class = "btn-primary", id = "btnSaveDepartment" })
+                        .Events(e => e.Click("saveDepartmentRecord"))
+                    )
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Area -->
+<div id="notification"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <p class="text-gray-700">Processing...</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/maintenance/department-maintenance.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize department maintenance view model
+            departmentMaintenanceViewModel.init();
+        });
+    </script>
+}

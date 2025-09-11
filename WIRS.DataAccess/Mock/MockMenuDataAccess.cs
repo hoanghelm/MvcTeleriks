@@ -6,76 +6,15 @@ namespace WIRS.DataAccess.Mock
 {
 	public class MockMenuDataAccess : IMenuDataAccess
 	{
-		private readonly Dictionary<string, List<MenuModel>> _menusByRole;
-
-		public MockMenuDataAccess()
-		{
-			_menusByRole = new Dictionary<string, List<MenuModel>>
-			{
-				["1"] = new List<MenuModel> 
-				{
-					new MenuModel { MenuId = 1, MenuName = "Dashboard", MenuUrl = "/Home", Icon = "k-i-dashboard", Order = 1, HasChildren = false },
-					new MenuModel { MenuId = 2, MenuName = "Incidents", MenuUrl = "#", Icon = "k-i-file-txt", Order = 2, HasChildren = true, 
-						Children = new List<MenuModel>
-						{
-							new MenuModel { MenuId = 21, MenuName = "Create Incident", MenuUrl = "/Incident/Create", Icon = "k-i-plus", Order = 1 },
-							new MenuModel { MenuId = 22, MenuName = "My Incidents", MenuUrl = "/Incident/My", Icon = "k-i-user", Order = 2 },
-							new MenuModel { MenuId = 23, MenuName = "All Incidents", MenuUrl = "/Incident/All", Icon = "k-i-list-unordered", Order = 3 }
-						}
-					},
-					new MenuModel { MenuId = 3, MenuName = "Reports", MenuUrl = "#", Icon = "k-i-chart-line", Order = 3, HasChildren = true,
-						Children = new List<MenuModel>
-						{
-							new MenuModel { MenuId = 31, MenuName = "Incident Reports", MenuUrl = "/Reports/Incidents", Icon = "k-i-chart", Order = 1 },
-							new MenuModel { MenuId = 32, MenuName = "Statistics", MenuUrl = "/Reports/Statistics", Icon = "k-i-chart-pie", Order = 2 }
-						}
-					},
-					new MenuModel { MenuId = 4, MenuName = "Administration", MenuUrl = "#", Icon = "k-i-gear", Order = 4, HasChildren = true,
-						Children = new List<MenuModel>
-						{
-							new MenuModel { MenuId = 41, MenuName = "User Management", MenuUrl = "/Admin/Users", Icon = "k-i-group", Order = 1 },
-							new MenuModel { MenuId = 42, MenuName = "System Settings", MenuUrl = "/Admin/Settings", Icon = "k-i-cog", Order = 2 }
-						}
-					}
-				},
-				["2"] = new List<MenuModel>
-				{
-					new MenuModel { MenuId = 1, MenuName = "Dashboard", MenuUrl = "/Home", Icon = "k-i-dashboard", Order = 1, HasChildren = false },
-					new MenuModel { MenuId = 2, MenuName = "Incidents", MenuUrl = "#", Icon = "k-i-file-txt", Order = 2, HasChildren = true,
-						Children = new List<MenuModel>
-						{
-							new MenuModel { MenuId = 21, MenuName = "Create Incident", MenuUrl = "/Incident/Create", Icon = "k-i-plus", Order = 1 },
-							new MenuModel { MenuId = 22, MenuName = "My Incidents", MenuUrl = "/Incident/My", Icon = "k-i-user", Order = 2 }
-						}
-					}
-				},
-				["3"] = new List<MenuModel>
-				{
-					new MenuModel { MenuId = 1, MenuName = "Dashboard", MenuUrl = "/Home", Icon = "k-i-dashboard", Order = 1, HasChildren = false },
-					new MenuModel { MenuId = 2, MenuName = "Incidents", MenuUrl = "#", Icon = "k-i-file-txt", Order = 2, HasChildren = true,
-						Children = new List<MenuModel>
-						{
-							new MenuModel { MenuId = 21, MenuName = "Create Incident", MenuUrl = "/Incident/Create", Icon = "k-i-plus", Order = 1 },
-							new MenuModel { MenuId = 22, MenuName = "My Incidents", MenuUrl = "/Incident/My", Icon = "k-i-user", Order = 2 },
-							new MenuModel { MenuId = 23, MenuName = "Team Incidents", MenuUrl = "/Incident/Team", Icon = "k-i-group", Order = 3 }
-						}
-					},
-					new MenuModel { MenuId = 3, MenuName = "Reports", MenuUrl = "#", Icon = "k-i-chart-line", Order = 3, HasChildren = true,
-						Children = new List<MenuModel>
-						{
-							new MenuModel { MenuId = 31, MenuName = "Team Reports", MenuUrl = "/Reports/Team", Icon = "k-i-chart", Order = 1 }
-						}
-					}
-				}
-			};
-		}
-
 		public Task<DataSet> GetMainpage(string UserID)
 		{
 			var dataSet = new DataSet();
 			var table = new DataTable("MainPage");
-			table.Columns.Add("page_url", typeof(string));
-			table.Rows.Add("/Home");
+			table.Columns.Add("user_id", typeof(string));
+			table.Columns.Add("welcome_message", typeof(string));
+
+			table.Rows.Add(UserID, "Welcome to WIRS - Workplace Incident Reporting System");
+
 			dataSet.Tables.Add(table);
 			return Task.FromResult(dataSet);
 		}
@@ -87,17 +26,15 @@ namespace WIRS.DataAccess.Mock
 			table.Columns.Add("menu_id", typeof(int));
 			table.Columns.Add("menu_name", typeof(string));
 			table.Columns.Add("menu_url", typeof(string));
-			table.Columns.Add("icon", typeof(string));
 			table.Columns.Add("order_no", typeof(int));
 			table.Columns.Add("has_children", typeof(bool));
 
-			foreach (var menuGroup in _menusByRole.Values)
-			{
-				foreach (var menu in menuGroup)
-				{
-					table.Rows.Add(menu.MenuId, menu.MenuName, menu.MenuUrl, menu.Icon, menu.Order, menu.HasChildren);
-				}
-			}
+			// Mock menu data - same for all users
+			table.Rows.Add(1, "Home", "/Home", 1, false);
+			table.Rows.Add(2, "Incident", "#", 2, true);
+			table.Rows.Add(4, "Maintenance", "#", 4, true);
+			table.Rows.Add(5, "Help", "#", 5, true);
+			table.Rows.Add(8, "Logout", "/Login/Logout", 8, false);
 
 			dataSet.Tables.Add(table);
 			return Task.FromResult(dataSet);
@@ -110,26 +47,29 @@ namespace WIRS.DataAccess.Mock
 			table.Columns.Add("menu_id", typeof(int));
 			table.Columns.Add("menu_name", typeof(string));
 			table.Columns.Add("menu_url", typeof(string));
-			table.Columns.Add("icon", typeof(string));
 			table.Columns.Add("order_no", typeof(int));
 			table.Columns.Add("has_children", typeof(bool));
 			table.Columns.Add("parent_id", typeof(int));
 
-			if (_menusByRole.ContainsKey(role))
-			{
-				foreach (var menu in _menusByRole[role])
-				{
-					table.Rows.Add(menu.MenuId, menu.MenuName, menu.MenuUrl, menu.Icon, menu.Order, menu.HasChildren, 0);
-					
-					if (menu.Children != null)
-					{
-						foreach (var child in menu.Children)
-						{
-							table.Rows.Add(child.MenuId, child.MenuName, child.MenuUrl, child.Icon, child.Order, false, menu.MenuId);
-						}
-					}
-				}
-			}
+			// Mock data - main menus
+			table.Rows.Add(1, "Home", "/Home", 1, false, 0);
+			table.Rows.Add(2, "Incident", "#", 2, true, 0);
+			table.Rows.Add(4, "Maintenance", "#", 4, true, 0);
+			table.Rows.Add(5, "Help", "#", 5, true, 0);
+			table.Rows.Add(8, "Logout", "/Login/Logout", 8, false, 0);
+
+			// Mock data - sub menus
+			table.Rows.Add(21, "Create Incident Report", "/Incident/Create", 1, false, 2);
+			table.Rows.Add(23, "View Incident Report", "/Incident/View", 3, false, 2);
+			
+			table.Rows.Add(41, "Create User", "/User/Create", 1, false, 4);
+			table.Rows.Add(42, "Update User", "/User/Update", 2, false, 4);
+			table.Rows.Add(43, "Maintain Copy To", "/Maintenance/CopyTo", 3, false, 4);
+			table.Rows.Add(45, "Maintain LOB", "/Maintenance/LOB", 5, false, 4);
+			table.Rows.Add(46, "Maintain Locations", "/Maintenance/Locations", 6, false, 4);
+			table.Rows.Add(47, "Maintain Department", "/Maintenance/Department", 7, false, 4);
+			
+			table.Rows.Add(51, "User Guide", "/Help/UserGuide", 1, false, 5);
 
 			dataSet.Tables.Add(table);
 			return Task.FromResult(dataSet);
@@ -137,23 +77,12 @@ namespace WIRS.DataAccess.Mock
 
 		public Task<NpgsqlDataReader> GetSubMenuByRoleAndMenu(string role, decimal menuId)
 		{
-			throw new NotImplementedException("Use GetMenuInfoByRole instead");
+			throw new NotImplementedException("Use GetMenuInfoByRole instead for mock data");
 		}
 
 		public Task<NpgsqlDataReader> GetTopMenuByRole(string role)
 		{
-			throw new NotImplementedException("Use GetMenuInfoByRole instead");
+			throw new NotImplementedException("Use GetMenuInfoByRole instead for mock data");
 		}
-	}
-
-	public class MenuModel
-	{
-		public int MenuId { get; set; }
-		public string MenuName { get; set; }
-		public string MenuUrl { get; set; }
-		public string Icon { get; set; }
-		public int Order { get; set; }
-		public bool HasChildren { get; set; }
-		public List<MenuModel> Children { get; set; }
 	}
 }

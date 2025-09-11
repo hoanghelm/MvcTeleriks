@@ -1,7 +1,7 @@
+using Npgsql;
 using System;
 using System.Data;
-
-using Npgsql;
+using WIRS.DataAccess.Entities;
 using WIRS.DataAccess.Interfaces;
 using WIRS.Shared.Extensions;
 using WIRS.Shared.Helpers;
@@ -17,11 +17,11 @@ namespace WIRS.DataAccess.Implementations
             _dBHelper = dBHelper;
         }
 
-        public async Task<NpgsqlDataReader> GetTopMenuByRole(string role)
+
+		public async Task<NpgsqlDataReader> GetTopMenuByRole(string role)
         {
             NpgsqlDataReader dr = null;
 
-            //string strConnection = ConfigurationManager.AppSettings["Connectionstring"].ToString();            
             NpgsqlConnection con = _dBHelper.GetConnection();
             NpgsqlCommand cmd = new NpgsqlCommand();
             try
@@ -32,8 +32,6 @@ namespace WIRS.DataAccess.Implementations
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@p_user_role_code", role);
                 dr = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
-                //dr = cmd.ExecuteReader();
-                //dr.Close();
             }
             catch (Exception ex)
             {
@@ -42,17 +40,15 @@ namespace WIRS.DataAccess.Implementations
             finally
             {
                 cmd.Dispose();
-                //con.Close();
-                //con.Dispose();
             }
             return dr;
         }
+
 
         public async Task<NpgsqlDataReader> GetSubMenuByRoleAndMenu(string role, decimal menuId)
         {
             NpgsqlDataReader dr = null;
 
-            //string strConnection = ConfigurationManager.AppSettings["Connectionstring"].ToString();
             NpgsqlConnection con = _dBHelper.GetConnection();
             NpgsqlCommand cmd = new NpgsqlCommand();
             try
@@ -65,8 +61,6 @@ namespace WIRS.DataAccess.Implementations
                 cmd.Parameters.AddWithValue("@p_menu_opt_no", Convert.ToString(menuId));
 
                 dr = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
-                //dr = cmd.ExecuteReader();
-                //dr.Close();
             }
             catch (Exception ex)
             {
@@ -75,17 +69,16 @@ namespace WIRS.DataAccess.Implementations
             finally
             {
                 cmd.Dispose();
-                //con.Close();
-                //con.Dispose();
             }
             return dr;
         }
 
-        public async Task<DataSet> GetMenuInfoByRole(string role)
+
+
+		public async Task<DataSet> GetMenuInfoByRole(string role)
         {
             DataSet ds = new DataSet();
 
-            //string strConnection = ConfigurationManager.AppSettings["Connectionstring"].ToString();
 
             NpgsqlConnection con = _dBHelper.GetConnection();
             NpgsqlCommand cmd = new NpgsqlCommand();
@@ -104,8 +97,6 @@ namespace WIRS.DataAccess.Implementations
             }
             catch (Exception ex)
             {
-                //CommonFunction.WriteExceptionLog(ex);
-                //ds = null;
                 throw ex;
             }
             finally
@@ -121,7 +112,6 @@ namespace WIRS.DataAccess.Implementations
         {
             DataSet ds = new DataSet();
 
-            //string strConnection = ConfigurationManager.AppSettings["Connectionstring"].ToString();
 
             NpgsqlConnection con = _dBHelper.GetConnection();
             NpgsqlCommand cmd = new NpgsqlCommand();
@@ -139,8 +129,6 @@ namespace WIRS.DataAccess.Implementations
             }
             catch (Exception ex)
             {
-                //CommonFunction.WriteExceptionLog(ex);
-                //ds = null;
                 throw ex;
             }
             finally
@@ -156,7 +144,6 @@ namespace WIRS.DataAccess.Implementations
         {
             DataSet ds = new DataSet();
 
-            //string strConnection = ConfigurationManager.AppSettings["Connectionstring"].ToString();
 
             NpgsqlConnection con = _dBHelper.GetConnection();
             NpgsqlCommand cmd = new NpgsqlCommand();
@@ -175,8 +162,6 @@ namespace WIRS.DataAccess.Implementations
             }
             catch (Exception ex)
             {
-                //CommonFunction.WriteExceptionLog(ex);
-                //ds = null;
                 throw ex;
             }
             finally
@@ -187,5 +172,6 @@ namespace WIRS.DataAccess.Implementations
             }
             return ds;
         }
+
     }
 }

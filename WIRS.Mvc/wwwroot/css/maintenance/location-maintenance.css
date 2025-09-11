@@ -1,0 +1,172 @@
+/* Location Maintenance Specific Styles */
+
+.simple-empty-state {
+    @apply text-center py-8 text-gray-500;
+}
+
+.simple-empty-state p {
+    @apply text-sm;
+}
+
+/* Telerik Control Sizing to match Tailwind */
+.k-textbox,
+.k-dropdownlist .k-dropdown-wrap,
+.k-button {
+    height: 2.5rem !important; /* h-10 equivalent */
+    border-radius: 0.375rem !important; /* rounded */
+    border: 1px solid #d1d5db !important; /* border-gray-300 */
+    font-size: 0.875rem !important; /* text-sm */
+}
+
+.k-textbox:focus,
+.k-dropdownlist.k-state-focused .k-dropdown-wrap {
+    border-color: #3b82f6 !important; /* border-blue-500 */
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1) !important; /* focus:ring-blue-500 */
+}
+
+.k-button.k-button-md {
+    height: 2.5rem !important;
+    padding: 0.5rem 1rem !important; /* py-2 px-4 */
+    border-radius: 0.375rem !important;
+}
+
+/* Ensure button text alignment */
+.k-button .k-button-text {
+    line-height: 1.5rem !important;
+}
+
+/* Dropdown sizing */
+.k-dropdown {
+    width: 100% !important;
+}
+
+/* Date picker sizing */
+.k-datepicker .k-picker-wrap {
+    height: 2.5rem !important;
+    border-radius: 0.375rem !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.k-datepicker .k-input {
+    height: calc(2.5rem - 2px) !important;
+    line-height: calc(2.5rem - 2px) !important;
+    font-size: 0.875rem !important;
+}
+
+/* Grid styling */
+.k-grid {
+    @apply border-gray-200;
+}
+
+.k-grid-header {
+    @apply bg-gray-50;
+}
+
+.k-grid-header th {
+    @apply text-gray-700 font-medium border-gray-200;
+}
+
+.k-grid tbody tr:hover {
+    @apply bg-gray-50;
+}
+
+/* Edit link styling */
+.k-grid tbody tr td a {
+    @apply text-blue-600 hover:text-blue-800 font-medium;
+}
+
+/* Form validation styling */
+.validation-error {
+    @apply text-red-500 text-xs mt-1 hidden;
+}
+
+.validation-error.show {
+    @apply block;
+}
+
+/* Loading overlay improvements */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.loading-overlay.show {
+    display: flex;
+}
+
+.loading-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Panel transitions */
+#pnlLocationList,
+#pnlLocationUpdate {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Button spacing in card headers */
+.card-header .flex {
+    @apply items-center;
+}
+
+/* Form field spacing */
+.card-body .grid {
+    @apply gap-6;
+}
+
+/* Readonly field styling */
+.k-textbox[readonly] {
+    background-color: #f3f4f6 !important;
+    cursor: not-allowed !important;
+}
+
+/* Filter form styling */
+.grid.grid-cols-1.lg\\:grid-cols-4 {
+    @apply items-end;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .grid-cols-1.lg\\:grid-cols-2 {
+        @apply grid-cols-1;
+    }
+    
+    .grid-cols-1.lg\\:grid-cols-4 {
+        @apply grid-cols-1;
+    }
+}
+
+/* Button full width on small screens */
+@media (max-width: 1024px) {
+    .w-full {
+        @apply w-full;
+    }
+}

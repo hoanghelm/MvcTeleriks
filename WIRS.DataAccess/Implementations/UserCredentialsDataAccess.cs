@@ -439,5 +439,102 @@ namespace WIRS.DataAccess.Implementations
 
             return userRoleName;
         }
+
+        public async Task<DataSet> SearchUsers(string sector, string lob, string userId, string userName, string userRole)
+        {
+            DataSet ds = new DataSet();
+            NpgsqlConnection con = _dBHelper.GetConnection();
+            NpgsqlCommand cmd = new NpgsqlCommand();
+            try
+            {
+                con.Open();
+                cmd.Connection = con;
+                cmd.CommandTimeout = 0;
+                cmd.CommandText = "spc_search_users";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@p_sector", string.IsNullOrEmpty(sector) ? DBNull.Value : sector);
+                cmd.Parameters.AddWithValue("@p_lob", string.IsNullOrEmpty(lob) ? DBNull.Value : lob);
+                cmd.Parameters.AddWithValue("@p_user_id", string.IsNullOrEmpty(userId) ? DBNull.Value : userId);
+                cmd.Parameters.AddWithValue("@p_user_name", string.IsNullOrEmpty(userName) ? DBNull.Value : userName);
+                cmd.Parameters.AddWithValue("@p_user_role", string.IsNullOrEmpty(userRole) ? DBNull.Value : userRole);
+
+                NpgsqlDataAdapter da = new NpgsqlDataAdapter
+                {
+                    SelectCommand = cmd
+                };
+                da.Fill(ds);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                con.Dispose();
+            }
+
+            return ds;
+        }
+
+        public async Task<UserCredentials?> GetUserCredentialsWithAccess(string userId)
+        {
+            UserCredentials? userCredentials = null;
+            NpgsqlConnection con = _dBHelper.GetConnection();
+            NpgsqlCommand cmd = new NpgsqlCommand();
+            try
+            {
+                con.Open();
+                cmd.Connection = con;
+                cmd.CommandTimeout = 0;
+                cmd.CommandText = "spc_get_user_with_access";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@p_user_id", userId);
+
+                NpgsqlDataAdapter da = new NpgsqlDataAdapter
+                {
+                    SelectCommand = cmd
+                };
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+
+                if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                {
+                    var row = ds.Tables[0].Rows[0];
+                    userCredentials = new UserCredentials
+                    {
+                        UserId = row["userid"]?.ToString() ?? string.Empty,
+                        UserName = row["username"]?.ToString() ?? string.Empty,
+                        Email = row["email"]?.ToString() ?? string.Empty,
+                        UserRole = row["userrole"]?.ToString() ?? string.Empty,
+                        AccountStatus = row["accountstatus"]?.ToString() ?? string.Empty,
+                        InactiveDate = row["inactivedate"]?.ToString() ?? string.Empty,
+                        Creator = row["creator"]?.ToString() ?? string.Empty,
+                        Modifiedby = row["modifier"]?.ToString() ?? string.Empty,
+                        CreationDate = row["creationdate"] != DBNull.Value ? Convert.ToDateTime(row["creationdate"]) : null,
+                        LastModifyDate = row["modificationdate"] != DBNull.Value ? Convert.ToDateTime(row["modificationdate"]) : null
+                    };
+
+                    // Get user access data if available
+                    if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
+                    {
+                        userCredentials.UserAccess = ds.Tables[1];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                cmd.Dispose();
+                con.Close();
+                con.Dispose();
+            }
+
+            return userCredentials;
+        }
     }
 }

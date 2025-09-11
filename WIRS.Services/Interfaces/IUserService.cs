@@ -12,6 +12,15 @@ namespace WIRS.Services.Interfaces
         Task<UserModel?> GetUserById(string userId);
         Task<UserModel?> GetUserByEIP(string eipId);
         Task<bool> CheckUserExists(string userId);
-        Task<IncidentDataModel> GetIncidentDataAsync(string userId, string userRole);
+        Task<UserCreationModel?> ValidateUserExists(string userId);
+        Task<string> CreateUser(UserCreationRequest request, string creatorId);
+        Task<EmployeeSearchResult> SearchEmployees(string empId, string empName, int pageNo = 1, int pageSize = 10);
+        
+        // User management methods
+        Task<UserListResult> SearchUsers(string sector, string lob, string userId, string userName, string userRole);
+        Task<UserDetailsModel?> GetUserDetails(string userId);
+        Task<string> UpdateUser(UserUpdateRequest request, string modifierUserId);
+        Task<string> InactiveUser(string userId, string modifierUserId);
+        Task<string> ResetPassword(string userId, string modifierUserId);
     }
 }

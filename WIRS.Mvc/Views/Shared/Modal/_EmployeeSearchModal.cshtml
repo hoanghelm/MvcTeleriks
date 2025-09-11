@@ -1,0 +1,100 @@
+@model WIRS.Mvc.ViewModels.EmployeeSearchViewModel
+
+@{
+    var modalId = Model?.ModalId ?? "employeeSearchModal";
+    var gridId = Model?.GridId ?? "employeeSearchGrid";
+    var onSelectCallback = Model?.OnSelectCallback ?? "onEmployeeSelected";
+}
+
+<!-- Employee Search Modal -->
+@(Html.Kendo().Window()
+    .Name(modalId)
+    .Title("Search Employee")
+    .Modal(true)
+    .Width(800)
+    .Height(650)
+    .Resizable(r => r.Enabled(false))
+    .Visible(false)
+    .Actions(actions => actions.Close())
+    .Events(e => e.Close("onEmployeeSearchModalClose"))
+    .Content(@<text>
+        <div class="simple-search-container">
+            <!-- Simple Search Form -->
+            <div class="search-form">
+                <div class="search-fields">
+                    <div class="field-group">
+                        <label>Employee ID</label>
+                        @(Html.Kendo().TextBox()
+                            .Name("filterEmployeeId")
+                            .Placeholder("Enter Employee ID")
+                            .HtmlAttributes(new { @class = "search-input" })
+                        )
+                    </div>
+                    <div class="field-group">
+                        <label>Employee Name</label>
+                        @(Html.Kendo().TextBox()
+                            .Name("filterEmployeeName")
+                            .Placeholder("Enter Employee Name")
+                            .HtmlAttributes(new { @class = "search-input" })
+                        )
+                    </div>
+                    <div class="search-button">
+                        @(Html.Kendo().Button()
+                            .Name("btnSearch")
+                            .Content("Search")
+                            .HtmlAttributes(new { @class = "btn-primary" })
+                            .Events(e => e.Click("performAdvancedSearch"))
+                        )
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Grid -->
+            <div class="results-section">
+                @(Html.Kendo().Grid<dynamic>()
+                    .Name(gridId)
+                    .Columns(columns =>
+                    {
+                        columns.Bound("EmployeeId").Title("Employee ID").Width(120);
+                        columns.Bound("EmployeeName").Title("Employee Name").Width(200);
+                        columns.Bound("Email").Title("Email").Width(200);
+                        columns.Bound("Designation").Title("Position").Width(150);
+                    })
+                    .Selectable(sel => sel.Mode(GridSelectionMode.Single).Type(GridSelectionType.Row))
+                    .Sortable()
+                    .Pageable(pageable => pageable.PageSizes(new[] { 10, 25, 50 }))
+                    .Height(300)
+                    .DataSource(dataSource => dataSource
+                        .Custom()
+                        .PageSize(10)
+                        .Schema(schema => schema
+                            .Model(model => {
+                                model.Id("EmployeeId");
+                                model.Field("EmployeeId", typeof(string));
+                                model.Field("EmployeeName", typeof(string));
+                                model.Field("Email", typeof(string));
+                                model.Field("Designation", typeof(string));
+                            })
+                        )
+                    )
+                    .NoRecords(noRecords => noRecords.Template(@"
+                        <div class='simple-empty-state'>
+                            <p>No employees found. Please search to see results.</p>
+                        </div>
+                    "))
+                    .Events(e => e.Change("onEmployeeGridSelectionChange"))
+                )
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-actions">
+                @(Html.Kendo().Button()
+                    .Name("btnSelectEmployee")
+                    .Content("Select Employee")
+                    .HtmlAttributes(new { @class = "btn-primary", disabled = "disabled" })
+                    .Events(e => e.Click(onSelectCallback))
+                )
+            </div>
+        </div>
+    </text>)
+)

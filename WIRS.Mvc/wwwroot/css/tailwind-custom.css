@@ -48,6 +48,362 @@
     animation: shimmer 2s infinite;
 }
 
+/* Global Telerik Button Styling - Exclude pagination buttons */
+.k-button.btn-primary {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: white !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.k-button.btn-primary:hover {
+    background-color: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.k-button.btn-primary:focus {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px !important;
+}
+
+.k-button.btn-secondary {
+    background-color: #6b7280 !important;
+    border-color: #6b7280 !important;
+    color: white !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.k-button.btn-secondary:hover {
+    background-color: #374151 !important;
+    border-color: #374151 !important;
+}
+
+.k-button.btn-cancel {
+    background-color: #d1d5db !important;
+    border-color: #d1d5db !important;
+    color: #374151 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.k-button.btn-cancel:hover {
+    background-color: #9ca3af !important;
+    border-color: #9ca3af !important;
+}
+
+/* Reset pagination buttons to default size */
+.k-grid .k-pager .k-button {
+    padding: 0.125rem 0.375rem !important;
+    font-size: 0.75rem !important;
+    min-height: 1.5rem !important;
+    height: 1.5rem !important;
+    line-height: 1.2 !important;
+    border-radius: 0.25rem !important;
+}
+
+.k-grid .k-pager .k-dropdownlist {
+    font-size: 0.75rem !important;
+    min-height: 1.5rem !important;
+    height: 1.5rem !important;
+}
+
+.k-grid .k-pager .k-dropdownlist .k-dropdown-wrap {
+    height: 1.5rem !important;
+    min-height: 1.5rem !important;
+}
+
+.k-grid .k-pager .k-dropdownlist .k-input {
+    height: 1.5rem !important;
+    line-height: 1.5rem !important;
+    padding: 0 0.25rem !important;
+    font-size: 0.75rem !important;
+}
+
+.k-grid .k-pager .k-textbox {
+    font-size: 0.75rem !important;
+    padding: 0.125rem 0.375rem !important;
+    min-height: 1.5rem !important;
+    height: 1.5rem !important;
+    line-height: 1.2 !important;
+}
+
+/* Inline Grid Editor Controls - Higher specificity to override user-create.css */
+.k-grid tbody .k-edit-cell .k-dropdownlist .k-dropdown-wrap,
+.k-grid tbody .k-edit-cell .k-textbox,
+#userAccessGrid tbody .k-edit-cell .k-dropdownlist .k-dropdown-wrap,
+#userAccessGrid tbody .k-edit-cell .k-textbox {
+    height: 1.75rem !important; /* 28px - smaller than regular 2.5rem controls */
+    min-height: 1.75rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.25rem !important;
+}
+
+.k-grid tbody .k-edit-cell .k-dropdownlist .k-input,
+#userAccessGrid tbody .k-edit-cell .k-dropdownlist .k-input {
+    height: calc(1.75rem - 2px) !important;
+    line-height: calc(1.75rem - 2px) !important;
+    padding: 0 0.5rem !important;
+    font-size: 0.75rem !important;
+}
+
+.k-grid tbody .k-edit-cell .k-textbox,
+#userAccessGrid tbody .k-edit-cell .k-textbox {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.2 !important;
+}
+
+/* Extra specific for User Access Grid to ensure override */
+#userAccessGrid tbody td.k-edit-cell .k-dropdownlist .k-dropdown-wrap {
+    height: 1.75rem !important;
+    border: 1px solid #d1d5db !important;
+}
+
+#userAccessGrid tbody td.k-edit-cell .k-dropdownlist .k-input {
+    height: calc(1.75rem - 2px) !important;
+    line-height: calc(1.75rem - 2px) !important;
+    padding: 0 0.5rem !important;
+}
+
+#userAccessGrid tbody td.k-edit-cell .k-textbox {
+    height: 1.75rem !important;
+    padding: 0.25rem 0.5rem !important;
+}
+
+/* Global Kendo Notification Styling */
+.k-notification {
+    min-width: 320px !important;
+    max-width: 500px !important;
+    padding: 1rem 1.25rem !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e5e7eb !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+}
+
+.k-notification .k-notification-content {
+    padding: 0 !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    font-weight: 500 !important;
+}
+
+.k-notification.k-notification-info {
+    background-color: #eff6ff !important;
+    border-color: #3b82f6 !important;
+    color: #1e40af !important;
+}
+
+.k-notification.k-notification-success {
+    background-color: #f0f9ff !important;
+    border-color: #10b981 !important;
+    color: #065f46 !important;
+}
+
+.k-notification.k-notification-error {
+    background-color: #fef2f2 !important;
+    border-color: #ef4444 !important;
+    color: #991b1b !important;
+}
+
+.k-notification.k-notification-warning {
+    background-color: #fffbeb !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+    border-color: #9ca3af !important;
+}
+
+/* ===== REUSABLE COMPONENT CLASSES ===== */
+
+/* Card Components */
+.card {
+    background-color: white;
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+    border: 1px solid #e5e7eb; /* border-gray-200 */
+}
+
+.card-header {
+    background-color: #f9fafb; /* bg-gray-50 */
+    padding: 1.5rem; /* px-6 py-4 */
+    border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.card-body {
+    padding: 1.5rem; /* p-6 */
+}
+
+.card-title {
+    font-size: 1.125rem; /* text-lg */
+    font-weight: 600; /* font-semibold */
+    color: #111827; /* text-gray-900 */
+}
+
+/* Input Components */
+.input-base {
+    padding: 0.5rem 1rem; /* px-4 py-2 */
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.5rem; /* rounded-lg */
+    transition: all 0.2s ease-in-out;
+    background-color: white;
+    font-size: 0.875rem; /* text-sm */
+}
+
+.input-base:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); /* focus:ring-2 focus:ring-blue-500 */
+    border-color: #3b82f6; /* focus:border-blue-500 */
+}
+
+.search-input {
+    @apply input-base;
+}
+
+/* Status Badge Components */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem; /* px-3 py-1 */
+    border-radius: 9999px; /* rounded-full */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500; /* font-medium */
+}
+
+.badge-success {
+    @apply badge;
+    background-color: #dcfce7; /* bg-green-100 */
+    color: #166534; /* text-green-800 */
+}
+
+.badge-warning {
+    @apply badge;
+    background-color: #fef3c7; /* bg-yellow-100 */
+    color: #92400e; /* text-yellow-800 */
+}
+
+.badge-info {
+    @apply badge;
+    background-color: #dbeafe; /* bg-blue-100 */
+    color: #1e40af; /* text-blue-800 */
+}
+
+.badge-purple {
+    @apply badge;
+    background-color: #e9d5ff; /* bg-purple-100 */
+    color: #6b21a8; /* text-purple-800 */
+}
+
+.badge-gray {
+    @apply badge;
+    background-color: #f3f4f6; /* bg-gray-100 */
+    color: #374151; /* text-gray-800 */
+}
+
+/* Loading Components */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.loading-content {
+    @apply card;
+    padding: 2rem;
+    text-align: center;
+    margin: 1rem;
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+/* Icon Container */
+.icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* shadow-md */
+}
+
+.icon-container-sm {
+    @apply icon-container;
+    width: 2rem; /* w-8 */
+    height: 2rem; /* h-8 */
+}
+
+.icon-container-md {
+    @apply icon-container;
+    width: 2.5rem; /* w-10 */
+    height: 2.5rem; /* h-10 */
+}
+
+.icon-container-lg {
+    @apply icon-container;
+    width: 3.5rem; /* w-14 */
+    height: 3.5rem; /* h-14 */
+}
+
+/* Primary Theme Icons */
+.icon-primary {
+    background: linear-gradient(135deg, #3b82f6, #9333ea); /* from-blue-500 to-purple-600 */
+    color: white;
+}
+
+.icon-warning {
+    background: linear-gradient(135deg, #eab308, #ea580c); /* from-yellow-500 to-orange-600 */
+    color: white;
+}
+
+.icon-success {
+    background: linear-gradient(135deg, #059669, #047857); /* from-emerald-600 to-emerald-700 */
+    color: white;
+}
+
+/* Form Validation */
+.validation-error {
+    color: #dc2626; /* text-red-600 */
+    font-size: 0.875rem; /* text-sm */
+    margin-top: 0.25rem;
+}
+
+/* Button spacing utilities */
+.btn-group {
+    display: flex;
+    gap: 0.75rem; /* space-x-3 */
+}
+
+.btn-group-end {
+    @apply btn-group;
+    justify-content: flex-end;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .dashboard-card {
@@ -56,5 +412,22 @@
     
     .dashboard-card:hover {
         transform: none !important;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .loading-content {
+        margin: 1rem;
+        padding: 1.5rem;
     }
 }

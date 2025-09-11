@@ -1,0 +1,69 @@
+/* User List Page Styles */
+
+/* Grid enhancements */
+.k-grid-header .k-header {
+    @apply bg-gray-50 border-gray-200 font-medium text-gray-700;
+}
+
+.k-grid tbody tr:hover {
+    @apply bg-blue-50;
+}
+
+.k-grid .k-command-cell .btn-sm {
+    @apply px-3 py-1 text-xs;
+}
+
+/* Search form styles */
+#searchForm {
+    @apply items-end;
+}
+
+#searchForm .k-widget {
+    @apply w-full;
+}
+
+/* Skeleton Loading */
+.skeleton-row {
+    @apply animate-pulse;
+}
+
+.skeleton-cell {
+    @apply bg-gray-200 rounded h-4 mb-2;
+    width: 80%;
+}
+
+.skeleton-cell:nth-child(odd) {
+    width: 60%;
+}
+
+.skeleton-cell:nth-child(even) {
+    width: 90%;
+}
+
+/* Status badges */
+.status-active {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800;
+}
+
+.status-inactive {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800;
+}
+
+.status-pending {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #searchForm {
+        @apply grid-cols-1;
+    }
+    
+    .k-grid {
+        @apply text-sm;
+    }
+    
+    .card-header {
+        @apply flex-col items-start space-y-2;
+    }
+}

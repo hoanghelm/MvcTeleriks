@@ -1,0 +1,270 @@
+@model WIRS.Services.Models.UserDetailsModel
+@{
+    ViewData["Title"] = "Update User";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/telerik-controls-standardized.css" />
+    <link rel="stylesheet" href="~/css/user/user-update.css" />
+}
+
+<div class="p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900 mb-2">Update User Account</h1>
+            <p class="text-gray-600 text-sm">Fields marked with <span class="text-red-500 font-semibold">*</span> are required</p>
+        </div>
+        <div>
+            @(Html.Kendo().Button()
+                .Name("btnBackToList")
+                .Content("<i class='k-icon k-i-arrow-left'></i> Back to List")
+                .HtmlAttributes(new { @class = "btn-cancel" })
+                .Events(e => e.Click("function() { window.location.href = '" + @Url.Action("Index", "User") + "'; }"))
+            )
+        </div>
+    </div>
+
+    <form id="updateUserForm" class="space-y-6">
+        <input type="hidden" id="hiddenUserId" value="@Model.UserId" />
+        
+        <!-- Basic Information Card -->
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h2 class="card-title">Basic Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- User ID (Read-only) -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">User ID</label>
+                        @(Html.Kendo().TextBox()
+                            .Name("UserId")
+                            .Value(Model.UserId)
+                            .HtmlAttributes(new { 
+                                id = "txtUserId", 
+                                @readonly = "readonly",
+                                @class = "bg-gray-50"
+                            })
+                        )
+                    </div>
+
+                    <!-- User Name (Read-only) -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">User Name</label>
+                        @(Html.Kendo().TextBox()
+                            .Name("UserName")
+                            .Value(Model.UserName)
+                            .HtmlAttributes(new { 
+                                id = "txtUserName", 
+                                @readonly = "readonly",
+                                @class = "bg-gray-50"
+                            })
+                        )
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Email Address <span class="text-red-500">*</span>
+                        </label>
+                        @(Html.Kendo().TextBox()
+                            .Name("Email")
+                            .Value(Model.Email)
+                            .HtmlAttributes(new { 
+                                id = "txtEmail", 
+                                required = "required", 
+                                type = "email",
+                                pattern = @"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
+                                title = "Please enter a valid email address"
+                            })
+                        )
+                        <div id="emailError" class="validation-error"></div>
+                    </div>
+
+                    <!-- User Role -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            User Role <span class="text-red-500">*</span>
+                        </label>
+                        @(Html.Kendo().DropDownList()
+                            .Name("UserRole")
+                            .Value(Model.UserRole)
+                            .OptionLabel("Select User Role")
+                            .DataTextField("Value")
+                            .DataValueField("Code")
+                            .DataSource(source => source.Read(read => read.Action("GetUserRoles", "MasterData")))
+                            .HtmlAttributes(new { 
+                                id = "ddlUserRole", 
+                                required = "required" 
+                            })
+                        )
+                        <div id="userRoleError" class="validation-error"></div>
+                    </div>
+
+                    <!-- Account Status -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Account Status</label>
+                        @(Html.Kendo().DropDownList()
+                            .Name("AccountStatus")
+                            .Value(Model.AccountStatus)
+                            .DataTextField("Value")
+                            .DataValueField("Code")
+                            .DataSource(source => source.Read(read => read.Action("GetAccountStatuses", "MasterData")))
+                            .HtmlAttributes(new { id = "ddlAccountStatus" })
+                        )
+                    </div>
+
+                    <!-- Inactive Date -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Inactive Date</label>
+                        @(Html.Kendo().DatePicker()
+                            .Name("InactiveDate")
+                            .Value(Model.InactiveDate)
+                            .HtmlAttributes(new { 
+                                id = "dtpInactiveDate",
+                                @class = "w-full"
+                            })
+                            .Format("dd/MM/yyyy")
+                        )
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Access Management Card -->
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <div class="flex justify-between items-center">
+                    <h2 class="card-title">User Access Management</h2>
+                    @(Html.Kendo().Button()
+                        .Name("btnAddAccess")
+                        .Content("Add Access")
+                        .HtmlAttributes(new { @class = "btn-primary btn-sm" })
+                        .Events(e => e.Click("addNewAccess"))
+                    )
+                </div>
+            </div>
+            <div class="card-body">
+                @(Html.Kendo().Grid<dynamic>()
+                    .Name("userAccessGrid")
+                    .Columns(columns =>
+                    {
+                        columns.Bound("UserRoleName").Title("User Role").Width(150).EditorTemplateName("~/Views/Shared/Dropdown/UserRoleDropDown.cshtml");
+                        columns.Bound("SectorValue").Title("Sector").Width(150).EditorTemplateName("~/Views/Shared/Dropdown/SectorDropDown.cshtml");
+                        columns.Bound("LOBValue").Title("LOB").Width(150).EditorTemplateName("~/Views/Shared/Dropdown/LOBDropDown.cshtml");
+                        columns.Bound("DepartmentValue").Title("Department").Width(150).EditorTemplateName("~/Views/Shared/Dropdown/DepartmentDropDown.cshtml");
+                        columns.Bound("LocationValue").Title("Location").Width(120).EditorTemplateName("~/Views/Shared/Dropdown/LocationDropDown.cshtml");
+                        columns.Command(command => {
+                            command.Edit();
+                            command.Destroy();
+                        }).Title("Actions").Width(120);
+                    })
+                    .Editable(editable => editable.Mode(GridEditMode.InLine))
+                    .NoRecords(noRecords => noRecords.Template(@"
+                        <div class='text-center p-8'>
+                            <p class='text-gray-500'>No user access defined. Click 'Add Access' button above to add user permissions.</p>
+                        </div>
+                    "))
+                    .DataSource(dataSource => dataSource
+                        .Custom()
+                        .Schema(schema => schema
+                            .Model(model => {
+                                model.Id("Id");
+                                model.Field("Id", typeof(int)).Editable(false);
+                                model.Field("UserRoleCode", typeof(string));
+                                model.Field("UserRoleName", typeof(string));
+                                model.Field("SectorCode", typeof(string));
+                                model.Field("SectorValue", typeof(string));
+                                model.Field("LOBCode", typeof(string));
+                                model.Field("LOBValue", typeof(string));
+                                model.Field("DepartmentCode", typeof(string));
+                                model.Field("DepartmentValue", typeof(string));
+                                model.Field("LocationCode", typeof(string));
+                                model.Field("LocationValue", typeof(string));
+                            })
+                        )
+                        .Events(events => events.Error("onGridError"))
+                    )
+                )
+                <div id="accessError" class="validation-error mt-3"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-between pt-6">
+            <div class="flex space-x-3">
+                @(Html.Kendo().Button()
+                    .Name("btnResetPassword")
+                    .Content("Reset Password")
+                    .HtmlAttributes(new { @class = "btn-warning" })
+                    .Events(e => e.Click("resetPassword"))
+                )
+                @(Html.Kendo().Button()
+                    .Name("btnInactive")
+                    .Content("Inactive User")
+                    .HtmlAttributes(new { @class = "btn-danger" })
+                    .Events(e => e.Click("inactiveUser"))
+                )
+            </div>
+            <div class="flex space-x-3">
+                @(Html.Kendo().Button()
+                    .Name("btnCancel")
+                    .Content("Cancel")
+                    .HtmlAttributes(new { @class = "btn-cancel" })
+                    .Events(e => e.Click("cancelForm"))
+                )
+                @(Html.Kendo().Button()
+                    .Name("btnUpdateUser")
+                    .Content("Update User")
+                    .HtmlAttributes(new { @class = "btn-primary" })
+                    .Events(e => e.Click("updateUser"))
+                )
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Loading indicator for form operations -->
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-content">
+        <div class="k-loader k-loader-lg"></div>
+        <p class="text-gray-700 mt-4">Processing...</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/telerik-notifications.js"></script>
+    <script src="~/js/telerik-skeleton-loading.js"></script>
+    <script src="~/js/user-update-viewmodel.js"></script>
+    <script>
+        $(document).ready(function() {
+            var userAccess = @Html.Raw(Json.Serialize(Model.UserAccess));
+            userUpdateViewModel.init(userAccess);
+        });
+
+        function addNewAccess() {
+            userUpdateViewModel.addNewAccess();
+        }
+
+        function updateUser() {
+            userUpdateViewModel.updateUser();
+        }
+
+        function resetPassword() {
+            userUpdateViewModel.resetPassword();
+        }
+
+        function inactiveUser() {
+            userUpdateViewModel.inactiveUser();
+        }
+
+        function cancelForm() {
+            userUpdateViewModel.cancelForm();
+        }
+
+        function onGridError(e) {
+            console.error('Grid error:', e);
+        }
+    </script>
+}

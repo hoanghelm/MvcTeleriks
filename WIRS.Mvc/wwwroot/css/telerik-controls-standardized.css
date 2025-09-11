@@ -1,0 +1,240 @@
+/* Standardized Telerik Control Styles - Apply to all pages */
+
+/* Core Control Sizing - Match button dimensions */
+.k-textbox,
+.k-dropdownlist .k-dropdown-wrap,
+.k-button {
+    height: 2.5rem !important; /* h-10 equivalent */
+    border-radius: 0.375rem !important; /* rounded */
+    border: 1px solid #d1d5db !important; /* border-gray-300 */
+    font-size: 0.875rem !important; /* text-sm */
+}
+
+/* Remove dropdown arrow icons and borders as requested */
+.k-dropdownlist .k-select {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.k-dropdownlist .k-select .k-icon {
+    display: none !important; /* Hide dropdown arrow */
+}
+
+/* Focus states */
+.k-textbox:focus,
+.k-dropdownlist.k-state-focused .k-dropdown-wrap {
+    border-color: #3b82f6 !important; /* border-blue-500 */
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1) !important; /* focus:ring-blue-500 */
+    outline: none !important;
+}
+
+/* Button sizing standardization */
+.k-button.k-button-md {
+    height: 2.5rem !important;
+    padding: 0.5rem 1rem !important; /* py-2 px-4 */
+    border-radius: 0.375rem !important;
+}
+
+/* Ensure button text alignment */
+.k-button .k-button-text {
+    line-height: 1.5rem !important;
+    font-size: 0.875rem !important; /* Keep font-size same as controls */
+}
+
+/* Date picker sizing */
+.k-datepicker .k-picker-wrap {
+    height: 2.5rem !important;
+    border-radius: 0.375rem !important;
+    border: 1px solid #d1d5db !important;
+    font-size: 0.875rem !important;
+}
+
+/* Grid controls sizing */
+.k-grid td .k-textbox,
+.k-grid td .k-dropdownlist .k-dropdown-wrap {
+    height: 2.25rem !important; /* Slightly smaller for grid cells */
+    font-size: 0.75rem !important; /* text-xs for grid */
+}
+
+/* Remove unnecessary borders from grid dropdowns */
+.k-grid td .k-dropdownlist .k-select {
+    border: none !important;
+    background: transparent !important;
+}
+
+.k-grid td .k-dropdownlist .k-select .k-icon {
+    display: none !important;
+}
+
+/* Telerik Skeleton Loading Styles */
+.skeleton-row {
+    animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.skeleton-cell {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: skeleton-shimmer 2s infinite !important;
+    border-radius: 0.25rem !important;
+    height: 1rem !important;
+    margin: 0.5rem 0 !important;
+    display: block !important;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton-cell:nth-child(odd) {
+    width: 60% !important;
+}
+
+.skeleton-cell:nth-child(even) {
+    width: 85% !important;
+}
+
+/* Dropdown loading state */
+.k-dropdown.k-loading .k-dropdown-wrap {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: skeleton-shimmer 2s infinite !important;
+}
+
+/* Textbox loading state */
+.k-textbox.k-loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: skeleton-shimmer 2s infinite !important;
+    color: transparent !important;
+}
+
+/* Telerik Notification Customization */
+.k-notification-success {
+    background-color: #10b981 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.k-notification-error {
+    background-color: #ef4444 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.k-notification-warning {
+    background-color: #f59e0b !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.k-notification-info {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.k-notification .k-icon {
+    margin-right: 0.5rem !important;
+}
+
+/* Loading overlay with Telerik loader */
+.loading-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10000 !important;
+}
+
+.loading-content {
+    background: white !important;
+    padding: 2rem !important;
+    border-radius: 0.5rem !important;
+    text-align: center !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Telerik loader styling */
+.k-loader {
+    margin: 0 auto !important;
+}
+
+/* Grid action button standardization */
+.k-grid .k-command-cell .k-button {
+    height: 2rem !important;
+    min-width: 32px !important;
+    width: 32px !important;
+    padding: 0.25rem !important;
+    margin: 0 2px !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Grid empty state styling */
+.k-grid .k-grid-norecords td {
+    text-align: center !important;
+    padding: 2rem !important;
+    color: #6b7280 !important;
+    font-size: 0.875rem !important;
+}
+
+/* Search input improvements */
+.search-input.k-textbox {
+    background-color: white !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.search-input.k-textbox:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1) !important;
+    background-color: white !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .k-textbox,
+    .k-dropdownlist .k-dropdown-wrap,
+    .k-button {
+        height: 2.75rem !important; /* Slightly larger on mobile */
+        font-size: 1rem !important;
+    }
+    
+    .loading-content {
+        margin: 1rem !important;
+        padding: 1.5rem !important;
+    }
+}

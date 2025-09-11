@@ -2,27 +2,41 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper *, Kendo.Mvc
 @using Kendo.Mvc.UI
+
 @{
     ViewData["Title"] = "Home - WIRS Dashboard";
 }
 
 <div class="p-6 max-w-7xl mx-auto">
-    <!-- Page Header -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">WIRS Dashboard</h1>
-        <p class="text-gray-600">Manage your incident reports and track system status</p>
-    </div>
-
-    <!-- Dashboard Cards -->
+    <!-- Dashboard Cards (unchanged) -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- All Incidents Card -->
-        <div class="dashboard-card group bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-200 transform hover:-translate-y-1" 
-             id="incidentCard" data-filter="all" onclick="selectCard(this, 'all')">
+        <div class="dashboard-card group card hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-yellow-200 transform hover:-translate-y-1"
+             id="pendingCard" data-filter="pending">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" stroke="currentColor" fill="none" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">Pending Reports</h3>
+                            <p class="text-gray-600">Requiring attention or approval</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="pending-count inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card group card hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-200 transform hover:-translate-y-1"
+             id="incidentCard" data-filter="all">
             <div class="p-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <i class="k-icon k-i-file-txt text-white text-2xl"></i>
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" stroke="currentColor" fill="none" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
                         </div>
                         <div>
                             <h3 class="text-xl font-bold text-gray-900 mb-1">All Incident Reports</h3>
@@ -35,60 +49,36 @@
                 </div>
             </div>
         </div>
-
-        <!-- Pending Reports Card -->
-        <div class="dashboard-card group bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-yellow-200 transform hover:-translate-y-1" 
-             id="pendingCard" data-filter="pending" onclick="selectCard(this, 'pending')">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <i class="k-icon k-i-clock text-white text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-1">Pending Reports</h3>
-                            <p class="text-gray-600">Reports awaiting action</p>
-                        </div>
-                    </div>
-                    <div class="flex flex-col items-end">
-                        <span class="pending-count inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Incidents Grid Section -->
-    <div class="bg-white rounded-xl shadow-lg p-6" id="incidentsList">
-        <!-- Grid Header -->
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 gap-4">
-            <div>
-                <h2 id="listTitle" class="text-2xl font-bold text-gray-900 mb-1">All Incident Reports</h2>
-                <p class="text-gray-600">Manage and track your incident reports</p>
-            </div>
-            
-            <!-- Search Section -->
-            <div class="flex items-center space-x-2">
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="k-icon k-i-search text-gray-400"></i>
-                    </div>
-                    <input type="text" 
-                           id="incidentSearchInput" 
-                           placeholder="Search by ID, description, or creator..." 
-                           class="pl-10 pr-4 py-2 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" />
+    <!-- Main Content Area -->
+    <div class="card overflow-hidden">
+        <div class="card-header">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 class="card-title text-xl" id="listTitle">Pending Reports</h2>
+                <div class="flex items-center space-x-3">
+                    <input type="text"
+                           id="incidentSearchInput"
+                           placeholder="Search incidents..."
+                           class="input-base" />
+                    <button type="button"
+                            id="clearSearchBtn"
+                            class="k-button btn-cancel">
+                        <svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" stroke="currentColor" fill="none" d="M6 18 18 6M6 6l12 12" /></svg>
+                        Clear
+                    </button>
+                    <button type="button"
+                            id="refreshDataBtn"
+                            class="k-button btn-cancel">
+                        <svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" stroke="currentColor" fill="none" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                        Refresh
+                    </button>
                 </div>
-                <button type="button" 
-                        id="clearSearchBtn" 
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                    <i class="k-icon k-i-x mr-1"></i>
-                    Clear
-                </button>
             </div>
         </div>
 
         <!-- Loading Skeleton -->
-        <div class="space-y-4 mb-6" id="incidentSkeleton">
+        <div class="space-y-4 mb-6 p-6" id="incidentSkeleton">
             <div class="animate-pulse">
                 <div class="h-12 bg-gray-200 rounded-lg mb-3"></div>
                 <div class="space-y-3">
@@ -101,65 +91,99 @@
             </div>
         </div>
 
-        <!-- Grid Container -->
-        <div class="overflow-hidden rounded-lg border border-gray-200">
+        <!-- Kendo Grid -->
+        <div class="overflow-hidden">
             @(Html.Kendo().Grid<WIRS.Services.Models.IncidentModel>()
-                    .Name("incidentGrid")
-                    .Columns(columns =>
-                    {
-                        columns.Template("<a href='javascript:void(0)' onclick='viewIncident(\"#=incident_id#\")' class='incident-link'>#=incident_id#</a>")
-                        .Title("Incident ID").Width(120);
-                        columns.Bound(p => p.IncidentDateTime).Title("Date-Time").Format("{0:dd/MM/yyyy HH:mm}").Width(150);
-                        columns.Bound(p => p.SbuName).Title("LOB").Width(120);
-                        columns.Bound(p => p.DepartmentName).Title("Department").Width(150);
-                        columns.Bound(p => p.IncidentDesc).Title("Incident Type").Width(200);
-                        columns.Bound(p => p.CreatorName).Title("Submitted By").Width(150);
-                        columns.Bound(p => p.SubmittedOn).Title("Submitted On").Format("{0:dd/MM/yyyy}").Width(120);
-                        columns.Bound(p => p.StatusDesc).Title("Status").Width(100);
-                        columns.Template("<a href='javascript:void(0)' onclick='printIncident(\"#=incident_id#\")' class='k-button k-button-solid-secondary k-rounded-md k-button-sm'><i class='k-icon k-i-print'></i></a>")
-                        .Title("Actions").Width(80);
-                    })
-                    .Pageable(pageable => pageable
-                    .Refresh(true)
-                    .PageSizes(new int[] { 15, 25, 50 })
-                    .ButtonCount(5))
-                    .Sortable()
-                    .Filterable()
-                    .Scrollable()
-                    )
+                        .Name("incidentGrid")
+                        .Width("100%")
+                        .Columns(columns =>
+                        {
+                            columns.Bound(m => m.IncidentId)
+                            .ClientTemplate("<a href='javascript:void(0)' onclick='DashboardViewModel.api.viewIncident(\"#=incidentId#\")' class='text-blue-600 hover:text-blue-800 font-medium'>#=incidentId#</a>")
+                            .Title("Incident ID").Width(140).Filterable(true);
+
+                            columns.Bound(m => m.IncidentDateTime)
+                            .ClientTemplate("#= kendo.toString(kendo.parseDate(incidentDateTime), 'dd-MMM-yyyy hh:mm tt') #")
+                            .Title("Incident Date-Time").Width(140).Filterable(true);
+
+                            columns.Bound(m => m.SbuName)
+                            .ClientTemplate("#=sbuName#")
+                            .Title("LOB").Width(140).Filterable(true);
+
+                            columns.Bound(m => m.DepartmentName)
+                            .ClientTemplate("#=departmentName#")
+                            .Title("Department").Width(140).Filterable(true);
+
+                            columns.Bound(m => m.IncidentDesc)
+                            .ClientTemplate("#=incidentDesc#")
+                            .Title("Incident Type").Width(140).Filterable(true);
+
+                            columns.Bound(m => m.CreatorName)
+                            .ClientTemplate("#=creatorName#")
+                            .Title("Submitted By").Width(140).Filterable(true);
+
+                            columns.Bound(m => m.SubmittedOn)
+                            .ClientTemplate("#= kendo.toString(kendo.parseDate(submittedOn), 'dd-MMM-yyyy hh:mm tt') #")
+                            .Title("Submitted On").Width(140).Filterable(true);
+
+                            columns.Bound(m => m.StatusDesc)
+                            .ClientTemplate("<span class='inline-flex items-center px-2 py-1 rounded-full text-xs font-medium " +
+                            "# if(status == '08') { # badge-success # } " +
+                            "else if(status == '01') { # badge-warning # } " +
+                            "else if(status == '02') { # badge-info # } " +
+                            "else if(status == '03') { # badge-purple # } " +
+                            "else { # badge-gray # } #'>" +
+                            "#=statusDesc#</span>")
+                            .Title("Status").Width(120).Filterable(true);
+
+                            columns.Template("<a href='javascript:void(0)' onclick='DashboardViewModel.api.printIncident(\"#=incidentId#\")' class='k-button k-button-solid-secondary k-rounded-md k-button-sm'><svg class='w-4 h-4' fill='currentColor' viewBox='0 0 24 24'><path d='M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z'/></svg></a>")
+                            .Title("Actions").Width(80);
+                        })
+                        .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PageSizes(new int[] { 15, 25, 50 })
+                        .ButtonCount(5))
+                        .Sortable()
+                        .Filterable(filterable => filterable
+                        .Mode(GridFilterMode.Row)
+                        .Extra(false))
+                        .Scrollable()
+                        .Events(e => e
+                        .DataBound("DashboardViewModel.api.onGridDataBound")
+                        .Filter("DashboardViewModel.api.onGridFilter"))
+                        .DataSource(dataSource => dataSource
+                        .Custom()
+                        .PageSize(15)
+                        //.ServerOperation(false)
+                        .Schema(schema => schema
+                        .Data("data")
+                        .Total("total")
+                        .Model(model =>
+                        {
+                            model.Id("incidentId");
+                            model.Field("incidentId", typeof(string)).DefaultValue("");
+                            model.Field("incidentDateTime", typeof(DateTime));
+                            model.Field("sbuName", typeof(string)).DefaultValue("");
+                            model.Field("departmentName", typeof(string)).DefaultValue("");
+                            model.Field("incidentDesc", typeof(string)).DefaultValue("");
+                            model.Field("creatorName", typeof(string)).DefaultValue("");
+                            model.Field("submittedOn", typeof(DateTime));
+                            model.Field("statusDesc", typeof(string)).DefaultValue("");
+                            model.Field("status", typeof(string)).DefaultValue("");
+                        })
+                        )
+                        .Events(e => e.Error("DashboardViewModel.api.onGridError")))
+                        )
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/js/telerik-notifications.js"></script>
+    <script src="~/js/dashboard-viewmodel.js" asp-append-version="true"></script>
     <script>
-        function selectCard(cardElement, filterType) {
-            // Remove selected state from all cards
-            $('.dashboard-card').removeClass('border-blue-500 border-yellow-500 shadow-xl ring-2 ring-blue-200 ring-yellow-200');
-            $('.dashboard-card').addClass('border-transparent');
-            
-            // Add selected state to clicked card
-            $(cardElement).removeClass('border-transparent');
-            if (filterType === 'all') {
-                $(cardElement).addClass('border-blue-500 shadow-xl ring-2 ring-blue-200');
-            } else if (filterType === 'pending') {
-                $(cardElement).addClass('border-yellow-500 shadow-xl ring-2 ring-yellow-200');
-            }
-            
-            // Update the filter
-            DashboardViewModel.api.setFilter(filterType);
-        }
-
-        function refreshIncidentData() {
-            DashboardViewModel.api.refreshData();
-        }
-        
         $(document).ready(function() {
             DashboardViewModel.init();
-            // Select the "All Reports" card by default
-            selectCard($('#incidentCard')[0], 'all');
         });
     </script>
-    <script src="~/js/dashboard-viewmodel.js" asp-append-version="true"></script>
-    <script src="~/js/dashboard-actions.js" asp-append-version="true"></script>
 }

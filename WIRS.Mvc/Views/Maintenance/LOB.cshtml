@@ -1,0 +1,191 @@
+@{
+    ViewData["Title"] = "Maintain LOB";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/maintenance/lob-maintenance.css" />
+}
+
+<div class="p-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-900 mb-2">Maintain LOB</h1>
+        <p class="text-gray-600 text-sm">Manage Line of Business records by sector</p>
+    </div>
+
+    <!-- Sector Selection Card -->
+    <div class="card overflow-hidden mb-6">
+        <div class="card-header">
+            <h2 class="card-title">Sector Selection</h2>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Sector <span class="text-red-500">*</span>
+                    </label>
+                    @(Html.Kendo().DropDownList()
+                        .Name("SectorDropDown")
+                        .OptionLabel("--Select--")
+                        .DataTextField("Value")
+                        .DataValueField("Code")
+                        .DataSource(source => source.Read(read => read.Action("GetSectors", "MasterData")))
+                        .HtmlAttributes(new { 
+                            id = "ddlSector"
+                        })
+                        .Events(e => e.Change("onSectorChange"))
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOB List Panel -->
+    <div id="pnlLOBList" class="card overflow-hidden mb-6">
+        <div class="card-header">
+            <div class="flex justify-between items-center">
+                <h2 class="card-title">LOB Records</h2>
+                @(Html.Kendo().Button()
+                    .Name("btnNewLOB")
+                    .Content("New")
+                    .HtmlAttributes(new { @class = "btn-primary" })
+                    .Events(e => e.Click("newLOBRecord"))
+                )
+            </div>
+        </div>
+        <div class="card-body">
+            @(Html.Kendo().Grid<dynamic>()
+                .Name("lobGrid")
+                .Columns(columns =>
+                {
+                    columns.Bound("SbaName").Title("Sector").Width(150);
+                    columns.Bound("SbuCode").Title("LOB Code").Width(120);
+                    columns.Bound("SbuName").Title("LOB Name").Width(200);
+                    columns.Bound("InactiveDate").Title("Inactive Date").Width(120);
+                    columns.Template("<a href='#' onclick='editLOBRecord(\"#=SbaCode#\", \"#=SbuCode#\"); return false;' class='text-blue-600 hover:text-blue-800'>Edit</a>").Title("Actions").Width(80);
+                })
+                .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PageSizes(new int[] { 15, 25, 50 })
+                    .ButtonCount(5))
+                .NoRecords(noRecords => noRecords.Template(@"
+                    <div class='simple-empty-state'>
+                        <p>No LOB records found. Select a sector to view records, or click 'New' to add records.</p>
+                    </div>
+                "))
+                .DataSource(dataSource => dataSource
+                    .Custom()
+                    .PageSize(15)
+                    .Schema(schema => schema
+                        .Model(model => {
+                            model.Id("Uid");
+                            model.Field("SbaCode", typeof(string));
+                            model.Field("SbaName", typeof(string));
+                            model.Field("SbuCode", typeof(string));
+                            model.Field("SbuName", typeof(string));
+                            model.Field("InactiveDate", typeof(string));
+                            model.Field("Uid", typeof(string));
+                        })
+                    )
+                )
+            )
+        </div>
+    </div>
+
+    <!-- LOB Edit Panel -->
+    <div id="pnlLOBUpdate" class="card overflow-hidden" style="display: none;">
+        <div class="card-header">
+            <h2 class="card-title">LOB Details</h2>
+        </div>
+        <div class="card-body">
+            <form id="lobForm" class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- LOB Code -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            LOB Code <span class="text-red-500">*</span>
+                        </label>
+                        @(Html.Kendo().TextBox()
+                            .Name("LOBCode")
+                            .HtmlAttributes(new { 
+                                id = "txtLOBCode", 
+                                @readonly = "readonly",
+                                @class = "bg-gray-100"
+                            })
+                        )
+                        <div id="lobCodeError" class="validation-error"></div>
+                    </div>
+
+                    <!-- LOB Name -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Description <span class="text-red-500">*</span>
+                        </label>
+                        @(Html.Kendo().TextBox()
+                            .Name("LOBName")
+                            .Placeholder("Enter LOB description")
+                            .HtmlAttributes(new { 
+                                id = "txtLOBName", 
+                                required = "required",
+                                maxlength = "100"
+                            })
+                        )
+                        <div id="lobNameError" class="validation-error"></div>
+                    </div>
+
+                    <!-- Inactive Date -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Inactive Date
+                        </label>
+                        @(Html.Kendo().DatePicker()
+                            .Name("InactiveDate")
+                            .Format("dd/MM/yyyy")
+                            .HtmlAttributes(new { 
+                                id = "txtInactiveDate"
+                            })
+                        )
+                        <div id="inactiveDateError" class="validation-error"></div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3 pt-6">
+                    @(Html.Kendo().Button()
+                        .Name("btnCancel")
+                        .Content("Cancel")
+                        .HtmlAttributes(new { @class = "btn-cancel" })
+                        .Events(e => e.Click("cancelLOBEdit"))
+                    )
+                    @(Html.Kendo().Button()
+                        .Name("btnSave")
+                        .Content("Save")
+                        .HtmlAttributes(new { @class = "btn-primary" })
+                        .Events(e => e.Click("saveLOBRecord"))
+                    )
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Area -->
+<div id="notification"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <p class="text-gray-700">Processing...</p>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/maintenance/lob-maintenance.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize LOB maintenance view model
+            lobMaintenanceViewModel.init();
+        });
+    </script>
+}

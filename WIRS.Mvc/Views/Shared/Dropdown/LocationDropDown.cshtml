@@ -1,0 +1,12 @@
+@{
+    var locations = ViewBag.Locations as IEnumerable<dynamic> ?? new List<dynamic>();
+}
+
+@(Html.Kendo().DropDownList()
+    .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
+    .DataTextField("Value")
+    .DataValueField("Code")
+    .OptionLabel("Select Location")
+    .BindTo(locations)
+    .HtmlAttributes(new { @class = "form-control", style = "width: 100%" })
+)

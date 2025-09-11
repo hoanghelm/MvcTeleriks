@@ -1,0 +1,8 @@
+@(Html.Kendo().DropDownList()
+    .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
+    .DataTextField("Value")
+    .DataValueField("Code")
+    .OptionLabel("Select Department")
+    .BindTo(new List<dynamic>())
+    .HtmlAttributes(new { @class = "form-control", style = "width: 100%" })
+)

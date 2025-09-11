@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <Compile Remove="old-webforms\**" />
+    <Compile Remove="old-webform\**" />
     <Content Remove="old-webforms\**" />
+    <Content Remove="old-webform\**" />
     <EmbeddedResource Remove="old-webforms\**" />
+    <EmbeddedResource Remove="old-webform\**" />
     <None Remove="old-webforms\**" />
+    <None Remove="old-webform\**" />
   </ItemGroup>
 
   <ItemGroup>
