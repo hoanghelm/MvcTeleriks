@@ -1,0 +1,129 @@
+@{
+    // Framework script includes - Add this to your layout or pages that use dropdowns
+}
+
+@* Core Framework Scripts - Load in order *@
+<script src="~/js/framework/base-viewmodel.js"></script>
+<script src="~/js/framework/service-container.js"></script>
+<script src="~/js/framework/api-service.js"></script>
+<script src="~/js/framework/telerik-dropdown-component.js"></script>
+<script src="~/js/framework/dropdown-factory.js"></script>
+<script src="~/js/framework/framework-init.js"></script>
+<script src="~/js/telerik-skeleton-loading.js"></script>
+
+<style>
+/* Framework-specific styles */
+.dropdown-loading {
+    position: relative;
+}
+
+.dropdown-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.form-group.loading .k-dropdown {
+    opacity: 0.7;
+}
+
+.employee-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+}
+
+.employee-item img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.employee-name {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.employee-dept {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.selected-employee {
+    display: flex;
+    align-items: center;
+}
+
+/* Error states */
+.dropdown-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.validation-error {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+/* Success states */
+.dropdown-success {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+}
+</style>
+
+<script>
+// Global configuration for the framework
+$(document).ready(function() {
+    // Set global defaults for all dropdowns
+    if (window.TelerikDropdownComponent) {
+        // You can set global defaults here if needed
+        window.DROPDOWN_DEFAULTS = {
+            height: 200,
+            filter: "contains",
+            delay: 300,
+            animation: {
+                open: { effects: "slideDown", duration: 200 },
+                close: { effects: "slideUp", duration: 200 }
+            }
+        };
+    }
+
+    // Global error handler for dropdown failures
+    $(document).on('dropdown:error', function(e, error) {
+        console.error('Dropdown error:', error);
+        // You can implement global error handling here
+    });
+
+    // Global success handler for dropdown data loading
+    $(document).on('dropdown:loaded', function(e, data) {
+        console.log('Dropdown data loaded:', data);
+    });
+
+    // Cleanup on page unload
+    $(window).on('beforeunload', function() {
+        if (window.pageDropdowns) {
+            Object.values(window.pageDropdowns).forEach(dropdown => {
+                if (dropdown && typeof dropdown.destroy === 'function') {
+                    dropdown.destroy();
+                }
+            });
+        }
+    });
+});
+</script>

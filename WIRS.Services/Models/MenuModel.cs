@@ -2,7 +2,7 @@ namespace WIRS.Services.Models
 {
     public class MenuModel
     {
-        public int MenuId { get; set; }
+        public double MenuId { get; set; }
         public string MenuName { get; set; } = string.Empty;
         public string MenuUrl { get; set; } = string.Empty;
         public int Order { get; set; }

@@ -93,11 +93,11 @@
                             .OptionLabel("Select User Role")
                             .DataTextField("Value")
                             .DataValueField("Code")
-                            .DataSource(source => source.Read(read => read.Action("GetUserRoles", "MasterData")))
-                            .HtmlAttributes(new { 
-                                id = "ddlUserRole", 
-                                required = "required" 
+                            .HtmlAttributes(new {
+                                id = "ddlUserRole",
+                                required = "required"
                             })
+                            .AutoBind(false)
                         )
                         <div id="userRoleError" class="validation-error"></div>
                     </div>
@@ -110,8 +110,8 @@
                             .Value(Model.AccountStatus)
                             .DataTextField("Value")
                             .DataValueField("Code")
-                            .DataSource(source => source.Read(read => read.Action("GetAccountStatuses", "MasterData")))
                             .HtmlAttributes(new { id = "ddlAccountStatus" })
+                            .AutoBind(false)
                         )
                     </div>
 
@@ -234,11 +234,41 @@
 </div>
 
 @section Scripts {
+    @* Include the new framework scripts *@
+    @Html.Partial("_FrameworkScripts")
+
     <script src="~/js/telerik-notifications.js"></script>
     <script src="~/js/telerik-skeleton-loading.js"></script>
     <script src="~/js/user-update-viewmodel.js"></script>
     <script>
         $(document).ready(function() {
+            // Wait for framework to be ready before initializing dropdowns
+            $(document).on('framework:ready', function() {
+                // Initialize user management dropdowns using the new framework
+                const factory = window.DropdownFactory;
+
+                // Create user role dropdown with initial value
+                const userRoleDropdown = factory.createUserRoleDropdown('#ddlUserRole');
+                // Set the value after the dropdown is loaded
+                userRoleDropdown.refresh().then(() => {
+                    userRoleDropdown.value('@Model.UserRole');
+                });
+
+                // Create account status dropdown (you might need to add this to the factory)
+                const accountStatusDropdown = factory.createApiDropdown('#ddlAccountStatus', '/MasterData/GetAccountStatuses');
+                accountStatusDropdown.refresh().then(() => {
+                    accountStatusDropdown.value('@Model.AccountStatus');
+                });
+
+                // Store references for compatibility with existing code
+                window.userManagementDropdowns = {
+                    userRole: userRoleDropdown,
+                    accountStatus: accountStatusDropdown
+                };
+
+                console.log('User Update form dropdowns initialized with new framework');
+            });
+
             var userAccess = @Html.Raw(Json.Serialize(Model.UserAccess));
             userUpdateViewModel.init(userAccess);
         });

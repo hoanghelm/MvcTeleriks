@@ -1,13 +1,32 @@
-@{
-    var sectors = ViewBag.Sectors as IEnumerable<dynamic> ?? new List<dynamic>();
-}
-
+@* Refactored to use JavaScript framework - no more ViewBag dependency *@
 @(Html.Kendo().DropDownList()
     .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
     .DataTextField("Value")
     .DataValueField("Code")
     .OptionLabel("Select Sector")
-    .BindTo(sectors)
     .HtmlAttributes(new { @class = "form-control", style = "width: 100%" })
-    .Events(e => e.Change("onSectorChange"))
+    .AutoBind(false)
 )
+
+<script>
+$(document).ready(function() {
+    $(document).on('framework:ready', function() {
+        // Initialize sector dropdown using the framework
+        const fieldName = '@ViewData.TemplateInfo.GetFullHtmlFieldName("")';
+        const sectorDropdown = window.DropdownFactory.createSectorDropdown('#' + fieldName, null, {
+            onChange: function(value, dataItem, e) {
+                // Call existing global change handler if it exists
+                if (typeof onSectorChange === 'function') {
+                    onSectorChange(e);
+                }
+            }
+        });
+
+        // Store reference for cleanup if needed
+        if (!window.pageDropdowns) {
+            window.pageDropdowns = {};
+        }
+        window.pageDropdowns[fieldName] = sectorDropdown;
+    });
+});
+</script>

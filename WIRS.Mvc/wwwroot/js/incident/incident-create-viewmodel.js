@@ -191,26 +191,42 @@ class IncidentCreateViewModel {
     }
 
     collectFormData() {
+        // Helper function to get dropdown value (framework-aware)
+        const getDropdownValue = (selector) => {
+            // Try framework dropdown first
+            if (window.incidentDropdowns) {
+                const frameworkDropdown = Object.values(window.incidentDropdowns)
+                    .find(dd => dd.selector === selector);
+                if (frameworkDropdown) {
+                    return frameworkDropdown.value();
+                }
+            }
+
+            // Fallback to direct Kendo access
+            const kendoDropdown = $(selector).data("kendoDropDownList");
+            return kendoDropdown ? kendoDropdown.value() : null;
+        };
+
         const formData = {
             IncidentDateTime: this.combineDateTime(),
             IncidentTime: $("#tpIncidentTime").data("kendoTimePicker").value(),
             IncidentDate: $("#dpIncidentDate").data("kendoDatePicker").value(),
-            SbaCode: $("#ddlSbaCode").data("kendoDropDownList").value(),
-            SbuCode: $("#ddlSbuCode").data("kendoDropDownList").value(),
-            Division: $("#ddlDivision").data("kendoDropDownList").value(),
-            Department: $("#ddlDepartment").data("kendoDropDownList").value(),
-            Location: $("#ddlLocation").data("kendoDropDownList").value(),
+            SbaCode: getDropdownValue("#ddlSbaCode"),
+            SbuCode: getDropdownValue("#ddlSbuCode"),
+            Division: getDropdownValue("#ddlDivision"),
+            Department: getDropdownValue("#ddlDepartment"),
+            Location: getDropdownValue("#ddlLocation"),
             ExactLocation: $("#txtExactLocation").val(),
             IncidentDesc: $("#txtIncidentDesc").val(),
             SuperiorName: $("#txtSuperiorName").val(),
             SuperiorEmpNo: $("#txtSuperiorEmpNo").val(),
             SuperiorDesignation: $("#txtSuperiorDesignation").val(),
-            AnyEyewitness: $("#ddlAnyEyewitness").data("kendoDropDownList").value(),
+            AnyEyewitness: getDropdownValue("#ddlAnyEyewitness"),
             DamageDescription: $("#txtDamageDescription").val(),
-            IsWorkingOvertime: $("#ddlIsWorkingOvertime").data("kendoDropDownList").value(),
-            IsJobrelated: $("#ddlIsJobrelated").data("kendoDropDownList").value(),
+            IsWorkingOvertime: getDropdownValue("#ddlIsWorkingOvertime"),
+            IsJobrelated: getDropdownValue("#ddlIsJobrelated"),
             ExaminedHospitalClinicName: $("#txtExaminedHospitalClinicName").val(),
-            InjuredCaseType: $("#ddlInjuredCaseType").data("kendoDropDownList").value(),
+            InjuredCaseType: getDropdownValue("#ddlInjuredCaseType"),
             InjuredPersons: this.collectInjuredPersons(),
             Eyewitnesses: this.collectEyewitnesses()
         };
@@ -281,30 +297,52 @@ class IncidentCreateViewModel {
     }
 
     loadSbusBySba(sbaCode) {
-        // Implementation would call server endpoint to get SBUs by SBA
-        console.log('Loading SBUs for SBA:', sbaCode);
+        // Framework now handles cascading automatically
+        console.log('Loading SBUs for SBA:', sbaCode, '- handled by framework');
+        // Get the framework dropdown and refresh it
+        if (window.incidentDropdowns && window.incidentDropdowns.sbu) {
+            window.incidentDropdowns.sbu.refresh();
+        }
     }
 
     loadDivisionsBySbu(sbuCode) {
-        // Implementation would call server endpoint to get divisions by SBU
-        console.log('Loading divisions for SBU:', sbuCode);
+        // Framework now handles cascading automatically
+        console.log('Loading divisions for SBU:', sbuCode, '- handled by framework');
+        if (window.incidentDropdowns && window.incidentDropdowns.division) {
+            window.incidentDropdowns.division.refresh();
+        }
     }
 
     loadDepartmentsBySbu(sbuCode) {
-        // Implementation would call server endpoint to get departments by SBU
-        console.log('Loading departments for SBU:', sbuCode);
+        // Framework now handles cascading automatically
+        console.log('Loading departments for SBU:', sbuCode, '- handled by framework');
+        if (window.incidentDropdowns && window.incidentDropdowns.department) {
+            window.incidentDropdowns.department.refresh();
+        }
     }
 
     loadDepartmentsByDivision(divisionCode) {
-        // Implementation would call server endpoint to get departments by division
-        console.log('Loading departments for division:', divisionCode);
+        // Framework now handles cascading automatically
+        console.log('Loading departments for division:', divisionCode, '- handled by framework');
+        if (window.incidentDropdowns && window.incidentDropdowns.department) {
+            window.incidentDropdowns.department.refresh();
+        }
     }
 
     clearDropdown(selector) {
-        const dropdown = $(selector).data("kendoDropDownList");
-        if (dropdown) {
-            dropdown.setDataSource([]);
-            dropdown.value("");
+        // Try framework dropdown first, fallback to direct kendo access
+        const dropdownInstance = window.incidentDropdowns && Object.values(window.incidentDropdowns)
+            .find(dd => dd.selector === selector);
+
+        if (dropdownInstance) {
+            dropdownInstance.clear();
+        } else {
+            // Fallback to direct Kendo access
+            const dropdown = $(selector).data("kendoDropDownList");
+            if (dropdown) {
+                dropdown.setDataSource([]);
+                dropdown.value("");
+            }
         }
     }
 

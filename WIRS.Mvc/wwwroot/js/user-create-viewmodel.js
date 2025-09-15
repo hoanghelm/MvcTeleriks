@@ -80,31 +80,21 @@ var userCreateViewModel = (function () {
     }
     
     function loadMasterData() {
-        // Show skeleton loading only for dropdowns that need data
-        TelerikSkeleton.showDropdownSkeleton("#ddlUserRole");
-        
-        // Load all master data in parallel
-        var requests = [
-            $.get('/MasterData/GetUserRoles'),
-            $.get('/MasterData/GetSectors'),
-            $.get('/MasterData/GetLocations')
-        ];
-        
-        $.when.apply($, requests).done(function(userRoles, sectors, locations) {
-            _masterData.userRoles = userRoles[0].success ? userRoles[0].data : [];
-            _masterData.sectors = sectors[0].success ? sectors[0].data : [];
-            _masterData.locations = locations[0].success ? locations[0].data : [];
-            
-            // Cache empty arrays for LOBs and Departments - they'll be loaded on demand
-            _masterData.lobs = [];
-            _masterData.departments = [];
-            
-            // Hide skeleton loading for dropdowns
+        // NOTE: Master data loading is now handled by the framework
+        // The dropdowns will load their own data automatically
+        console.log('Master data loading now handled by framework - dropdowns will load automatically');
+
+        // Initialize master data cache for backward compatibility
+        _masterData.userRoles = [];
+        _masterData.sectors = [];
+        _masterData.locations = [];
+        _masterData.lobs = [];
+        _masterData.departments = [];
+
+        // Framework will handle the loading, just hide any skeleton loading
+        if (typeof TelerikSkeleton !== 'undefined') {
             TelerikSkeleton.hideDropdownSkeleton("#ddlUserRole");
-        }).fail(function() {
-            TelerikSkeleton.hideDropdownSkeleton("#ddlUserRole");
-            TelerikNotification.error('Error loading master data');
-        });
+        }
     }
     
     function initializeUserAccessGrid() {

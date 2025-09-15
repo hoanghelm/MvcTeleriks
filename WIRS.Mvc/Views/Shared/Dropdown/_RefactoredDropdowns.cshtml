@@ -1,0 +1,88 @@
+@{
+    // Refactored dropdown partial views using the new JavaScript framework
+    // These replace the old ViewBag-based approach
+}
+
+@* Location Dropdown - Now uses JavaScript framework *@
+<div class="location-dropdown-container">
+    @(Html.Kendo().DropDownList()
+        .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
+        .DataTextField("Value")
+        .DataValueField("Code")
+        .OptionLabel("Select Location")
+        .HtmlAttributes(new { @class = "form-control", style = "width: 100%" })
+        .AutoBind(false)
+    )
+</div>
+
+<script>
+$(document).ready(function() {
+    // Wait for framework to be ready
+    $(document).on('framework:ready', function() {
+        // Initialize location dropdown using the framework
+        const locationDropdown = window.DropdownFactory.createLocationDropdown('#@(ViewData.TemplateInfo.GetFullHtmlFieldName(""))');
+
+        // Store reference for cleanup if needed
+        if (!window.pageDropdowns) {
+            window.pageDropdowns = {};
+        }
+        window.pageDropdowns['@(ViewData.TemplateInfo.GetFullHtmlFieldName(""))'] = locationDropdown;
+    });
+});
+</script>
+
+@* User Role Dropdown - Now uses JavaScript framework *@
+<div class="user-role-dropdown-container">
+    @(Html.Kendo().DropDownList()
+        .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
+        .DataTextField("Value")
+        .DataValueField("Code")
+        .OptionLabel("Select Role")
+        .HtmlAttributes(new { @class = "form-control", style = "width: 100%" })
+        .AutoBind(false)
+    )
+</div>
+
+<script>
+$(document).ready(function() {
+    // Wait for framework to be ready
+    $(document).on('framework:ready', function() {
+        // Initialize user role dropdown using the framework
+        const userRoleDropdown = window.DropdownFactory.createUserRoleDropdown('#@(ViewData.TemplateInfo.GetFullHtmlFieldName(""))');
+
+        // Store reference for cleanup if needed
+        if (!window.pageDropdowns) {
+            window.pageDropdowns = {};
+        }
+        window.pageDropdowns['@(ViewData.TemplateInfo.GetFullHtmlFieldName(""))'] = userRoleDropdown;
+    });
+});
+</script>
+
+@* Sector Dropdown - Now uses JavaScript framework *@
+<div class="sector-dropdown-container">
+    @(Html.Kendo().DropDownList()
+        .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
+        .DataTextField("Value")
+        .DataValueField("Code")
+        .OptionLabel("Select Sector")
+        .HtmlAttributes(new { @class = "form-control", style = "width: 100%" })
+        .AutoBind(false)
+    )
+</div>
+
+<script>
+$(document).ready(function() {
+    // Wait for framework to be ready
+    $(document).on('framework:ready', function() {
+        // Initialize sector dropdown using the framework
+        const sectorDropdown = window.DropdownFactory.createSectorDropdown('#@(ViewData.TemplateInfo.GetFullHtmlFieldName(""))');
+
+        // Store reference for cleanup if needed
+        if (!window.pageDropdowns) {
+            window.pageDropdowns = {};
+        }
+        window.pageDropdowns['@(ViewData.TemplateInfo.GetFullHtmlFieldName(""))'] = sectorDropdown;
+    });
+});
+</script>

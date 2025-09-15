@@ -82,11 +82,11 @@
                             .OptionLabel("Select User Role")
                             .DataTextField("Value")
                             .DataValueField("Code")
-                            .DataSource(source => source.Read(read => read.Action("GetUserRoles", "MasterData")))
-                            .HtmlAttributes(new { 
-                                id = "ddlUserRole", 
-                                required = "required" 
+                            .HtmlAttributes(new {
+                                id = "ddlUserRole",
+                                required = "required"
                             })
+                            .AutoBind(false)
                         )
                         <div id="userRoleError" class="validation-error"></div>
                     </div>
@@ -198,15 +198,34 @@
 
 
 @section Scripts {
+    @* Include the new framework scripts *@
+    @Html.Partial("_FrameworkScripts")
+
     <script src="~/js/telerik-notifications.js"></script>
     <script src="~/js/telerik-skeleton-loading.js"></script>
     <script src="~/js/components/employee-search.js"></script>
     <script src="~/js/user-create-viewmodel.js"></script>
     <script>
         $(document).ready(function() {
+            // Wait for framework to be ready before initializing dropdowns
+            $(document).on('framework:ready', function() {
+                // Initialize user management dropdowns using the new framework
+                const factory = window.DropdownFactory;
+
+                // Create user role dropdown
+                const userRoleDropdown = factory.createUserRoleDropdown('#ddlUserRole');
+
+                // Store reference for compatibility with existing code
+                window.userManagementDropdowns = {
+                    userRole: userRoleDropdown
+                };
+
+                console.log('User Create form dropdowns initialized with new framework');
+            });
+
             // Initialize user create view model
             userCreateViewModel.init();
-            
+
             // Initialize employee search component
             var employeeSearch = EmployeeSearchComponent.create({
                 modalId: 'employeeSearchWindow',
