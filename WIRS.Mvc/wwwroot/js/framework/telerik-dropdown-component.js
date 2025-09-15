@@ -101,37 +101,62 @@ class TelerikDropdownComponent {
                                 }
                             }
 
+                            console.log('API request params for', this.options.apiEndpoint, ':', params);
                             return params;
                         }
+                    },
+                    error: (e) => {
+                        console.error('API Error for', this.options.apiEndpoint, ':', e);
+
+                        // Hide loading skeleton on error
+                        if (typeof TelerikSkeleton !== 'undefined') {
+                            TelerikSkeleton.hideDropdownSkeleton(this.selector);
+                        }
+
+                        // Trigger custom error event
+                        $(document).trigger('dropdown:error', [e, this.selector]);
                     }
                 },
                 schema: {
                     data: (response) => {
-                        console.log('API Response received:', response);
+                        console.log('Raw API Response for', this.options.apiEndpoint, ':', response);
 
                         // Handle different response formats
                         let data = [];
-                        if (response.success && response.data) {
+                        if (response && response.success && Array.isArray(response.data)) {
                             data = response.data;
+                            console.log('Extracted data from response.data:', data);
                         } else if (Array.isArray(response)) {
                             data = response;
+                            console.log('Using response directly as array:', data);
+                        } else {
+                            console.warn('Unexpected response format:', response);
+                            return [];
                         }
 
-                        // Ensure uppercase properties are maintained
-                        const normalizedData = data.map(item => {
-                            // If the item already has uppercase Code/Value, use as-is
-                            if (item.hasOwnProperty('Code') && item.hasOwnProperty('Value')) {
-                                return item;
+                        // Validate and normalize data
+                        const normalizedData = data.map((item, index) => {
+                            if (!item || typeof item !== 'object') {
+                                console.warn(`Invalid item at index ${index}:`, item);
+                                return null;
                             }
 
-                            // Map lowercase to uppercase for compatibility
-                            return {
-                                Code: item.code || item.Code || item.id || item.value,
-                                Value: item.value || item.Value || item.text || item.name || item.display
+                            // Create normalized item with uppercase properties
+                            const normalized = {
+                                Code: item.Code || item.code || item.id || item.value || '',
+                                Value: item.Value || item.value || item.text || item.name || item.display || ''
                             };
-                        });
 
-                        console.log('Normalized dropdown data:', normalizedData);
+                            // Validate that both Code and Value exist
+                            if (!normalized.Code && !normalized.Value) {
+                                console.warn(`Item missing both Code and Value at index ${index}:`, item);
+                                return null;
+                            }
+
+                            return normalized;
+                        }).filter(item => item !== null); // Remove invalid items
+
+                        console.log('Final normalized data for dropdown:', normalizedData);
                         return normalizedData;
                     }
                 },
@@ -268,6 +293,16 @@ class TelerikDropdownComponent {
     }
 
     handleDataBound(e) {
+        console.log('Dropdown data bound for', this.selector, 'Data items:', e.sender.dataSource.data());
+
+        // Log the actual data items to help debug display issues
+        const dataItems = e.sender.dataSource.data();
+        if (dataItems.length > 0) {
+            console.log('First data item structure:', dataItems[0]);
+            console.log('DataTextField mapping:', this.options.dataTextField, '-> Value:', dataItems[0][this.options.dataTextField]);
+            console.log('DataValueField mapping:', this.options.dataValueField, '-> Value:', dataItems[0][this.options.dataValueField]);
+        }
+
         // Call custom onDataBound handler
         if (this.options.onDataBound && typeof this.options.onDataBound === 'function') {
             this.options.onDataBound(e);
