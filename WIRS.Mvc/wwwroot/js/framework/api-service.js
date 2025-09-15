@@ -157,7 +157,20 @@ class MasterDataService {
 
         if (!data) {
             const response = await this.apiService.get('/MasterData/GetUserRoles');
-            data = response.success ? response.data : [];
+            console.log('GetUserRoles API response:', response);
+
+            if (response.success && response.data) {
+                data = response.data;
+                // Ensure uppercase properties
+                data = data.map(item => ({
+                    Code: item.Code || item.code,
+                    Value: item.Value || item.value || item.text || item.name
+                }));
+            } else {
+                data = [];
+            }
+
+            console.log('Processed UserRoles data:', data);
             this.cache.set(cacheKey, data);
         }
 
@@ -170,7 +183,20 @@ class MasterDataService {
 
         if (!data) {
             const response = await this.apiService.get('/MasterData/GetLocations');
-            data = response.success ? response.data : [];
+            console.log('GetLocations API response:', response);
+
+            if (response.success && response.data) {
+                data = response.data;
+                // Ensure uppercase properties
+                data = data.map(item => ({
+                    Code: item.Code || item.code,
+                    Value: item.Value || item.value || item.text || item.name
+                }));
+            } else {
+                data = [];
+            }
+
+            console.log('Processed Locations data:', data);
             this.cache.set(cacheKey, data);
         }
 
@@ -183,7 +209,20 @@ class MasterDataService {
 
         if (!data) {
             const response = await this.apiService.get('/MasterData/GetSectors');
-            data = response.success ? response.data : [];
+            console.log('GetSectors API response:', response);
+
+            if (response.success && response.data) {
+                data = response.data;
+                // Ensure uppercase properties
+                data = data.map(item => ({
+                    Code: item.Code || item.code,
+                    Value: item.Value || item.value || item.text || item.name
+                }));
+            } else {
+                data = [];
+            }
+
+            console.log('Processed Sectors data:', data);
             this.cache.set(cacheKey, data);
         }
 
@@ -196,7 +235,20 @@ class MasterDataService {
 
         if (!data) {
             const response = await this.apiService.get('/MasterData/GetSbaList');
-            data = response.success ? response.data : [];
+            console.log('GetSbaList API response:', response);
+
+            if (response.success && response.data) {
+                data = response.data;
+                // Ensure uppercase properties
+                data = data.map(item => ({
+                    Code: item.Code || item.code,
+                    Value: item.Value || item.value || item.text || item.name
+                }));
+            } else {
+                data = [];
+            }
+
+            console.log('Processed SbaList data:', data);
             this.cache.set(cacheKey, data);
         }
 
@@ -209,7 +261,20 @@ class MasterDataService {
 
         if (!data) {
             const response = await this.apiService.get(`/MasterData/GetSbusBySba?sbaCode=${sbaCode}`);
-            data = response.success ? response.data : [];
+            console.log('GetSbusBySba API response:', response);
+
+            if (response.success && response.data) {
+                data = response.data;
+                // Ensure uppercase properties
+                data = data.map(item => ({
+                    Code: item.Code || item.code,
+                    Value: item.Value || item.value || item.text || item.name
+                }));
+            } else {
+                data = [];
+            }
+
+            console.log('Processed SBUs data:', data);
             this.cache.set(cacheKey, data, 15); // Shorter cache for dependent data
         }
 
@@ -222,7 +287,20 @@ class MasterDataService {
 
         if (!data) {
             const response = await this.apiService.get(`/MasterData/GetDivisionsBySbu?sbuCode=${sbuCode}`);
-            data = response.success ? response.data : [];
+            console.log('GetDivisionsBySbu API response:', response);
+
+            if (response.success && response.data) {
+                data = response.data;
+                // Ensure uppercase properties
+                data = data.map(item => ({
+                    Code: item.Code || item.code,
+                    Value: item.Value || item.value || item.text || item.name
+                }));
+            } else {
+                data = [];
+            }
+
+            console.log('Processed Divisions data:', data);
             this.cache.set(cacheKey, data, 15);
         }
 
@@ -235,7 +313,20 @@ class MasterDataService {
 
         if (!data) {
             const response = await this.apiService.get(`/MasterData/GetDepartmentsBySbu?sbuCode=${sbuCode}`);
-            data = response.success ? response.data : [];
+            console.log('GetDepartmentsBySbu API response:', response);
+
+            if (response.success && response.data) {
+                data = response.data;
+                // Ensure uppercase properties
+                data = data.map(item => ({
+                    Code: item.Code || item.code,
+                    Value: item.Value || item.value || item.text || item.name
+                }));
+            } else {
+                data = [];
+            }
+
+            console.log('Processed Departments (SBU) data:', data);
             this.cache.set(cacheKey, data, 15);
         }
 
@@ -248,7 +339,20 @@ class MasterDataService {
 
         if (!data) {
             const response = await this.apiService.get(`/MasterData/GetDepartmentsByDivision?divisionCode=${divisionCode}`);
-            data = response.success ? response.data : [];
+            console.log('GetDepartmentsByDivision API response:', response);
+
+            if (response.success && response.data) {
+                data = response.data;
+                // Ensure uppercase properties
+                data = data.map(item => ({
+                    Code: item.Code || item.code,
+                    Value: item.Value || item.value || item.text || item.name
+                }));
+            } else {
+                data = [];
+            }
+
+            console.log('Processed Departments (Division) data:', data);
             this.cache.set(cacheKey, data, 15);
         }
 

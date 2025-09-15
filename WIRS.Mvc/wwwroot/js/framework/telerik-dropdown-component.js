@@ -107,13 +107,32 @@ class TelerikDropdownComponent {
                 },
                 schema: {
                     data: (response) => {
+                        console.log('API Response received:', response);
+
                         // Handle different response formats
+                        let data = [];
                         if (response.success && response.data) {
-                            return response.data;
+                            data = response.data;
                         } else if (Array.isArray(response)) {
-                            return response;
+                            data = response;
                         }
-                        return [];
+
+                        // Ensure uppercase properties are maintained
+                        const normalizedData = data.map(item => {
+                            // If the item already has uppercase Code/Value, use as-is
+                            if (item.hasOwnProperty('Code') && item.hasOwnProperty('Value')) {
+                                return item;
+                            }
+
+                            // Map lowercase to uppercase for compatibility
+                            return {
+                                Code: item.code || item.Code || item.id || item.value,
+                                Value: item.value || item.Value || item.text || item.name || item.display
+                            };
+                        });
+
+                        console.log('Normalized dropdown data:', normalizedData);
+                        return normalizedData;
                     }
                 },
                 serverFiltering: this.options.serverFiltering || false,
