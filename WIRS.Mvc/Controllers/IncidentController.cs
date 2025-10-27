@@ -84,6 +84,69 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateApi([FromBody] IncidentCreateApiRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null)
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                var createModel = new WorkflowIncidentCreateModel
+                {
+                    IncidentDateTime = $"{request.IncidentDate} {request.IncidentTime}",
+                    IncidentTime = request.IncidentTime,
+                    IncidentDate = request.IncidentDate,
+                    SbaCode = request.SectorCode,
+                    SbuCode = request.LobCode,
+                    Division = request.DepartmentCode ?? string.Empty,
+                    Department = request.DepartmentCode ?? string.Empty,
+                    Location = request.LocationCode ?? string.Empty,
+                    ExactLocation = request.ExactLocation ?? string.Empty,
+                    IncidentDesc = request.IncidentDescription,
+                    SuperiorName = request.SuperiorName ?? currentUser.UserName,
+                    SuperiorEmpNo = request.SuperiorEmpNo ?? currentUser.UserId,
+                    SuperiorDesignation = request.SuperiorDesignation ?? string.Empty,
+                    IncidentTypes = new[] { request.IncidentType },
+                    InjuredPersons = request.InjuredPersons ?? new List<InjuredPersonModel>(),
+                    Eyewitnesses = request.Eyewitnesses ?? new List<EyewitnessModel>(),
+                    AnyEyewitness = request.HasEyeWitness ? "1" : "0",
+                    DamageDescription = request.DamageDescription ?? string.Empty,
+                    IsWorkingOvertime = request.WorkingOvertime ?? string.Empty,
+                    IsJobrelated = request.IsJobRelated ?? string.Empty,
+                    ExaminedHospitalClinicName = request.HospitalClinicName ?? string.Empty,
+                    OfficialWorkingHrs = request.OfficialWorkingHours ?? string.Empty,
+                    HodId = request.HodId,
+                    WshoId = request.WshoId ?? string.Empty,
+                    AhodId = request.AhodId ?? string.Empty,
+                    CopyToList = request.CopyToList ?? new List<string>()
+                };
+
+                var result = await _workflowService.CreateIncidentAsync(createModel, currentUser.UserId);
+
+                if (!string.IsNullOrEmpty(result.incidentId) && string.IsNullOrEmpty(result.errorCode))
+                {
+                    return Json(new { success = true, incidentId = result.incidentId, message = "Incident created successfully" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result.errorCode ?? "Failed to create incident" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while creating the incident", error = ex.Message });
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> View(string id)
         {
@@ -261,6 +324,346 @@ namespace WIRS.Mvc.Controllers
             {
                 return Json(new { success = false, message = "An error occurred while searching incidents" });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Update(string id)
+        {
+            var currentUser = await GetCurrentUserSessionAsync();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetIncidentById(string id)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (string.IsNullOrEmpty(id))
+                {
+                    return Json(new { success = false, message = "Incident ID is required" });
+                }
+
+                var incident = await _workflowService.GetIncidentByIdAsync(id, currentUser.UserId);
+                if (incident == null)
+                {
+                    return Json(new { success = false, message = "Incident not found" });
+                }
+
+                return Json(new { success = true, incident = incident });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error retrieving incident", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitPartB([FromBody] PartBSubmitRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.ReviewComment))
+                {
+                    return Json(new { success = false, message = "Review and Comment is required", errorCode = "ERR-134" });
+                }
+
+                if (string.IsNullOrEmpty(request.WshoId))
+                {
+                    return Json(new { success = false, message = "WSHO selection is required", errorCode = "ERR-135" });
+                }
+
+                var partBModel = new PartBSubmitModel
+                {
+                    IncidentId = request.IncidentId,
+                    InjuredCaseType = request.InjuredCaseType,
+                    ReviewComment = request.ReviewComment,
+                    WshoId = request.WshoId,
+                    AlternateWshoId = request.AlternateWshoId ?? string.Empty,
+                    EmailToList = request.EmailToList ?? new List<string>(),
+                    AdditionalCopyToList = request.AdditionalCopyToList ?? new List<CopyToPersonModel>(),
+                    SubmitterName = currentUser.UserName,
+                    SubmitterEmpId = currentUser.UserId,
+                    SubmitterDesignation = string.Empty
+                };
+
+                var result = await _workflowService.SubmitPartBAsync(partBModel, currentUser.UserId);
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part B submitted successfully", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while submitting Part B", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SavePartC([FromBody] PartCSaveRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                var partCModel = MapPartCRequestToModel(request, currentUser.UserId);
+                var result = await _workflowService.SavePartCAsync(partCModel, currentUser.UserId);
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part C saved successfully" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while saving Part C", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitPartC([FromBody] PartCSaveRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                var validationError = ValidatePartC(request);
+                if (!string.IsNullOrEmpty(validationError))
+                {
+                    return Json(new { success = false, message = validationError });
+                }
+
+                var partCModel = MapPartCRequestToModel(request, currentUser.UserId);
+                var result = await _workflowService.SubmitPartCAsync(partCModel, currentUser.UserId);
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part C submitted successfully", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while submitting Part C", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ClosePartC([FromBody] PartCCloseRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.AdditionalComments))
+                {
+                    return Json(new { success = false, message = "Additional comments required for closure", errorCode = "ERR-134" });
+                }
+
+                if (string.IsNullOrEmpty(request.CwshoId))
+                {
+                    return Json(new { success = false, message = "Corporate WSHO selection required", errorCode = "ERR-135" });
+                }
+
+                var partCModel = MapPartCCloseRequestToModel(request, currentUser.UserId);
+                var result = await _workflowService.ClosePartCAsync(partCModel, currentUser.UserId);
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Incident closed successfully", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while closing incident", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitPartD([FromBody] PartDSubmitRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                // Validation
+                if (string.IsNullOrEmpty(request.Comments))
+                {
+                    return Json(new { success = false, message = "Comments are required", errorCode = "ERR-137" });
+                }
+
+                if (string.IsNullOrEmpty(request.HsbuId))
+                {
+                    return Json(new { success = false, message = "HSBU selection is required", errorCode = "ERR-133" });
+                }
+
+                var partDModel = new PartDSubmitModel
+                {
+                    IncidentId = request.IncidentId,
+                    Comments = request.Comments,
+                    HsbuId = request.HsbuId,
+                    EmailToList = request.EmailToList ?? new List<string>(),
+                    AdditionalCopyToList = request.AdditionalCopyToList ?? new List<CopyToPersonModel>(),
+                    SubmitterName = currentUser.UserName,
+                    SubmitterEmpId = currentUser.UserId,
+                    SubmitterDesignation = string.Empty
+                };
+
+                var result = await _workflowService.SubmitPartDAsync(partDModel, currentUser.UserId);
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part D submitted successfully to HSBU", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while submitting Part D", error = ex.Message });
+            }
+        }
+
+        private string ValidatePartC(PartCSaveRequest request)
+        {
+            if (string.IsNullOrEmpty(request.IsNegligent))
+            {
+                return "Negligent field is required (ERR-136)";
+            }
+
+            if (request.IsNegligent == "Y" && string.IsNullOrEmpty(request.NegligentComments))
+            {
+                return "Negligent comments required when employee is negligent (ERR-137)";
+            }
+
+            if (string.IsNullOrEmpty(request.WhatHappenedAndWhy))
+            {
+                return "What happened and why is required (ERR-138)";
+            }
+
+            if (string.IsNullOrEmpty(request.RecommendedActions))
+            {
+                return "Recommended actions is required (ERR-139)";
+            }
+
+            return string.Empty;
+        }
+
+        private PartCSubmitModel MapPartCRequestToModel(PartCSaveRequest request, string userId)
+        {
+            return new PartCSubmitModel
+            {
+                IncidentId = request.IncidentId,
+                IsNegligent = request.IsNegligent,
+                NegligentComments = request.NegligentComments ?? string.Empty,
+                NeedsRiskAssessmentReview = request.NeedsRiskAssessmentReview ?? "N",
+                RiskAssessmentComments = request.RiskAssessmentComments ?? string.Empty,
+                WhatHappenedAndWhy = request.WhatHappenedAndWhy,
+                RecommendedActions = request.RecommendedActions,
+                AdditionalComments = request.AdditionalComments ?? string.Empty,
+                PersonsInterviewed = request.PersonsInterviewed ?? new List<PersonInterviewedModel>(),
+                InjuryDetails = request.InjuryDetails ?? new List<InjuryDetailModel>(),
+                MedicalCertificates = request.MedicalCertificates ?? new List<MedicalCertificateModel>(),
+                IncidentClassList = request.IncidentClassList ?? new List<string>(),
+                IncidentAgentList = request.IncidentAgentList ?? new List<string>(),
+                UnsafeConditionsList = request.UnsafeConditionsList ?? new List<string>(),
+                UnsafeActsList = request.UnsafeActsList ?? new List<string>(),
+                ContributingFactorsList = request.ContributingFactorsList ?? new List<string>(),
+                SubmitterName = string.Empty,
+                SubmitterEmpId = userId,
+                SubmitterDesignation = string.Empty
+            };
+        }
+
+        private PartCCloseModel MapPartCCloseRequestToModel(PartCCloseRequest request, string userId)
+        {
+            return new PartCCloseModel
+            {
+                IncidentId = request.IncidentId,
+                AdditionalComments = request.AdditionalComments,
+                CwshoId = request.CwshoId,
+                PartCData = MapPartCRequestToModel(request.PartCData, userId)
+            };
         }
 
         private async Task LoadCreateViewModelDropdowns(IncidentCreateViewModel model)
@@ -443,5 +846,144 @@ namespace WIRS.Mvc.Controllers
 
             return incidents;
         }
+    }
+
+    public class IncidentCreateApiRequest
+    {
+        public string IncidentType { get; set; }
+        public string IncidentOther { get; set; }
+        public string IncidentDate { get; set; }
+        public string IncidentTime { get; set; }
+        public string IncidentDateTime { get; set; }
+        public string SectorCode { get; set; }
+        public string LobCode { get; set; }
+        public string DepartmentCode { get; set; }
+        public string LocationCode { get; set; }
+        public string ExactLocation { get; set; }
+        public string IncidentDescription { get; set; }
+        public string DamageDescription { get; set; }
+        public string IsJobRelated { get; set; }
+        public string HospitalClinicName { get; set; }
+        public string WorkingOvertime { get; set; }
+        public string OfficialWorkingHours { get; set; }
+        public bool HasEyeWitness { get; set; }
+        public string HodId { get; set; }
+        public string WshoId { get; set; }
+        public string AhodId { get; set; }
+        public List<InjuredPersonModel> InjuredPersons { get; set; }
+        public List<EyewitnessModel> Eyewitnesses { get; set; }
+        public List<string> CopyToList { get; set; }
+        public string SuperiorEmpNo { get; set; }
+        public string SuperiorName { get; set; }
+        public string SuperiorDesignation { get; set; }
+    }
+
+    public class InjuredPersonModel
+    {
+        public string Name { get; set; }
+        public string EmployeeNo { get; set; }
+        public string ContactNo { get; set; }
+        public string Age { get; set; }
+        public string Company { get; set; }
+        public string Race { get; set; }
+        public string Nationality { get; set; }
+        public string Gender { get; set; }
+        public string Designation { get; set; }
+        public string EmploymentType { get; set; }
+        public string DateOfEmployment { get; set; }
+        public string Type { get; set; }
+    }
+
+    public class EyewitnessModel
+    {
+        public string Name { get; set; }
+        public string EmployeeNo { get; set; }
+        public string Designation { get; set; }
+        public string ContactNo { get; set; }
+    }
+
+    public class PartBSubmitRequest
+    {
+        public string IncidentId { get; set; }
+        public string InjuredCaseType { get; set; }
+        public string ReviewComment { get; set; }
+        public string WshoId { get; set; }
+        public string AlternateWshoId { get; set; }
+        public List<string> EmailToList { get; set; }
+        public List<CopyToPersonModel> AdditionalCopyToList { get; set; }
+    }
+
+    public class CopyToPersonModel
+    {
+        public string EmployeeNo { get; set; }
+        public string Name { get; set; }
+        public string Designation { get; set; }
+    }
+
+    public class PartCSaveRequest
+    {
+        public string IncidentId { get; set; }
+        public string IsNegligent { get; set; }
+        public string NegligentComments { get; set; }
+        public string NeedsRiskAssessmentReview { get; set; }
+        public string RiskAssessmentComments { get; set; }
+        public string WhatHappenedAndWhy { get; set; }
+        public string RecommendedActions { get; set; }
+        public string AdditionalComments { get; set; }
+        public List<PersonInterviewedModel> PersonsInterviewed { get; set; }
+        public List<InjuryDetailModel> InjuryDetails { get; set; }
+        public List<MedicalCertificateModel> MedicalCertificates { get; set; }
+        public List<string> IncidentClassList { get; set; }
+        public List<string> IncidentAgentList { get; set; }
+        public List<string> UnsafeConditionsList { get; set; }
+        public List<string> UnsafeActsList { get; set; }
+        public List<string> ContributingFactorsList { get; set; }
+    }
+
+    public class PartCCloseRequest
+    {
+        public string IncidentId { get; set; }
+        public string AdditionalComments { get; set; }
+        public string CwshoId { get; set; }
+        public PartCSaveRequest PartCData { get; set; }
+    }
+
+    public class PersonInterviewedModel
+    {
+        public string Name { get; set; }
+        public string EmployeeNo { get; set; }
+        public string Designation { get; set; }
+        public string ContactNo { get; set; }
+    }
+
+    public class InjuryDetailModel
+    {
+        public string InjuredPersonId { get; set; }
+        public string InjuredPersonName { get; set; }
+        public List<string> NatureOfInjury { get; set; }
+        public List<string> HeadNeckTorso { get; set; }
+        public List<string> UpperLimbs { get; set; }
+        public List<string> LowerLimbs { get; set; }
+        public string Description { get; set; }
+    }
+
+    public class MedicalCertificateModel
+    {
+        public string InjuredPersonId { get; set; }
+        public string InjuredPersonName { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+        public int NumberOfDays { get; set; }
+        public string AttachmentPath { get; set; }
+        public bool HasAttachment { get; set; }
+    }
+
+    public class PartDSubmitRequest
+    {
+        public string IncidentId { get; set; }
+        public string Comments { get; set; }
+        public string HsbuId { get; set; }
+        public List<string> EmailToList { get; set; }
+        public List<CopyToPersonModel> AdditionalCopyToList { get; set; }
     }
 }

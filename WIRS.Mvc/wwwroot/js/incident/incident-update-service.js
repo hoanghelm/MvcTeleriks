@@ -1,0 +1,226 @@
+(function () {
+    angular
+        .module('incidentUpdateApp')
+        .factory('IncidentUpdateService', IncidentUpdateService);
+
+    IncidentUpdateService.$inject = ['$http', '$q'];
+
+    function IncidentUpdateService($http, $q) {
+        var service = {
+            getIncidentById: getIncidentById,
+            getCurrentUser: getCurrentUser,
+            getInjuredCaseTypes: getInjuredCaseTypes,
+            getWSHOs: getWSHOs,
+            getAlternateWSHOs: getAlternateWSHOs,
+            getPartBCopyToList: getPartBCopyToList,
+            submitPartB: submitPartB,
+            searchEmployee: searchEmployee,
+            getCWSHOs: getCWSHOs,
+            getNatureOfInjury: getNatureOfInjury,
+            getHeadNeckTorso: getHeadNeckTorso,
+            getUpperLimbs: getUpperLimbs,
+            getLowerLimbs: getLowerLimbs,
+            getIncidentClass: getIncidentClass,
+            getIncidentAgent: getIncidentAgent,
+            getUnsafeConditions: getUnsafeConditions,
+            getUnsafeActs: getUnsafeActs,
+            getContributingFactors: getContributingFactors,
+            getNegligentOptions: getNegligentOptions,
+            savePartC: savePartC,
+            submitPartC: submitPartC,
+            closePartC: closePartC,
+            getHSBUs: getHSBUs,
+            getPartDCopyToList: getPartDCopyToList,
+            submitPartD: submitPartD
+        };
+
+        return service;
+
+        function getIncidentById(incidentId) {
+            return $http.get('/Incident/GetIncidentById?id=' + incidentId)
+                .then(function(response) {
+                    if (response.data.success) {
+                        return response.data.incident;
+                    }
+                    return $q.reject(response.data.message || 'Failed to load incident');
+                })
+                .catch(handleError);
+        }
+
+        function getCurrentUser() {
+            return $http.get('/User/GetCurrentUser')
+                .then(function(response) {
+                    if (response.data.success) {
+                        return response.data.user;
+                    }
+                    return $q.reject(response.data.message || 'Failed to load user');
+                })
+                .catch(handleError);
+        }
+
+        function getInjuredCaseTypes() {
+            return $http.get('/MasterData/GetLookupByType?type=InjuredCaseType')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getWSHOs(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetWSHOs?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getAlternateWSHOs(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetAWSHOs?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getPartBCopyToList(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetPartACopyTo?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function submitPartB(partBData) {
+            return $http.post('/Incident/SubmitPartB', partBData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function searchEmployee(searchTerm, searchType) {
+            return $http.get('/api/Employee/Search?name=' + searchTerm + '&searchType=' + searchType)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getCWSHOs(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetCWSHOs?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getNatureOfInjury() {
+            return $http.get('/MasterData/GetLookupByType?type=NatureOfInjury')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getHeadNeckTorso() {
+            return $http.get('/MasterData/GetLookupByType?type=HeadNeckTorso')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getUpperLimbs() {
+            return $http.get('/MasterData/GetLookupByType?type=UpperLimbs')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getLowerLimbs() {
+            return $http.get('/MasterData/GetLookupByType?type=LowerLimbs')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getIncidentClass() {
+            return $http.get('/MasterData/GetLookupByType?type=IncidentClass')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getIncidentAgent() {
+            return $http.get('/MasterData/GetLookupByType?type=IncidentAgent')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getUnsafeConditions() {
+            return $http.get('/MasterData/GetLookupByType?type=UnsafeCondition')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getUnsafeActs() {
+            return $http.get('/MasterData/GetLookupByType?type=UnsafeAct')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getContributingFactors() {
+            return $http.get('/MasterData/GetLookupByType?type=Factors')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getNegligentOptions() {
+            return $http.get('/MasterData/GetLookupByType?type=Negligent')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function savePartC(partCData) {
+            return $http.post('/Incident/SavePartC', partCData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function submitPartC(partCData) {
+            return $http.post('/Incident/SubmitPartC', partCData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function closePartC(closeData) {
+            return $http.post('/Incident/ClosePartC', closeData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getHSBUs(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetHSBUs?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getPartDCopyToList(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetPartACopyTo?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function submitPartD(partDData) {
+            return $http.post('/Incident/SubmitPartD', partDData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function handleSuccess(response) {
+            return response.data;
+        }
+
+        function handleError(error) {
+            console.error('API Error:', error);
+            return $q.reject(error.data || error.statusText || 'An error occurred');
+        }
+    }
+})();

@@ -148,37 +148,24 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult GetYesNoOptions()
-        {
-            var options = new List<LookupItem>
-            {
-                new LookupItem { Code = "1", Value = "Yes" },
-                new LookupItem { Code = "0", Value = "No" }
-            };
-            return Json(options);
-        }
 
         [HttpGet]
-        public IActionResult GetOvertimeOptions()
+        public async Task<IActionResult> GetLookupByType(string type)
         {
-            var options = new List<LookupItem>
+            try
             {
-                new LookupItem { Code = "Y", Value = "Yes" },
-                new LookupItem { Code = "N", Value = "No" }
-            };
-            return Json(options);
-        }
+                if (string.IsNullOrWhiteSpace(type))
+                {
+                    return Json(new { success = false, message = "Lookup type is required" });
+                }
 
-        [HttpGet]
-        public IActionResult GetJobRelatedOptions()
-        {
-            var options = new List<LookupItem>
+                var lookupData = await _masterDataService.GetLookupByType(type);
+                return Json(lookupData);
+            }
+            catch (Exception ex)
             {
-                new LookupItem { Code = "Y", Value = "Yes" },
-                new LookupItem { Code = "N", Value = "No" }
-            };
-            return Json(options);
+                return Json(new { success = false, message = $"Error retrieving lookup data for type '{type}'", error = ex.Message });
+            }
         }
     }
 }

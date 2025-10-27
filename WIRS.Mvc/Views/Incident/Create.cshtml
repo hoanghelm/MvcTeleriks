@@ -1,5 +1,3 @@
-@using System.Security.Policy
-@model IncidentCreateViewModel
 @{
     ViewData["Title"] = "Create Incident Report";
 }
@@ -10,413 +8,560 @@
     <link rel="stylesheet" href="~/css/components/employee-search.css" />
 }
 
-<div class="p-6 max-w-7xl mx-auto">
+<div ng-app="incidentApp" ng-controller="IncidentCreateController as vm" class="p-6 max-w-7xl mx-auto">
     <div class="mb-6">
         <h1 class="text-xl font-bold text-gray-900 mb-2">Create Incident Report</h1>
-        <p class="text-gray-600 text-sm">Fields marked with <span class="text-red-500 font-semibold">*</span> are required</p>
-        <div class="text-blue-600 text-sm mt-2">This form is for <strong>Part A - Initial Report</strong> only</div>
+        <p class="text-sm text-gray-600">Part A - Incident Report to be submitted</p>
     </div>
 
-    @if (!string.IsNullOrEmpty(Model.ValidationMessage))
-    {
-        <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
-            @Model.ValidationMessage
-        </div>
-    }
+    <div ng-show="vm.validationMessage" class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
+        {{vm.validationMessage}}
+    </div>
 
-    <form id="createIncidentForm" method="post" action="@Url.Action("Create", "Incident")" class="space-y-6">
-        <!-- Incident Details Card -->
-        <div class="card overflow-hidden">
-            <div class="card-header">
-                <h2 class="card-title">Incident Details</h2>
-            </div>
-            <div class="card-body">
-                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <!-- Incident Date -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Incident Date <span class="text-red-500">*</span>
-                        </label>
-                        @(Html.Kendo().DatePicker()
-                            .Name("IncidentDate")
-                            .Value(DateTime.Today)
-                            .HtmlAttributes(new
-                            {
-                                id = "dpIncidentDate",
-                                required = "required"
-                            })
-                            )
-                    </div>
+    <div ng-show="vm.successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded">
+        {{vm.successMessage}}
+    </div>
 
-                    <!-- Incident Time -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Incident Time <span class="text-red-500">*</span>
-                        </label>
-                        @(Html.Kendo().TimePicker()
-                            .Name("IncidentTime")
-                            .Value(DateTime.Now)
-                            .HtmlAttributes(new
-                            {
-                                id = "tpIncidentTime",
-                                required = "required"
-                            })
-                            )
-                    </div>
+    <form name="incidentForm" class="space-y-6" ng-submit="vm.submitIncident()" novalidate>
+        <fieldset class="border border-gray-300 rounded-lg p-6">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Incident Details</legend>
 
-                    <!-- SBA -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            SBA <span class="text-red-500">*</span>
-                        </label>
-                        @(Html.Kendo().DropDownList()
-                            .Name("SbaCode")
-                            .OptionLabel("Select SBA")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .BindTo(Model.SbaOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new
-                            {
-                                id = "ddlSbaCode",
-                                required = "required"
-                            })
-                            .Events(e => e.Change("onSbaChange"))
-                            )
-                    </div>
-
-                    <!-- SBU -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            SBU <span class="text-red-500">*</span>
-                        </label>
-                        @(Html.Kendo().DropDownList()
-                            .Name("SbuCode")
-                            .OptionLabel("Select SBU")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .BindTo(Model.SbuOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new
-                            {
-                                id = "ddlSbuCode",
-                                required = "required"
-                            })
-                            .Events(e => e.Change("onSbuChange"))
-                            )
-                    </div>
-
-                    <!-- Division -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Division
-                        </label>
-                        @(Html.Kendo().DropDownList()
-                            .Name("Division")
-                            .OptionLabel("Select Division")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .BindTo(Model.DivisionOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new { id = "ddlDivision" })
-                            .Events(e => e.Change("onDivisionChange"))
-                            )
-                    </div>
-
-                    <!-- Location -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Location <span class="text-red-500">*</span>
-                        </label>
-                        @(Html.Kendo().TextBox()
-                            .Name("Location")
-                            .Placeholder("Enter incident location")
-                            .HtmlAttributes(new
-                            {
-                                id = "txtLocation",
-                                required = "required",
-                                maxlength = "200"
-                            })
-                            )
-                    </div>
-                </div>
-
-                <!-- Description -->
-                <div class="mt-6 space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        Description <span class="text-red-500">*</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="incidentType" class="block text-sm font-medium text-gray-700 mb-1">
+                        Incident Type <span class="text-red-600">*</span>
                     </label>
-                    @(Html.Kendo().TextArea()
-                        .Name("Description")
-                        .Placeholder("Describe what happened")
-                        .Rows(4)
-                        .HtmlAttributes(new
-                        {
-                            id = "txtDescription",
-                            required = "required",
-                            maxlength = "2000"
-                        })
-                        )
+                    <select kendo-drop-down-list
+                            k-options="vm.incidentTypeOptions"
+                            k-ng-model="vm.incident.incidentType"
+                            k-on-change="vm.onIncidentTypeChange()"
+                            id="incidentType"
+                            class="w-full"
+                            required>
+                    </select>
                 </div>
 
-                <!-- Incident Type -->
-                <div class="mt-6 space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        Incident Type <span class="text-red-500">*</span>
+                <div class="form-group" ng-show="vm.showOtherIncidentType">
+                    <label for="incidentOther" class="block text-sm font-medium text-gray-700 mb-1">
+                        If 'Others', please specify <span class="text-red-600">*</span>
                     </label>
-                    @(Html.Kendo().DropDownList()
-                        .Name("IncidentType")
-                        .OptionLabel("Select incident type...")
-                        .DataTextField("Value")
-                        .DataValueField("Code")
-                        .BindTo(Model.IncidentTypes)
-                        .HtmlAttributes(new
-                        {
-                            id = "ddlIncidentType",
-                            required = "required"
-                        })
-                        )
+                    <input type="text"
+                           id="incidentOther"
+                           ng-model="vm.incident.incidentOther"
+                           class="form-input w-full"
+                           ng-required="vm.showOtherIncidentType" />
                 </div>
             </div>
-        </div>
 
-        <!-- Superior Information Card -->
-        <div class="card overflow-hidden">
-            <div class="card-header">
-                <h2 class="card-title">Superior Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="incidentDate" class="block text-sm font-medium text-gray-700 mb-1">
+                        Date of Incident <span class="text-red-600">*</span>
+                    </label>
+                    <input kendo-date-picker
+                           k-ng-model="vm.incident.incidentDate"
+                           k-format="'dd-MMM-yyyy'"
+                           k-max="vm.maxDate"
+                           id="incidentDate"
+                           class="w-full"
+                           required />
+                </div>
+
+                <div class="form-group">
+                    <label for="incidentTime" class="block text-sm font-medium text-gray-700 mb-1">
+                        Time (24-hr) <span class="text-red-600">*</span>
+                    </label>
+                    <input kendo-time-picker
+                           k-ng-model="vm.incident.incidentTime"
+                           k-format="'HH:mm'"
+                           id="incidentTime"
+                           class="w-full"
+                           required />
+                </div>
             </div>
-            <div class="card-body">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Superior Name -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Superior Name <span class="text-red-500">*</span>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="sector" class="block text-sm font-medium text-gray-700 mb-1">
+                        Sector
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.sectorOptions"
+                            k-ng-model="vm.incident.sectorCode"
+                            k-on-change="vm.onSectorChange()"
+                            id="sector"
+                            class="w-full"
+                            disabled>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="lob" class="block text-sm font-medium text-gray-700 mb-1">
+                        LOB <span class="text-red-600">*</span>
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.lobOptions"
+                            k-ng-model="vm.incident.lobCode"
+                            k-on-change="vm.onLobChange()"
+                            id="lob"
+                            class="w-full"
+                            required>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="department" class="block text-sm font-medium text-gray-700 mb-1">
+                        Department
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.departmentOptions"
+                            k-ng-model="vm.incident.departmentCode"
+                            k-on-change="vm.onDepartmentChange()"
+                            id="department"
+                            class="w-full">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location" class="block text-sm font-medium text-gray-700 mb-1">
+                        Location of Incident
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.locationOptions"
+                            k-ng-model="vm.incident.locationCode"
+                            id="location"
+                            class="w-full">
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <label for="exactLocation" class="block text-sm font-medium text-gray-700 mb-1">
+                    Exact Location
+                </label>
+                <input type="text"
+                       id="exactLocation"
+                       ng-model="vm.incident.exactLocation"
+                       class="form-input w-full" />
+            </div>
+
+            <div class="form-group mt-4">
+                <label for="incidentDescription" class="block text-sm font-medium text-gray-700 mb-1">
+                    Near-miss / Incident Description <span class="text-red-600">*</span>
+                </label>
+                <textarea id="incidentDescription"
+                          ng-model="vm.incident.incidentDescription"
+                          rows="4"
+                          maxlength="2000"
+                          class="form-textarea w-full"
+                          required></textarea>
+                <div class="text-xs text-gray-500 mt-1">{{vm.incident.incidentDescription.length || 0}}/2000 characters</div>
+            </div>
+        </fieldset>
+
+        <fieldset class="border border-gray-300 rounded-lg p-6" ng-show="vm.incident.incidentType == '1'">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Particulars of Injured Person(s)</legend>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <div class="flex gap-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" ng-model="vm.injuredPersonType" value="E" class="form-radio" />
+                        <span class="ml-2">Employee</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" ng-model="vm.injuredPersonType" value="P" class="form-radio" />
+                        <span class="ml-2">Contractor/Public</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="injuredName" class="block text-sm font-medium text-gray-700 mb-1">
+                        Name <span class="text-red-600">*</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text"
+                               id="injuredName"
+                               ng-model="vm.injuredPerson.name"
+                               class="form-input flex-1" />
+                        <button type="button"
+                                class="btn-secondary px-3"
+                                ng-click="vm.searchInjuredPerson()">...</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="injuredContactNo" class="block text-sm font-medium text-gray-700 mb-1">
+                        Contact Number
+                    </label>
+                    <input type="text"
+                           id="injuredContactNo"
+                           ng-model="vm.injuredPerson.contactNo"
+                           class="form-input w-full" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="injuredEmpNo" class="block text-sm font-medium text-gray-700 mb-1">
+                        Employee Number <span class="text-red-600" ng-show="vm.injuredPersonType == 'E'">*</span>
+                    </label>
+                    <input type="text"
+                           id="injuredEmpNo"
+                           ng-model="vm.injuredPerson.employeeNo"
+                           class="form-input w-full" />
+                </div>
+
+                <div class="form-group" ng-show="vm.injuredPersonType == 'P'">
+                    <label for="injuredCompany" class="block text-sm font-medium text-gray-700 mb-1">
+                        Company
+                    </label>
+                    <input type="text"
+                           id="injuredCompany"
+                           ng-model="vm.injuredPerson.company"
+                           maxlength="50"
+                           class="form-input w-full" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="injuredRace" class="block text-sm font-medium text-gray-700 mb-1">
+                        Race
+                    </label>
+                    <input type="text"
+                           id="injuredRace"
+                           ng-model="vm.injuredPerson.race"
+                           maxlength="10"
+                           class="form-input w-full" />
+                </div>
+
+                <div class="form-group">
+                    <label for="injuredNationality" class="block text-sm font-medium text-gray-700 mb-1">
+                        Nationality
+                    </label>
+                    <input type="text"
+                           id="injuredNationality"
+                           ng-model="vm.injuredPerson.nationality"
+                           maxlength="20"
+                           class="form-input w-full" />
+                </div>
+
+                <div class="form-group">
+                    <label for="injuredGender" class="block text-sm font-medium text-gray-700 mb-1">
+                        Gender
+                    </label>
+                    <input type="text"
+                           id="injuredGender"
+                           ng-model="vm.injuredPerson.gender"
+                           maxlength="10"
+                           class="form-input w-full" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="injuredDesignation" class="block text-sm font-medium text-gray-700 mb-1">
+                        Designation
+                    </label>
+                    <input type="text"
+                           id="injuredDesignation"
+                           ng-model="vm.injuredPerson.designation"
+                           maxlength="40"
+                           class="form-input w-full" />
+                </div>
+
+                <div class="form-group">
+                    <label for="injuredEmploymentType" class="block text-sm font-medium text-gray-700 mb-1">
+                        Employment Type
+                    </label>
+                    <input type="text"
+                           id="injuredEmploymentType"
+                           ng-model="vm.injuredPerson.employmentType"
+                           maxlength="10"
+                           class="form-input w-full" />
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <label for="injuredDateOfEmployment" class="block text-sm font-medium text-gray-700 mb-1">
+                    Date of Employment
+                </label>
+                <input type="text"
+                       id="injuredDateOfEmployment"
+                       ng-model="vm.injuredPerson.dateOfEmployment"
+                       placeholder="dd-MMM-yyyy"
+                       class="form-input w-full" />
+            </div>
+
+            <div class="mt-4">
+                <button type="button"
+                        class="btn-primary"
+                        ng-click="vm.addInjuredPerson()">Add Injured Person</button>
+            </div>
+
+            <div class="mt-6" ng-show="vm.injuredPersons.length > 0">
+                <div kendo-grid="vm.injuredGrid"
+                     k-options="vm.injuredGridOptions"
+                     k-data-source="vm.injuredPersons">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 mt-6">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Is this incident job related?
+                    </label>
+                    <div class="flex gap-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.incident.isJobRelated" value="Yes" class="form-radio" />
+                            <span class="ml-2">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.incident.isJobRelated" value="No" class="form-radio" />
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="hospitalName" class="block text-sm font-medium text-gray-700 mb-1">
+                        Hospital / Clinic where the injured person was examined or treated
+                    </label>
+                    <textarea id="hospitalName"
+                              ng-model="vm.incident.hospitalClinicName"
+                              rows="2"
+                              maxlength="2000"
+                              class="form-textarea w-full"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="workingOvertime" class="block text-sm font-medium text-gray-700 mb-1">
+                        Was the injured person working overtime when the accident happened?
+                    </label>
+                    <textarea id="workingOvertime"
+                              ng-model="vm.incident.workingOvertime"
+                              rows="2"
+                              maxlength="2000"
+                              class="form-textarea w-full"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="officialWorkingHours" class="block text-sm font-medium text-gray-700 mb-1">
+                        What is the official working hours of the injured person on the day of incident?
+                    </label>
+                    <input type="text"
+                           id="officialWorkingHours"
+                           ng-model="vm.incident.officialWorkingHours"
+                           class="form-input w-full" />
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="border border-gray-300 rounded-lg p-6" ng-show="vm.incident.incidentType != '1'">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Damage / Environmental Impact</legend>
+
+            <div class="form-group">
+                <label for="damageDescription" class="block text-sm font-medium text-gray-700 mb-1">
+                    Damage Description / Impact of Environment Incident <span class="text-red-600">*</span>
+                </label>
+                <textarea id="damageDescription"
+                          ng-model="vm.incident.damageDescription"
+                          rows="4"
+                          maxlength="2000"
+                          class="form-textarea w-full"
+                          ng-required="vm.incident.incidentType != '1'"></textarea>
+            </div>
+        </fieldset>
+
+        <fieldset class="border border-gray-300 rounded-lg p-6">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Eye Witnesses</legend>
+
+            <div class="form-group mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Have eye witness? <span class="text-red-600">*</span>
+                </label>
+                <div class="flex gap-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" ng-model="vm.incident.hasEyeWitness" ng-value="true" class="form-radio" required />
+                        <span class="ml-2">Yes</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" ng-model="vm.incident.hasEyeWitness" ng-value="false" class="form-radio" required />
+                        <span class="ml-2">No</span>
+                    </label>
+                </div>
+            </div>
+
+            <div ng-show="vm.incident.hasEyeWitness">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="witnessName" class="block text-sm font-medium text-gray-700 mb-1">
+                            Name
                         </label>
                         <div class="flex gap-2">
-                            @(Html.Kendo().TextBox()
-                                .Name("SuperiorName")
-                                .Placeholder("Enter superior name")
-                                .HtmlAttributes(new
-                                {
-                                    id = "txtSuperiorName",
-                                    required = "required",
-                                    @readonly = "readonly",
-                                    @class = "flex-1"
-                                })
-                                )
-                            @(Html.Kendo().Button()
-                                .Name("btnSearchSuperior")
-                                .Content("Search")
-                                .HtmlAttributes(new { @class = "btn-secondary" })
-                                .Events(e => e.Click("function() { openEmployeeSearch('superior'); }"))
-                                )
+                            <input type="text"
+                                   id="witnessName"
+                                   ng-model="vm.eyeWitness.name"
+                                   class="form-input flex-1" />
+                            <button type="button"
+                                    class="btn-secondary px-3"
+                                    ng-click="vm.searchEyeWitness()">...</button>
                         </div>
-                        <input type="hidden" id="hdnSuperiorEmployeeId" name="SuperiorEmployeeId" />
                     </div>
 
-                    <!-- Superior Department -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Department
+                    <div class="form-group">
+                        <label for="witnessEmpNo" class="block text-sm font-medium text-gray-700 mb-1">
+                            Employee Number/NRIC/Passport/Fin Number
                         </label>
-                        @(Html.Kendo().TextBox()
-                            .Name("SuperiorDepartment")
-                            .Placeholder("Department will be auto-filled")
-                            .HtmlAttributes(new
-                            {
-                                id = "txtSuperiorDepartment",
-                                @readonly = "readonly"
-                            })
-                            )
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Injured Person Information Card -->
-        <div class="card overflow-hidden">
-            <div class="card-header">
-                <h2 class="card-title">Injured Person Information</h2>
-            </div>
-            <div class="card-body">
-                <div id="injuredPersonsContainer">
-                    <!-- Initial injured person form -->
-                    <div class="injured-person-section" data-index="0">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
-                            <!-- Injured Person Name -->
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Name <span class="text-red-500">*</span>
-                                </label>
-                                <div class="flex gap-2">
-                                    @(Html.Kendo().TextBox()
-                                        .Name("InjuredPersons[0].Name")
-                                        .Placeholder("Enter injured person name")
-                                        .HtmlAttributes(new
-                                        {
-                                            id = "txtInjuredName_0",
-                                            required = "required",
-                                            @readonly = "readonly",
-                                            @class = "flex-1"
-                                        })
-                                        )
-                                    @(Html.Kendo().Button()
-                                        .Name("btnSearchInjured_0")
-                                        .Content("Search")
-                                        .HtmlAttributes(new { @class = "btn-secondary" })
-                                        .Events(e => e.Click("function() { openEmployeeSearch('injured', 0); }"))
-                                        )
-                                </div>
-                                <input type="hidden" name="InjuredPersons[0].EmployeeId" id="hdnInjuredEmployeeId_0" />
-                            </div>
-
-                            <!-- Injured Person Department -->
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Department
-                                </label>
-                                @(Html.Kendo().TextBox()
-                                    .Name("InjuredPersons[0].Department")
-                                    .Placeholder("Department will be auto-filled")
-                                    .HtmlAttributes(new
-                                    {
-                                        id = "txtInjuredDepartment_0",
-                                        @readonly = "readonly"
-                                    })
-                                    )
-                            </div>
-                        </div>
-
-                        <!-- Case Type -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Case Type <span class="text-red-500">*</span>
-                                </label>
-                                @(Html.Kendo().DropDownList()
-                                    .Name("InjuredPersons[0].CaseType")
-                                    .OptionLabel("Select case type...")
-                                    .DataTextField("Value")
-                                    .DataValueField("Code")
-                                    .BindTo(new List<LookupItem>())
-                                    .HtmlAttributes(new
-                                    {
-                                        id = "ddlInjuredCaseType_0",
-                                        required = "required"
-                                    })
-                                    )
-                            </div>
-                        </div>
+                        <input type="text"
+                               id="witnessEmpNo"
+                               ng-model="vm.eyeWitness.employeeNo"
+                               class="form-input w-full" />
                     </div>
                 </div>
 
-                <!-- Add Injured Person Button -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="form-group">
+                        <label for="witnessDesignation" class="block text-sm font-medium text-gray-700 mb-1">
+                            Designation
+                        </label>
+                        <input type="text"
+                               id="witnessDesignation"
+                               ng-model="vm.eyeWitness.designation"
+                               class="form-input w-full" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="witnessContactNo" class="block text-sm font-medium text-gray-700 mb-1">
+                            Contact Number
+                        </label>
+                        <input type="text"
+                               id="witnessContactNo"
+                               ng-model="vm.eyeWitness.contactNo"
+                               class="form-input w-full" />
+                    </div>
+                </div>
+
                 <div class="mt-4">
-                    @(Html.Kendo().Button()
-                        .Name("btnAddInjuredPerson")
-                        .Content("<i class='k-icon k-i-plus'></i> Add Another Injured Person")
-                        .HtmlAttributes(new { @class = "btn-secondary" })
-                        .Events(e => e.Click("addInjuredPerson"))
-                        )
+                    <button type="button"
+                            class="btn-primary"
+                            ng-click="vm.addEyeWitness()">Add Eye Witness</button>
                 </div>
-            </div>
-        </div>
 
-        <!-- Additional Information Card -->
-        <div class="card overflow-hidden">
-            <div class="card-header">
-                <h2 class="card-title">Additional Information</h2>
-            </div>
-            <div class="card-body">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Overtime -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Overtime Status
-                        </label>
-                        @(Html.Kendo().DropDownList()
-                            .Name("OvertimeStatus")
-                            .OptionLabel("Select overtime status...")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .BindTo(Model.OvertimeOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new { id = "ddlOvertimeStatus" })
-                            )
-                    </div>
-
-                    <!-- Job Related -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Job Related
-                        </label>
-                        @(Html.Kendo().DropDownList()
-                            .Name("JobRelated")
-                            .OptionLabel("Select...")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .BindTo(Model.JobRelatedOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new { id = "ddlJobRelated" })
-                            )
+                <div class="mt-6" ng-show="vm.eyeWitnesses.length > 0">
+                    <div kendo-grid="vm.witnessGrid"
+                         k-options="vm.witnessGridOptions"
+                         k-data-source="vm.eyeWitnesses">
                     </div>
                 </div>
+            </div>
+        </fieldset>
 
-                <!-- Damage Description -->
-                <div class="mt-6 space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        Damage Description
-                    </label>
-                    @(Html.Kendo().TextArea()
-                        .Name("DamageDescription")
-                        .Placeholder("Describe any damages")
-                        .Rows(3)
-                        .HtmlAttributes(new
-                        {
-                            id = "txtDamageDescription",
-                            maxlength = "1000"
-                        })
-                        )
+        <fieldset class="border border-gray-300 rounded-lg p-6">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Particulars of Person Submitting</legend>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <div class="text-gray-900">{{vm.currentUser.name}}</div>
                 </div>
 
-                <!-- Hospital/Clinic Name -->
-                <div class="mt-6 space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        Examined at Hospital/Clinic
-                    </label>
-                    @(Html.Kendo().TextBox()
-                        .Name("ExaminedHospitalClinicName")
-                        .Placeholder("Hospital or clinic name")
-                        .HtmlAttributes(new
-                        {
-                            id = "txtExaminedHospitalClinicName",
-                            maxlength = "200"
-                        })
-                        )
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Employee Number</label>
+                    <div class="text-gray-900">{{vm.currentUser.userId}}</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Form Actions -->
-        <div class="flex justify-end space-x-4">
-            @(Html.Kendo().Button()
-                .Name("btnCancel")
-                .Content("Cancel")
-                .HtmlAttributes(new { @class = "btn-secondary" })
-                .Events(e => e.Click("cancelForm"))
-                )
-            @(Html.Kendo().Button()
-                .Name("btnSaveDraft")
-                .Content("Save Draft")
-                .HtmlAttributes(new { @class = "btn-primary" })
-                .Events(e => e.Click("saveDraft"))
-                )
-            @(Html.Kendo().Button()
-                .Name("btnSubmit")
-                .Content("Submit Report")
-                .HtmlAttributes(new { @class = "btn-success", type = "submit" })
-                )
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date of Submission</label>
+                    <div class="text-gray-900">{{vm.currentDate | date:'dd-MMM-yyyy'}}</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                    <div class="text-gray-900">{{vm.currentUser.designation}}</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="hodId" class="block text-sm font-medium text-gray-700 mb-1">
+                        Name of HOD <span class="text-red-600">*</span>
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.hodOptions"
+                            k-ng-model="vm.incident.hodId"
+                            id="hodId"
+                            class="w-full"
+                            required>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="wshoId" class="block text-sm font-medium text-gray-700 mb-1">
+                        Name of WSHO
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.wshoOptions"
+                            k-ng-model="vm.incident.wshoId"
+                            id="wshoId"
+                            class="w-full">
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <label for="ahodId" class="block text-sm font-medium text-gray-700 mb-1">
+                    Alternate to HOD
+                </label>
+                <select kendo-drop-down-list
+                        k-options="vm.ahodOptions"
+                        k-ng-model="vm.incident.ahodId"
+                        id="ahodId"
+                        class="w-full">
+                </select>
+            </div>
+
+            <div class="form-group mt-4">
+                <fieldset class="border border-gray-300 rounded p-4">
+                    <legend class="text-sm font-medium text-gray-700 px-2">Copy To HR</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <label ng-repeat="hr in vm.hrCopyToList" class="inline-flex items-center">
+                            <input type="checkbox"
+                                   ng-model="hr.selected"
+                                   class="form-checkbox" />
+                            <span class="ml-2">{{hr.name}}</span>
+                        </label>
+                    </div>
+                </fieldset>
+            </div>
+        </fieldset>
+
+        <div class="flex justify-end gap-4 mt-6">
+            <button type="button"
+                    class="btn-secondary"
+                    ng-click="vm.cancel()">Cancel</button>
+            <button type="submit"
+                    class="btn-primary"
+                    ng-disabled="incidentForm.$invalid || vm.isSubmitting">
+                <span ng-show="!vm.isSubmitting">Submit to HOD</span>
+                <span ng-show="vm.isSubmitting">Submitting...</span>
+            </button>
         </div>
     </form>
 </div>
 
+@Html.Partial("_EmployeeSearchModal")
+
 @section Scripts {
-    <script src="~/js/incident/incident-create-viewmodel.js"></script>
-    <script src="~/js/components/employee-search.js"></script>
-    <script src="~/js/telerik-notifications.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="~/js/incident/incident-create-app.js"></script>
+    <script src="~/js/incident/incident-create-service.js"></script>
+    <script src="~/js/incident/incident-create-controller.js"></script>
 }

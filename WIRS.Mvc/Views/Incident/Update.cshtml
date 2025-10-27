@@ -1,0 +1,79 @@
+@{
+    ViewData["Title"] = "Update Incident Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div ng-app="incidentUpdateApp" ng-controller="IncidentUpdateController as vm">
+    <div class="container mx-auto px-4 py-6">
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Incident Report - {{ vm.incident.incidentId }}</h2>
+
+            <div ng-show="vm.loading" class="text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                <p class="mt-4 text-gray-600">Loading incident data...</p>
+            </div>
+
+            <div ng-show="vm.error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {{ vm.error }}
+            </div>
+
+            <div ng-show="!vm.loading && !vm.error">
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-700">Current Status: <span class="text-blue-600">{{ vm.incident.statusDesc }}</span></h3>
+                        <span class="px-3 py-1 rounded-full text-sm font-medium" ng-class="vm.getStatusClass()">
+                            Status {{ vm.incident.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="partA-tab" data-bs-toggle="tab" data-bs-target="#partA" type="button" role="tab">
+                            Part A - Incident Details
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation" ng-show="vm.canViewPartB()">
+                        <button class="nav-link" id="partB-tab" data-bs-toggle="tab" data-bs-target="#partB" type="button" role="tab">
+                            Part B - HOD Review
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation" ng-show="vm.canViewPartC()">
+                        <button class="nav-link" id="partC-tab" data-bs-toggle="tab" data-bs-target="#partC" type="button" role="tab">
+                            Part C - WSHO Investigation
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation" ng-show="vm.canViewPartD()">
+                        <button class="nav-link" id="partD-tab" data-bs-toggle="tab" data-bs-target="#partD" type="button" role="tab">
+                            Part D - HOD Comment
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="partA" role="tabpanel">
+                        @await Html.PartialAsync("_PartA")
+                    </div>
+
+                    <div class="tab-pane fade" id="partB" role="tabpanel" ng-show="vm.canViewPartB()">
+                        @await Html.PartialAsync("_PartB")
+                    </div>
+
+                    <div class="tab-pane fade" id="partC" role="tabpanel" ng-show="vm.canViewPartC()">
+                        @await Html.PartialAsync("_PartC")
+                    </div>
+
+                    <div class="tab-pane fade" id="partD" role="tabpanel" ng-show="vm.canViewPartD()">
+                        @await Html.PartialAsync("_PartD")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/angular/angular.min.js"></script>
+<script src="~/lib/kendo-ui/js/kendo.all.min.js"></script>
+<script src="~/js/incident/incident-update-app.js"></script>
+<script src="~/js/incident/incident-update-service.js"></script>
+<script src="~/js/incident/incident-update-controller.js"></script>

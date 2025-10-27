@@ -129,6 +129,8 @@ namespace WIRS.Mvc.Controllers
                     userName = currentUser.UserName,
                     userRole = currentUser.UserRole.ToString(),
                     sbaName = currentUser.SbaName,
+                    sectorCode = currentUser.SectorCode,
+                    designation = string.Empty,
                     displayName = !string.IsNullOrEmpty(currentUser.UserName) ? currentUser.UserName : "User",
                     loginTime = currentUser.LoginTime,
                     lastActivity = currentUser.LastActivity
@@ -357,6 +359,120 @@ namespace WIRS.Mvc.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Error inactivating user", error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHODs(string sectorCode, string lobCode, string departmentCode = "", string locationCode = "")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(sectorCode) || string.IsNullOrWhiteSpace(lobCode))
+                {
+                    return Json(new { success = false, message = "Sector and LOB codes are required" });
+                }
+
+                var hods = await _userService.GetHODsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                return Json(hods);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error retrieving HODs", error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWSHOs(string sectorCode, string lobCode, string departmentCode = "", string locationCode = "")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(sectorCode) || string.IsNullOrWhiteSpace(lobCode))
+                {
+                    return Json(new { success = false, message = "Sector and LOB codes are required" });
+                }
+
+                var wshos = await _userService.GetWSHOsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                return Json(wshos);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error retrieving WSHOs", error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAHODs(string sectorCode, string lobCode, string departmentCode = "", string locationCode = "")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(sectorCode) || string.IsNullOrWhiteSpace(lobCode))
+                {
+                    return Json(new { success = false, message = "Sector and LOB codes are required" });
+                }
+
+                var ahods = await _userService.GetAHODsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                return Json(ahods);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error retrieving AHODs", error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPartACopyTo(string sectorCode, string lobCode, string departmentCode = "", string locationCode = "")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(sectorCode) || string.IsNullOrWhiteSpace(lobCode))
+                {
+                    return Json(new { success = false, message = "Sector and LOB codes are required" });
+                }
+
+                var copyToList = await _userService.GetPartACopyToList(sectorCode, lobCode, departmentCode, locationCode);
+                return Json(copyToList);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error retrieving CC list", error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCWSHOs(string sectorCode, string lobCode, string departmentCode = "", string locationCode = "")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(sectorCode) || string.IsNullOrWhiteSpace(lobCode))
+                {
+                    return Json(new { success = false, message = "Sector and LOB codes are required" });
+                }
+
+                var cwshos = await _userService.GetCWSHOsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                return Json(cwshos);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error retrieving Corporate WSHOs", error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHSBUs(string sectorCode, string lobCode, string departmentCode = "", string locationCode = "")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(sectorCode) || string.IsNullOrWhiteSpace(lobCode))
+                {
+                    return Json(new { success = false, message = "Sector and LOB codes are required" });
+                }
+
+                var hsbus = await _userService.GetHSBUsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                return Json(hsbus);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error retrieving HSBUs", error = ex.Message });
             }
         }
     }

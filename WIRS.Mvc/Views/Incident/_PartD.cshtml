@@ -1,0 +1,282 @@
+@* Part D - HOD Comments on Investigation *@
+
+<div class="bg-white shadow-md rounded-lg p-6">
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part D - HOD Comments on Investigation</h3>
+        <p class="text-sm text-gray-600">Review the WSHO's investigation findings and provide your comments before forwarding to HSBU for approval.</p>
+    </div>
+
+    <div ng-show="vm.partD.validationMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ vm.partD.validationMessage }}
+    </div>
+
+    <div ng-show="vm.partD.successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        {{ vm.partD.successMessage }}
+    </div>
+
+    <!-- Edit Mode (Status = 03) -->
+    <form name="partDForm" ng-submit="vm.submitPartD()" novalidate ng-show="!vm.partD.isReadOnly">
+        <div class="space-y-6">
+            <!-- Section 1: HOD Comments -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-lg font-semibold text-gray-700 mb-4">1. HOD Comments</h4>
+
+                <div>
+                    <label for="partDComments" class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="text-red-600">*</span> Comments on Investigation Findings
+                    </label>
+                    <textarea
+                        id="partDComments"
+                        name="partDComments"
+                        ng-model="vm.partD.comments"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        rows="6"
+                        placeholder="Provide your comments on the WSHO's investigation findings, recommended actions, and any additional observations..."
+                        maxlength="2000"
+                        required
+                        ng-disabled="vm.partD.isReadOnly">
+                    </textarea>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-red-600 text-sm" ng-show="partDForm.partDComments.$touched && partDForm.partDComments.$invalid">
+                            Comments are required (ERR-137)
+                        </span>
+                        <span class="text-sm text-gray-500">{{ vm.partD.comments ? vm.partD.comments.length : 0 }} / 2000 characters</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Forward To -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-lg font-semibold text-gray-700 mb-4">2. Forward To</h4>
+
+                <div>
+                    <label for="partDHsbu" class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="text-red-600">*</span> Head of SBU (HSBU)
+                    </label>
+                    <select
+                        id="partDHsbu"
+                        name="partDHsbu"
+                        ng-model="vm.partD.hsbuId"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required
+                        ng-disabled="vm.partD.isReadOnly">
+                        <option value="">-- Select HSBU --</option>
+                        <option ng-repeat="hsbu in vm.hsbuList" value="{{ hsbu.userId }}">
+                            {{ hsbu.userName }} ({{ hsbu.userId }})
+                        </option>
+                    </select>
+                    <span class="text-red-600 text-sm" ng-show="partDForm.partDHsbu.$touched && partDForm.partDHsbu.$invalid">
+                        HSBU selection is required (ERR-133)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Section 3: CC/Email To -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-lg font-semibold text-gray-700 mb-4">3. CC/Email To</h4>
+
+                <!-- Standard Email To List -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Standard Email Recipients</label>
+                    <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
+                        <div ng-repeat="person in vm.partD.emailToList" class="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="emailTo_{{ person.userId }}"
+                                ng-model="person.selected"
+                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                ng-disabled="vm.partD.isReadOnly">
+                            <label for="emailTo_{{ person.userId }}" class="ml-2 text-sm text-gray-700">
+                                {{ person.userName }} ({{ person.userId }}) - {{ person.designation }}
+                            </label>
+                        </div>
+                        <div ng-show="vm.partD.emailToList.length === 0" class="text-sm text-gray-500 italic">
+                            No standard recipients found
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Copy To -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Additional Recipients (Optional)</label>
+                    <div ng-show="!vm.partD.isReadOnly" class="mb-3">
+                        <button
+                            type="button"
+                            ng-click="vm.openEmployeeSearchForPartD()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search mr-2"></i>Add Recipient
+                        </button>
+                    </div>
+
+                    <div ng-show="vm.partD.additionalCopyToList.length > 0" class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 border border-gray-300 rounded">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Employee ID</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                                    <th ng-show="!vm.partD.isReadOnly" class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr ng-repeat="person in vm.partD.additionalCopyToList">
+                                    <td class="px-4 py-3 text-sm text-gray-900">{{ person.employeeId }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-900">{{ person.name }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-900">{{ person.designation }}</td>
+                                    <td ng-show="!vm.partD.isReadOnly" class="px-4 py-3 text-center">
+                                        <button
+                                            type="button"
+                                            ng-click="vm.removeAdditionalCopyToFromPartD($index)"
+                                            class="text-red-600 hover:text-red-800">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Submitter Information -->
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-lg font-semibold text-gray-700 mb-4">4. Submitter Information</h4>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input
+                            type="text"
+                            ng-model="vm.currentUser.userName"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                            readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+                        <input
+                            type="text"
+                            ng-model="vm.currentUser.userId"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                            readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                        <input
+                            type="text"
+                            ng-model="vm.currentUser.designation"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                            readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        <input
+                            type="text"
+                            ng-model="vm.partD.currentDate"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                            readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+                <button
+                    type="button"
+                    ng-click="vm.cancelPartD()"
+                    class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    ng-disabled="partDForm.$invalid || vm.partD.isSubmitting"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    <span ng-show="!vm.partD.isSubmitting">Submit to HSBU</span>
+                    <span ng-show="vm.partD.isSubmitting">
+                        <i class="fas fa-spinner fa-spin mr-2"></i>Submitting...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Read-Only Mode (Status > 03) -->
+    <div ng-show="vm.partD.isReadOnly" class="space-y-6">
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+            <p class="text-sm text-blue-700">
+                <i class="fas fa-info-circle mr-2"></i>
+                Part D has been submitted and is now read-only.
+            </p>
+        </div>
+
+        <!-- Section 1: HOD Comments (Read-only) -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-lg font-semibold text-gray-700 mb-4">1. HOD Comments</h4>
+            <div class="bg-white p-4 rounded border border-gray-300">
+                <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ vm.partD.comments || 'No comments provided' }}</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Forward To (Read-only) -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-lg font-semibold text-gray-700 mb-4">2. Forwarded To</h4>
+            <div class="bg-white p-4 rounded border border-gray-300">
+                <p class="text-sm text-gray-700">
+                    <strong>HSBU:</strong> {{ vm.getHsbuName(vm.partD.hsbuId) }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 3: CC/Email To (Read-only) -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-lg font-semibold text-gray-700 mb-4">3. CC/Email To</h4>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Standard Recipients</label>
+                <div class="bg-white p-4 rounded border border-gray-300">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li ng-repeat="person in vm.partD.emailToList | filter: {selected: true}" class="text-sm text-gray-700">
+                            {{ person.userName }} ({{ person.userId }}) - {{ person.designation }}
+                        </li>
+                        <li ng-show="(vm.partD.emailToList | filter: {selected: true}).length === 0" class="text-sm text-gray-500 italic list-none">
+                            No standard recipients selected
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div ng-show="vm.partD.additionalCopyToList.length > 0">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Recipients</label>
+                <div class="bg-white p-4 rounded border border-gray-300">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li ng-repeat="person in vm.partD.additionalCopyToList" class="text-sm text-gray-700">
+                            {{ person.name }} ({{ person.employeeId }}) - {{ person.designation }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Submitter Information (Read-only) -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="text-lg font-semibold text-gray-700 mb-4">4. Submitted By</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded border border-gray-300">
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Name:</p>
+                    <p class="text-sm text-gray-900">{{ vm.partD.submitterName || 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Employee ID:</p>
+                    <p class="text-sm text-gray-900">{{ vm.partD.submitterEmpId || 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Designation:</p>
+                    <p class="text-sm text-gray-900">{{ vm.partD.submitterDesignation || 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Date:</p>
+                    <p class="text-sm text-gray-900">{{ vm.partD.submittedDate || 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

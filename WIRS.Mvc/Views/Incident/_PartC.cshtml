@@ -1,0 +1,686 @@
+<div class="part-c-container">
+    <h3 class="text-xl font-semibold mb-4 text-gray-700">Part C - WSHO Investigation</h3>
+
+    <div ng-show="vm.partC.isReadOnly">
+        <div class="space-y-6">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-700 mb-3">Investigation Summary</h4>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Was Employee Negligent?</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partC.isNegligent === 'Y' ? 'Yes' : 'No' }}</p>
+                    </div>
+                    <div ng-show="vm.partC.isNegligent === 'Y'">
+                        <label class="block text-sm font-medium text-gray-600">Negligence Comments</label>
+                        <p class="mt-1 text-gray-900 whitespace-pre-wrap bg-white p-3 rounded border">{{ vm.partC.negligentComments }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">What Happened and Why</label>
+                        <p class="mt-1 text-gray-900 whitespace-pre-wrap bg-white p-3 rounded border">{{ vm.partC.whatHappenedAndWhy }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Recommended Actions</label>
+                        <p class="mt-1 text-gray-900 whitespace-pre-wrap bg-white p-3 rounded border">{{ vm.partC.recommendedActions }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-gray-700 mb-3">Investigated By</h4>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Name</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partC.submitterName }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Employee ID</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partC.submitterEmpId }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Designation</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partC.submitterDesignation }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Submission Date</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partC.submissionDate }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="!vm.partC.isReadOnly && vm.canEditPartC()">
+        <form name="partCForm" ng-submit="vm.submitPartC()" novalidate>
+            <div class="accordion" id="partCAccordion">
+
+                <!-- Section C-1: Eye Witnesses -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC1">
+                            <span class="font-semibold">C-1: Eye Witnesses</span>
+                        </button>
+                    </h2>
+                    <div id="collapseC1" class="accordion-collapse collapse show" data-bs-parent="#partCAccordion">
+                        <div class="accordion-body">
+                            <p class="text-sm text-gray-600 mb-3">Eye witnesses from Part A are listed below. You may add additional witnesses if needed.</p>
+
+                            <div ng-show="vm.incident.eyewitnesses && vm.incident.eyewitnesses.length > 0" class="mb-4 overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Contact No</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr ng-repeat="witness in vm.incident.eyewitnesses">
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ witness.name }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ witness.employeeNo }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ witness.designation }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ witness.contactNo }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div ng-show="!vm.incident.eyewitnesses || vm.incident.eyewitnesses.length === 0">
+                                <p class="text-gray-500 italic">No eye witnesses recorded in Part A.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section C-2: Persons Interviewed -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC2">
+                            <span class="font-semibold">C-2: Persons Interviewed</span>
+                        </button>
+                    </h2>
+                    <div id="collapseC2" class="accordion-collapse collapse" data-bs-parent="#partCAccordion">
+                        <div class="accordion-body">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                                    <div class="flex gap-2">
+                                        <input type="text"
+                                               ng-model="vm.partC.personInterviewed.name"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                               placeholder="Enter name or search">
+                                        <button type="button"
+                                                ng-click="vm.openEmployeeSearch('personInterviewed')"
+                                                class="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+                                            Search
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Employee No/NRIC</label>
+                                    <input type="text"
+                                           ng-model="vm.partC.personInterviewed.employeeNo"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Designation</label>
+                                    <input type="text"
+                                           ng-model="vm.partC.personInterviewed.designation"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Contact Number</label>
+                                    <input type="text"
+                                           ng-model="vm.partC.personInterviewed.contactNo"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            <button type="button"
+                                    ng-click="vm.addPersonInterviewed()"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Add Person
+                            </button>
+
+                            <div ng-show="vm.partC.personsInterviewed.length > 0" class="mt-4 overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Contact No</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr ng-repeat="person in vm.partC.personsInterviewed">
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.name }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.employeeNo }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.designation }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.contactNo }}</td>
+                                            <td class="px-4 py-2 text-sm">
+                                                <button type="button"
+                                                        ng-click="vm.removePersonInterviewed($index)"
+                                                        class="text-red-600 hover:text-red-800">
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section C-3: Injury Details (only for injury incidents) -->
+                <div class="accordion-item" ng-show="vm.isInjuryIncident()">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC3">
+                            <span class="font-semibold">C-3: Injury Details</span>
+                        </button>
+                    </h2>
+                    <div id="collapseC3" class="accordion-collapse collapse" data-bs-parent="#partCAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700">Select Injured Person</label>
+                                <select ng-model="vm.partC.injuryDetail.injuredPersonId"
+                                        class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <option value="">-- Select Injured Person --</option>
+                                    <option ng-repeat="person in vm.incident.injuredPersons" value="{{ person.employeeNo }}">
+                                        {{ person.name }} ({{ person.employeeNo }})
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nature of Injury</label>
+                                    <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="nature in vm.natureOfInjury" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="nature.selected"
+                                                   id="nature{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="nature{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ nature.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Head/Neck/Torso</label>
+                                    <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="part in vm.headNeckTorso" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="part.selected"
+                                                   id="head{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="head{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ part.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Upper Limbs</label>
+                                    <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="limb in vm.upperLimbs" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="limb.selected"
+                                                   id="upper{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="upper{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ limb.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Lower Limbs</label>
+                                    <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="limb in vm.lowerLimbs" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="limb.selected"
+                                                   id="lower{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="lower{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ limb.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700">Injury Description</label>
+                                <textarea ng-model="vm.partC.injuryDetail.description"
+                                          rows="3"
+                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                            </div>
+
+                            <button type="button"
+                                    ng-click="vm.addInjuryDetail()"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Add Injury Detail
+                            </button>
+
+                            <div ng-show="vm.partC.injuryDetails.length > 0" class="mt-4 overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Injured Person</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Nature of Injury</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Body Parts</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Description</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr ng-repeat="injury in vm.partC.injuryDetails">
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ injury.injuredPersonName }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ injury.natureOfInjury }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ injury.bodyParts }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ injury.description }}</td>
+                                            <td class="px-4 py-2 text-sm">
+                                                <button type="button"
+                                                        ng-click="vm.removeInjuryDetail($index)"
+                                                        class="text-red-600 hover:text-red-800">
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section C-4: Medical Certificates (only for injury incidents) -->
+                <div class="accordion-item" ng-show="vm.isInjuryIncident()">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC4">
+                            <span class="font-semibold">C-4: Medical Certificates/Leaves</span>
+                        </button>
+                    </h2>
+                    <div id="collapseC4" class="accordion-collapse collapse" data-bs-parent="#partCAccordion">
+                        <div class="accordion-body">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Select Injured Person</label>
+                                    <select ng-model="vm.partC.medicalCert.injuredPersonId"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">-- Select Injured Person --</option>
+                                        <option ng-repeat="person in vm.incident.injuredPersons" value="{{ person.employeeNo }}">
+                                            {{ person.name }} ({{ person.employeeNo }})
+                                        </option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Number of Days</label>
+                                    <input type="number"
+                                           ng-model="vm.partC.medicalCert.numberOfDays"
+                                           min="1"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">MC From Date</label>
+                                    <input type="date"
+                                           ng-model="vm.partC.medicalCert.fromDate"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">MC To Date</label>
+                                    <input type="date"
+                                           ng-model="vm.partC.medicalCert.toDate"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700">MC Attachment (PDF, JPG, PNG)</label>
+                                    <input type="file"
+                                           accept=".pdf,.jpg,.jpeg,.png"
+                                           class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                </div>
+                            </div>
+                            <button type="button"
+                                    ng-click="vm.addMedicalCertificate()"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                Add MC
+                            </button>
+
+                            <div ng-show="vm.partC.medicalCertificates.length > 0" class="mt-4 overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Injured Person</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">From Date</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">To Date</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Days</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Attachment</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr ng-repeat="mc in vm.partC.medicalCertificates">
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ mc.injuredPersonName }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ mc.fromDate }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ mc.toDate }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ mc.numberOfDays }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">
+                                                <span ng-show="mc.hasAttachment" class="text-green-600">Yes</span>
+                                                <span ng-show="!mc.hasAttachment" class="text-gray-400">No</span>
+                                            </td>
+                                            <td class="px-4 py-2 text-sm">
+                                                <button type="button"
+                                                        ng-click="vm.removeMedicalCertificate($index)"
+                                                        class="text-red-600 hover:text-red-800">
+                                                    Remove
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section C-5: Incident Classification and Cause Analysis -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC5">
+                            <span class="font-semibold">C-5: Incident Classification and Cause Analysis</span>
+                        </button>
+                    </h2>
+                    <div id="collapseC5" class="accordion-collapse collapse" data-bs-parent="#partCAccordion">
+                        <div class="accordion-body">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Incident Class</label>
+                                    <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="cls in vm.incidentClass" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="cls.selected"
+                                                   id="class{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="class{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ cls.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Incident Agent</label>
+                                    <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="agent in vm.incidentAgent" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="agent.selected"
+                                                   id="agent{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="agent{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ agent.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Unsafe Conditions</label>
+                                    <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="condition in vm.unsafeConditions" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="condition.selected"
+                                                   id="unsafe{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="unsafe{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ condition.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Unsafe Acts</label>
+                                    <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="act in vm.unsafeActs" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="act.selected"
+                                                   id="act{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="act{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ act.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Contributing Factors</label>
+                                    <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-300 rounded p-3">
+                                        <div ng-repeat="factor in vm.contributingFactors" class="flex items-center">
+                                            <input type="checkbox"
+                                                   ng-model="factor.selected"
+                                                   id="factor{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="factor{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ factor.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section C-6: Root Cause Analysis -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC6">
+                            <span class="font-semibold">C-6: Root Cause Analysis</span>
+                        </button>
+                    </h2>
+                    <div id="collapseC6" class="accordion-collapse collapse" data-bs-parent="#partCAccordion">
+                        <div class="accordion-body">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Was the incident job-related? (from Part A)</label>
+                                    <p class="text-gray-900">{{ vm.incident.isJobrelated === 'Y' ? 'Yes' : 'No' }}</p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Was employee negligent?</label>
+                                    <div class="space-y-2">
+                                        <div ng-repeat="option in vm.negligentOptions" class="flex items-center">
+                                            <input type="radio"
+                                                   name="negligent"
+                                                   ng-model="vm.partC.isNegligent"
+                                                   ng-value="option.code"
+                                                   id="neg{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                            <label for="neg{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                {{ option.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.isNegligent">
+                                        Negligent field is required (ERR-136)
+                                    </span>
+                                </div>
+
+                                <div ng-show="vm.partC.isNegligent === 'Y'">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Comments on Negligence</label>
+                                    <textarea ng-model="vm.partC.negligentComments"
+                                              rows="4"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                              placeholder="Provide details on why the employee was negligent..."></textarea>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && vm.partC.isNegligent === 'Y' && !vm.partC.negligentComments">
+                                        Negligent comments required when negligent is Yes (ERR-137)
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Does risk assessment need review?</label>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <input type="radio"
+                                                   name="riskReview"
+                                                   ng-model="vm.partC.needsRiskAssessmentReview"
+                                                   value="Y"
+                                                   id="riskY"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                            <label for="riskY" class="ml-2 block text-sm text-gray-700">Yes</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="radio"
+                                                   name="riskReview"
+                                                   ng-model="vm.partC.needsRiskAssessmentReview"
+                                                   value="N"
+                                                   id="riskN"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                            <label for="riskN" class="ml-2 block text-sm text-gray-700">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div ng-show="vm.partC.needsRiskAssessmentReview === 'Y'">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Comments on Risk Assessment Review</label>
+                                    <textarea ng-model="vm.partC.riskAssessmentComments"
+                                              rows="4"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                              placeholder="Explain what needs to be reviewed in the risk assessment..."></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">What happened and why?</label>
+                                    <textarea ng-model="vm.partC.whatHappenedAndWhy"
+                                              rows="6"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                              placeholder="Provide detailed root cause analysis - describe the sequence of events and underlying reasons..."
+                                              required></textarea>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.whatHappened.$touched && partCForm.whatHappened.$invalid">
+                                        What happened and why is required (ERR-138)
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Recommended Corrective/Preventive Actions</label>
+                                    <textarea ng-model="vm.partC.recommendedActions"
+                                              rows="6"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                              placeholder="List actions to prevent recurrence of this incident..."
+                                              required></textarea>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.recommendedActions.$touched && partCForm.recommendedActions.$invalid">
+                                        Recommended actions is required (ERR-139)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section C-7: Final Submission -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC7">
+                            <span class="font-semibold">C-7: Additional Comments and Submission</span>
+                        </button>
+                    </h2>
+                    <div id="collapseC7" class="accordion-collapse collapse" data-bs-parent="#partCAccordion">
+                        <div class="accordion-body">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Additional Comments</label>
+                                    <textarea ng-model="vm.partC.additionalComments"
+                                              rows="4"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                              placeholder="Any additional information for HOD..."></textarea>
+                                </div>
+
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-700 mb-3">WSHO Submission Info</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-600">Name</label>
+                                            <p class="mt-1 text-gray-900">{{ vm.currentUser.name }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-600">Employee ID</label>
+                                            <p class="mt-1 text-gray-900">{{ vm.currentUser.userId }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-600">Designation</label>
+                                            <p class="mt-1 text-gray-900">{{ vm.currentUser.designation }}</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-600">Date</label>
+                                            <p class="mt-1 text-gray-900">{{ vm.getCurrentDate() }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div ng-show="vm.partC.showCloseOptions">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Forward To (for closure)</label>
+                                    <select ng-model="vm.partC.cwshoId"
+                                            class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">-- Select Corporate WSHO --</option>
+                                        <option ng-repeat="cwsho in vm.cwshoList" value="{{ cwsho.id }}">{{ cwsho.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div ng-show="vm.partC.validationMessage" class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                                {{ vm.partC.validationMessage }}
+                            </div>
+
+                            <div class="mt-6 flex justify-end space-x-4">
+                                <button type="button"
+                                        ng-click="vm.cancel()"
+                                        class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="button"
+                                        ng-click="vm.savePartC()"
+                                        ng-disabled="vm.partC.saving"
+                                        class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50">
+                                    <span ng-show="!vm.partC.saving">Save Progress</span>
+                                    <span ng-show="vm.partC.saving">Saving...</span>
+                                </button>
+                                <button type="submit"
+                                        ng-disabled="partCForm.$invalid || vm.partC.submitting"
+                                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
+                                    <span ng-show="!vm.partC.submitting">Submit to HOD</span>
+                                    <span ng-show="vm.partC.submitting">Submitting...</span>
+                                </button>
+                                <button type="button"
+                                        ng-click="vm.closePartC()"
+                                        ng-disabled="vm.partC.closing"
+                                        class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50">
+                                    <span ng-show="!vm.partC.closing">Close Incident</span>
+                                    <span ng-show="vm.partC.closing">Closing...</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <div ng-show="!vm.canEditPartC() && !vm.partC.isReadOnly" class="bg-yellow-50 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+        You do not have permission to edit Part C. Only the assigned WSHO can investigate and submit this section.
+    </div>
+</div>
+
+<style>
+.required::after {
+    content: " *";
+    color: red;
+}
+</style>
