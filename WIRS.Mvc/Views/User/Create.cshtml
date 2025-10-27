@@ -79,9 +79,9 @@
                         </label>
                         @(Html.Kendo().DropDownList()
                             .Name("UserRole")
-                            .OptionLabel("Select User Role")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
+                            .OptionLabel("--Select--")
+                            .DataTextField("value")
+                            .DataValueField("code")
                             .DataSource(source => source.Read(read => read.Action("GetUserRoles", "MasterData")))
                             .HtmlAttributes(new { 
                                 id = "ddlUserRole", 
@@ -115,18 +115,18 @@
 
         <!-- User Access Management Card -->
         <div class="card overflow-hidden">
-            <div class="card-header">
+            <div class="card-header flex justify-between items-center">
                 <h2 class="card-title">User Access Management</h2>
-            </div>
-            <div class="card-body">
-                <div class="flex justify-end mb-4">
+                <div>
                     @(Html.Kendo().Button()
                         .Name("btnAddAccess")
                         .Content("Add Access")
                         .HtmlAttributes(new { @class = "btn-primary" })
                         .Events(e => e.Click("addNewAccess"))
-                    )
+                        )
                 </div>
+            </div>
+            <div class="card-body">
                 @(Html.Kendo().Grid<dynamic>()
                     .Name("userAccessGrid")
                     .Columns(columns =>
@@ -201,13 +201,11 @@
     <script src="~/js/telerik-notifications.js"></script>
     <script src="~/js/telerik-skeleton-loading.js"></script>
     <script src="~/js/components/employee-search.js"></script>
-    <script src="~/js/user-create-viewmodel.js"></script>
+    <script src="~/js/user/create-viewmodel.js"></script>
     <script>
         $(document).ready(function() {
-            // Initialize user create view model
             userCreateViewModel.init();
             
-            // Initialize employee search component
             var employeeSearch = EmployeeSearchComponent.create({
                 modalId: 'employeeSearchWindow',
                 gridId: 'employeeSearchGrid',
@@ -215,7 +213,6 @@
             });
         });
         
-        // Custom callback for employee selection
         function onEmployeeSearchSelect(employee) {
             if (employee) {
                 var userIdTextBox = $("#txtUserId").data("kendoTextBox");
@@ -226,12 +223,10 @@
                 if (userNameTextBox) userNameTextBox.value(employee.EmployeeName);
                 if (emailTextBox) emailTextBox.value(employee.Email);
                 
-                // Show success notification
                 userCreateViewModel.showNotification('Employee information loaded successfully', 'success');
             }
         }
         
-        // Global function for opening employee search
         function openEmployeeSearch() {
             var instance = EmployeeSearchComponent.getInstance('employeeSearchWindow');
             if (instance) {

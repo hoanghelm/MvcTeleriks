@@ -1,444 +1,238 @@
-/**
- * Employee Search Component
- * Reusable JavaScript module for employee search functionality
- */
+var EmployeeSearchComponent = (function () {
+    var instances = {};
 
-var EmployeeSearchComponent = (function() {
-    'use strict';
-
-    // Private variables
-    var _instances = {};
-    
-    /**
-     * Constructor for EmployeeSearch instance
-     */
-    function EmployeeSearch(options) {
-        this.options = $.extend({
-            modalId: 'employeeSearchModal',
-            gridId: 'employeeSearchGrid',
-            onSelectCallback: null,
-            apiEndpoint: '/User/SearchEmployees',
-            enableAdvancedFilters: true,
-            enableExport: true,
-            autoSearch: false,
-            pageSize: 25
-        }, options);
-        
-        this.elements = {};
+    function EmployeeSearchInstance(config) {
+        this.modalId = config.modalId;
+        this.gridId = config.gridId;
+        this.onSelectCallback = config.onSelectCallback;
+        this.modal = null;
+        this.grid = null;
         this.selectedEmployee = null;
-        
+
         this.init();
     }
 
-    EmployeeSearch.prototype = {
-        /**
-         * Initialize the component
-         */
-        init: function() {
-            this.initializeElements();
-            this.bindEvents();
-            this.setupGrid();
-            
-            // Store instance for global access
-            _instances[this.options.modalId] = this;
-        },
+    EmployeeSearchInstance.prototype.init = function () {
+        var self = this;
 
-        /**
-         * Initialize DOM elements
-         */
-        initializeElements: function() {
-            this.elements.modal = $("#" + this.options.modalId).data("kendoWindow");
-            this.elements.grid = $("#" + this.options.gridId).data("kendoGrid");
-            this.elements.splitter = $("#employeeSearchSplitter").data("kendoSplitter");
-            
-            // Filter elements
-            this.elements.filterEmployeeId = $("#filterEmployeeId").data("kendoTextBox");
-            this.elements.filterEmployeeName = $("#filterEmployeeName").data("kendoTextBox");
-            this.elements.filterEmployeeEmail = $("#filterEmployeeEmail").data("kendoTextBox");
-            this.elements.filterDepartment = $("#filterDepartment").data("kendoDropDownList");
-            
-            // Action buttons
-            this.elements.btnSelect = $("#btnSelectEmployee").data("kendoButton");
-            this.elements.btnCancel = $("#btnCancelSearch").data("kendoButton");
-            this.elements.btnSearch = $("#btnAdvancedSearch").data("kendoButton");
-            this.elements.btnClear = $("#btnClearFilters").data("kendoButton");
-            this.elements.btnExport = $("#btnExportResults").data("kendoButton");
-            
-            // Info elements
-            this.elements.resultsCount = $("#resultsCount");
-            this.elements.selectedEmployeeInfo = $("#selectedEmployeeInfo");
-            this.elements.selectedEmployeeName = $("#selectedEmployeeName");
-            this.elements.selectedEmployeeId = $("#selectedEmployeeId");
-            this.elements.selectedEmployeeEmail = $("#selectedEmployeeEmail");
-        },
+        this.modal = $("#" + this.modalId).data("kendoWindow");
+        this.grid = $("#" + this.gridId).data("kendoGrid");
 
-        /**
-         * Bind event handlers
-         */
-        bindEvents: function() {
-            var self = this;
-            
-            // Grid selection change
-            if (this.elements.grid) {
-                this.elements.grid.bind("change", function() {
-                    self.onGridSelectionChange();
-                });
-            }
-            
-            // Enter key search
-            var filterInputs = [
-                this.elements.filterEmployeeId,
-                this.elements.filterEmployeeName,
-                this.elements.filterEmployeeEmail
-            ];
-            
-            filterInputs.forEach(function(input) {
-                if (input) {
-                    input.bind("keypress", function(e) {
-                        if (e.which === 13) {
-                            self.performSearch();
-                        }
-                    });
-                }
+        if (this.modal) {
+            this.modal.bind("open", function () {
+                self.loadAllEmployees();
             });
-        },
-
-        /**
-         * Setup grid configuration
-         */
-        setupGrid: function() {
-            if (!this.elements.grid) return;
-            
-            var self = this;
-            
-            // Configure data source
-            var dataSource = new kendo.data.DataSource({
-                pageSize: this.options.pageSize,
-                schema: {
-                    model: {
-                        id: "EmployeeId",
-                        fields: {
-                            EmployeeId: { type: "string" },
-                            EmployeeName: { type: "string" },
-                            Email: { type: "string" },
-                            Department: { type: "string" },
-                            Designation: { type: "string" },
-                            Status: { type: "string" }
-                        }
-                    },
-                    total: function(response) {
-                        return response.totalCount || response.length || 0;
-                    },
-                    data: function(response) {
-                        return response.data || response;
-                    }
-                },
-                requestEnd: function(e) {
-                    self.updateResultsCount(e.response);
-                }
-            });
-            
-            this.elements.grid.setDataSource(dataSource);
-        },
-
-        /**
-         * Open the modal
-         */
-        open: function() {
-            if (this.elements.modal) {
-                this.clearSelection();
-                this.clearFilters();
-                this.elements.modal.center().open();
-            }
-        },
-
-        /**
-         * Close the modal
-         */
-        close: function() {
-            if (this.elements.modal) {
-                this.elements.modal.close();
-            }
-        },
-
-        /**
-         * Perform employee search
-         */
-        performSearch: function() {
-            var filters = this.getFilterValues();
-            
-            if (!this.hasValidFilters(filters)) {
-                this.showNotification("Please enter at least one search criteria", "warning");
-                return;
-            }
-            
-            this.searchEmployees(filters);
-        },
-
-        /**
-         * Get current filter values
-         */
-        getFilterValues: function() {
-            return {
-                EmployeeId: this.elements.filterEmployeeId ? this.elements.filterEmployeeId.value() : "",
-                EmployeeName: this.elements.filterEmployeeName ? this.elements.filterEmployeeName.value() : "",
-                Email: this.elements.filterEmployeeEmail ? this.elements.filterEmployeeEmail.value() : "",
-                Department: this.elements.filterDepartment ? this.elements.filterDepartment.value() : "",
-                PageNo: 1,
-                PageSize: this.options.pageSize
-            };
-        },
-
-        /**
-         * Validate if at least one filter has value
-         */
-        hasValidFilters: function(filters) {
-            return filters.EmployeeId || filters.EmployeeName || filters.Email || filters.Department;
-        },
-
-        /**
-         * Search employees via API
-         */
-        searchEmployees: function(filters) {
-            var self = this;
-            
-            this.showLoading(true);
-            
-            $.ajax({
-                url: this.options.apiEndpoint,
-                type: 'POST',
-                data: JSON.stringify(filters),
-                contentType: 'application/json',
-                success: function(response) {
-                    self.showLoading(false);
-                    
-                    if (response.success) {
-                        self.populateGrid(response.data);
-                    } else {
-                        self.showNotification(response.message || "Search failed", "error");
-                    }
-                },
-                error: function() {
-                    self.showLoading(false);
-                    self.showNotification("Error searching employees. Please try again.", "error");
-                }
-            });
-        },
-
-        /**
-         * Populate grid with search results
-         */
-        populateGrid: function(data) {
-            if (this.elements.grid) {
-                var employees = data.Employees || data;
-                this.elements.grid.dataSource.data(employees);
-                this.updateResultsCount({ data: employees, totalCount: data.TotalCount });
-            }
-        },
-
-        /**
-         * Update results count display
-         */
-        updateResultsCount: function(response) {
-            var count = response.totalCount || (response.data && response.data.length) || 0;
-            var text = count === 0 ? "No results" : `${count} employee${count !== 1 ? 's' : ''} found`;
-            this.elements.resultsCount.text(text);
-        },
-
-        /**
-         * Handle grid selection change
-         */
-        onGridSelectionChange: function() {
-            var selected = this.elements.grid.select();
-            
-            if (selected.length > 0) {
-                this.selectedEmployee = this.elements.grid.dataItem(selected);
-                this.showSelectedEmployee(this.selectedEmployee);
-                this.enableSelectButton(true);
-            } else {
-                this.clearSelection();
-            }
-        },
-
-        /**
-         * Show selected employee information
-         */
-        showSelectedEmployee: function(employee) {
-            this.elements.selectedEmployeeName.text(employee.EmployeeName);
-            this.elements.selectedEmployeeId.text(`ID: ${employee.EmployeeId}`);
-            this.elements.selectedEmployeeEmail.text(employee.Email);
-            this.elements.selectedEmployeeInfo.show();
-        },
-
-        /**
-         * Clear current selection
-         */
-        clearSelection: function() {
-            this.selectedEmployee = null;
-            this.elements.selectedEmployeeInfo.hide();
-            this.enableSelectButton(false);
-            
-            if (this.elements.grid) {
-                this.elements.grid.clearSelection();
-            }
-        },
-
-        /**
-         * Enable/disable select button
-         */
-        enableSelectButton: function(enable) {
-            if (this.elements.btnSelect) {
-                this.elements.btnSelect.enable(enable);
-            }
-        },
-
-        /**
-         * Clear all filters
-         */
-        clearFilters: function() {
-            if (this.elements.filterEmployeeId) this.elements.filterEmployeeId.value("");
-            if (this.elements.filterEmployeeName) this.elements.filterEmployeeName.value("");
-            if (this.elements.filterEmployeeEmail) this.elements.filterEmployeeEmail.value("");
-            if (this.elements.filterDepartment) this.elements.filterDepartment.value("");
-            
-            // Clear grid
-            if (this.elements.grid) {
-                this.elements.grid.dataSource.data([]);
-            }
-            
-            this.updateResultsCount({ totalCount: 0 });
-        },
-
-        /**
-         * Select current employee and trigger callback
-         */
-        selectEmployee: function() {
-            if (!this.selectedEmployee) {
-                this.showNotification("Please select an employee", "warning");
-                return;
-            }
-            
-            // Execute callback if provided
-            if (this.options.onSelectCallback && typeof window[this.options.onSelectCallback] === 'function') {
-                window[this.options.onSelectCallback](this.selectedEmployee);
-            }
-            
-            this.close();
-        },
-
-        /**
-         * Export search results
-         */
-        exportResults: function() {
-            if (this.elements.grid) {
-                var dataSource = this.elements.grid.dataSource;
-                if (dataSource.total() === 0) {
-                    this.showNotification("No data to export", "warning");
-                    return;
-                }
-                
-                // Trigger Kendo Grid export
-                this.elements.grid.saveAsExcel();
-            }
-        },
-
-        /**
-         * Show loading state
-         */
-        showLoading: function(show) {
-            // You can implement a loading overlay here
-            if (show) {
-                this.elements.modal.element.find('.employee-search-container').addClass('loading');
-            } else {
-                this.elements.modal.element.find('.employee-search-container').removeClass('loading');
-            }
-        },
-
-        /**
-         * Show notification message
-         */
-        showNotification: function(message, type) {
-            // Simple notification - you can enhance this with a toast library
-            var className = type === 'error' ? 'alert-danger' : type === 'warning' ? 'alert-warning' : 'alert-info';
-            console.log(`[${type.toUpperCase()}] ${message}`);
-            
-            // You can integrate with your notification system here
-        },
-
-        /**
-         * Destroy the instance
-         */
-        destroy: function() {
-            if (this.elements.modal) {
-                this.elements.modal.destroy();
-            }
-            delete _instances[this.options.modalId];
         }
     };
 
-    // Public API
-    return {
-        /**
-         * Create a new EmployeeSearch instance
-         */
-        create: function(options) {
-            return new EmployeeSearch(options);
-        },
+    EmployeeSearchInstance.prototype.loadAllEmployees = function () {
+        var self = this;
 
-        /**
-         * Get existing instance by modal ID
-         */
-        getInstance: function(modalId) {
-            return _instances[modalId];
-        },
+        if (!this.grid) return;
 
-        /**
-         * Global event handlers for use in HTML attributes
-         */
-        globalHandlers: {
-            performAdvancedSearch: function() {
-                var instance = _instances['employeeSearchModal'];
-                if (instance) instance.performSearch();
+        kendo.ui.progress(this.grid.element, true);
+
+        $.ajax({
+            url: '/User/SearchEmployees',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                employeeId: '',
+                employeeName: '',
+                pageNo: 1,
+                pageSize: 100
+            }),
+            success: function (response) {
+                kendo.ui.progress(self.grid.element, false);
+
+                if (response.success && response.data && response.data.employees) {
+                    var employees = response.data.employees.map(function (emp) {
+                        return {
+                            EmployeeId: emp.employeeId,
+                            EmployeeName: emp.employeeName,
+                            CostCentreName: emp.costCentreName,
+                            Designation: emp.designation,
+                            Email: emp.email,
+                            ContactNo: emp.contactNo
+                        };
+                    });
+
+                    self.grid.setDataSource(new kendo.data.DataSource({
+                        data: employees,
+                        pageSize: 10,
+                        schema: {
+                            model: {
+                                id: "EmployeeId",
+                                fields: {
+                                    EmployeeId: { type: "string" },
+                                    EmployeeName: { type: "string" },
+                                    CostCentreName: { type: "string" },
+                                    Designation: { type: "string" },
+                                    Email: { type: "string" },
+                                    ContactNo: { type: "string" }
+                                }
+                            }
+                        }
+                    }));
+                } else {
+                    self.grid.setDataSource(new kendo.data.DataSource({ data: [] }));
+                    TelerikNotification.error(response.message || 'Failed to load employees');
+                }
             },
-
-            clearAllFilters: function() {
-                var instance = _instances['employeeSearchModal'];
-                if (instance) instance.clearFilters();
-            },
-
-            onEmployeeSelected: function() {
-                var instance = _instances['employeeSearchModal'];
-                if (instance) instance.selectEmployee();
-            },
-
-            closeEmployeeSearchModal: function() {
-                var instance = _instances['employeeSearchModal'];
-                if (instance) instance.close();
-            },
-
-            exportSearchResults: function() {
-                var instance = _instances['employeeSearchModal'];
-                if (instance) instance.exportResults();
-            },
-
-            onEmployeeSearchModalClose: function() {
-                var instance = _instances['employeeSearchModal'];
-                if (instance) instance.clearSelection();
-            },
-
-            onEmployeeGridSelectionChange: function() {
-                var instance = _instances['employeeSearchModal'];
-                if (instance) instance.onGridSelectionChange();
+            error: function (xhr, status, error) {
+                kendo.ui.progress(self.grid.element, false);
+                console.error('Error loading employees:', error);
+                console.error('Status:', status);
+                console.error('Response:', xhr.responseText);
+                TelerikNotification.error('Error loading employees. Please check console for details.');
             }
+        });
+    };
+
+    EmployeeSearchInstance.prototype.open = function () {
+        if (this.modal) {
+            var searchBox = $("#filterEmployeeName").data("kendoTextBox");
+            if (searchBox) searchBox.value('');
+
+            this.selectedEmployee = null;
+
+            this.modal.center().open();
+        }
+    };
+
+    EmployeeSearchInstance.prototype.close = function () {
+        if (this.modal) {
+            this.modal.close();
+        }
+    };
+
+    EmployeeSearchInstance.prototype.getSelectedEmployee = function () {
+        return this.selectedEmployee;
+    };
+
+    EmployeeSearchInstance.prototype.selectEmployee = function (employeeId) {
+        if (!this.grid) return;
+
+        var dataSource = this.grid.dataSource;
+        var employee = null;
+
+        for (var i = 0; i < dataSource.data().length; i++) {
+            var item = dataSource.data()[i];
+            if (item.EmployeeId === employeeId) {
+                employee = item;
+                break;
+            }
+        }
+
+        if (employee) {
+            this.selectedEmployee = employee;
+
+            if (window[this.onSelectCallback]) {
+                window[this.onSelectCallback](employee);
+            }
+
+            this.close();
+        }
+    };
+
+    return {
+        create: function (config) {
+            var instance = new EmployeeSearchInstance(config);
+            instances[config.modalId] = instance;
+            return instance;
+        },
+
+        getInstance: function (modalId) {
+            return instances[modalId];
         }
     };
 })();
 
-// Expose global handlers for HTML event binding
-window.performAdvancedSearch = EmployeeSearchComponent.globalHandlers.performAdvancedSearch;
-window.clearAllFilters = EmployeeSearchComponent.globalHandlers.clearAllFilters;
-window.onEmployeeSelected = EmployeeSearchComponent.globalHandlers.onEmployeeSelected;
-window.closeEmployeeSearchModal = EmployeeSearchComponent.globalHandlers.closeEmployeeSearchModal;
-window.exportSearchResults = EmployeeSearchComponent.globalHandlers.exportSearchResults;
-window.onEmployeeSearchModalClose = EmployeeSearchComponent.globalHandlers.onEmployeeSearchModalClose;
-window.onEmployeeGridSelectionChange = EmployeeSearchComponent.globalHandlers.onEmployeeGridSelectionChange;
+function onEmployeeSearchModalOpen() {
+}
+
+function onEmployeeSearchModalClose() {
+    var modalId = this.element.attr('id');
+    var instance = EmployeeSearchComponent.getInstance(modalId);
+
+    if (instance) {
+        instance.selectedEmployee = null;
+    }
+}
+
+function performAdvancedSearch() {
+    var employeeNameBox = $("#filterEmployeeName").data("kendoTextBox");
+    var employeeName = employeeNameBox ? employeeNameBox.value() : '';
+    var grid = $("#employeeSearchGrid").data("kendoGrid");
+
+    if (!grid) return;
+
+    kendo.ui.progress(grid.element, true);
+
+    $.ajax({
+        url: '/User/SearchEmployees',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            employeeId: '',
+            employeeName: employeeName,
+            pageNo: 1,
+            pageSize: 100
+        }),
+        success: function (response) {
+            kendo.ui.progress(grid.element, false);
+
+            if (response.success && response.data && response.data.employees) {
+                var employees = response.data.employees.map(function (emp) {
+                    return {
+                        EmployeeId: emp.employeeId,
+                        EmployeeName: emp.employeeName,
+                        CostCentreName: emp.costCentreName,
+                        Designation: emp.designation,
+                        Email: emp.email,
+                        ContactNo: emp.contactNo
+                    };
+                });
+
+                grid.setDataSource(new kendo.data.DataSource({
+                    data: employees,
+                    pageSize: 10,
+                    schema: {
+                        model: {
+                            id: "EmployeeId",
+                            fields: {
+                                EmployeeId: { type: "string" },
+                                EmployeeName: { type: "string" },
+                                CostCentreName: { type: "string" },
+                                Designation: { type: "string" },
+                                Email: { type: "string" },
+                                ContactNo: { type: "string" }
+                            }
+                        }
+                    }
+                }));
+
+                if (employees.length === 0) {
+                    TelerikNotification.info('No employees found matching your search');
+                }
+            } else {
+                grid.setDataSource(new kendo.data.DataSource({ data: [] }));
+                TelerikNotification.error(response.message || 'Search failed');
+            }
+        },
+        error: function (xhr, status, error) {
+            kendo.ui.progress(grid.element, false);
+            console.error('Search error:', error);
+            console.error('Status:', status);
+            console.error('Response:', xhr.responseText);
+            TelerikNotification.error('Error searching employees. Please check console for details.');
+        }
+    });
+}
+
+function selectEmployeeById(employeeId) {
+    var instance = EmployeeSearchComponent.getInstance('employeeSearchWindow');
+    if (instance) {
+        instance.selectEmployee(employeeId);
+    }
+}

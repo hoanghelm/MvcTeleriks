@@ -1,4 +1,3 @@
-// Telerik Skeleton Loading System
 var TelerikSkeleton = (function() {
     
     function showDropdownSkeleton(dropdownElement) {

@@ -30,8 +30,6 @@ namespace WIRS.DataAccess.Interfaces
 
         Task<string> GetUserRoleName(string userRoleCode);
 
-        // Additional methods for user management
-        Task<DataSet> SearchUsers(string sector, string lob, string userId, string userName, string userRole);
-        Task<UserCredentials?> GetUserCredentialsWithAccess(string userId);
+        Task<DataSet> SearchUsers(string currentUserId, string sector, string lob, string userId, string userName, string userRole);
     }
 }

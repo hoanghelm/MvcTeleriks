@@ -73,7 +73,6 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = string.Join(", ", errors) });
                 }
 
-                // Get current user from session (you may need to adjust this based on your auth implementation)
                 var currentUser = HttpContext.Session.GetString("UserId") ?? "System";
                 
                 var result = await _maintenanceService.SaveLOBAsync(model, currentUser);
@@ -107,7 +106,6 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
-        // Location Methods
         [HttpPost]
         public async Task<IActionResult> GetLocationList(string sbaCode, string sbuCode, string departmentCode)
         {
@@ -150,7 +148,6 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = string.Join(", ", errors) });
                 }
 
-                // Get current user from session
                 var currentUser = HttpContext.Session.GetString("UserId") ?? "System";
                 
                 var result = await _maintenanceService.SaveLocationAsync(model, currentUser);
@@ -184,7 +181,6 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
-        // Department Methods
         [HttpPost]
         public async Task<IActionResult> GetDepartmentList(string sbaCode, string sbuCode, string departmentName = "")
         {
@@ -227,7 +223,6 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = string.Join(", ", errors) });
                 }
 
-                // Get current user from session
                 var currentUser = HttpContext.Session.GetString("UserId") ?? "System";
                 
                 var result = await _maintenanceService.SaveDepartmentAsync(model, currentUser);
@@ -261,7 +256,6 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
-        // CopyTo List Methods
         public IActionResult CopyTo()
         {
             return View();
@@ -313,7 +307,6 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = string.Join(", ", errors) });
                 }
 
-                // Get current user from session
                 var currentUser = HttpContext.Session.GetString("UserId") ?? "System";
                 
                 var result = await _maintenanceService.SaveCopyToListAsync(model, currentUser);
@@ -338,10 +331,8 @@ namespace WIRS.Mvc.Controllers
         {
             try
             {
-                // For now, we'll mark as inactive rather than actual deletion
                 model.InactiveDate = DateTime.Now.ToString("yyyy-MM-dd");
                 
-                // Get current user from session
                 var currentUser = HttpContext.Session.GetString("UserId") ?? "System";
                 
                 var result = await _maintenanceService.SaveCopyToListAsync(model, currentUser);

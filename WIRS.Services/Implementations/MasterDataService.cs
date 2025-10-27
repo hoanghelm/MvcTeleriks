@@ -58,7 +58,7 @@ namespace WIRS.Services.Implementations
                         {
                             Code = row["lookup_code"]?.ToString() ?? string.Empty,
                             Value = row["lookup_value"]?.ToString() ?? string.Empty,
-                            Description = row["lookup_desc"]?.ToString()
+                            Description = row["lookup_value"]?.ToString() ?? string.Empty,
                         });
                     }
                 }
@@ -140,6 +140,33 @@ namespace WIRS.Services.Implementations
                         {
                             Code = row["lookup_code"]?.ToString() ?? string.Empty,
                             Value = row["lookup_value"]?.ToString() ?? string.Empty
+                        });
+                    }
+                }
+
+                return result;
+            }
+            catch
+            {
+                return new List<LookupItem>();
+            }
+        }
+
+        public async Task<List<LookupItem>> GetLocations(string sectorCode, string lobCode, string deptCode)
+        {
+            try
+            {
+                var result = new List<LookupItem>();
+                var dataSet = await _commonFunDataAccess.get_active_locations(sectorCode, lobCode, deptCode);
+
+                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataSet.Tables[0].Rows)
+                    {
+                        result.Add(new LookupItem
+                        {
+                            Code = row["location_code"]?.ToString() ?? string.Empty,
+                            Value = row["location_name"]?.ToString() ?? string.Empty
                         });
                     }
                 }

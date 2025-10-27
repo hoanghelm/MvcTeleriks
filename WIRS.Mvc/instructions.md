@@ -6,10 +6,6 @@ You can see my old webform use BC (business component layer like usersBC it's is
 Note: since I cannot share the app settings. so all of this call method we need to implement the mock data logics when services to dataaccess. Include Appsetting Options...
 We can make some thing we can reuse in unit test too. please create mock test data if needed from data access
 
-Current Issues:
-- my telerik controls have issues
-Uncaught ReferenceError: kendo is not defined
-    at (index):23:167
 Improvements:
 - So move the own javascript for MVVM into separated js files.
 - I don't like the current theme of Login page and Dashboard as well so make it better with bootsrap and telerik controls

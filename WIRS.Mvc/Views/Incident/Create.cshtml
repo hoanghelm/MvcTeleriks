@@ -40,11 +40,12 @@
                         @(Html.Kendo().DatePicker()
                             .Name("IncidentDate")
                             .Value(DateTime.Today)
-                            .HtmlAttributes(new { 
-                                id = "dpIncidentDate", 
+                            .HtmlAttributes(new
+                            {
+                                id = "dpIncidentDate",
                                 required = "required"
                             })
-                        )
+                            )
                     </div>
 
                     <!-- Incident Time -->
@@ -55,11 +56,12 @@
                         @(Html.Kendo().TimePicker()
                             .Name("IncidentTime")
                             .Value(DateTime.Now)
-                            .HtmlAttributes(new { 
-                                id = "tpIncidentTime", 
+                            .HtmlAttributes(new
+                            {
+                                id = "tpIncidentTime",
                                 required = "required"
                             })
-                        )
+                            )
                     </div>
 
                     <!-- SBA -->
@@ -73,12 +75,13 @@
                             .DataTextField("Value")
                             .DataValueField("Code")
                             .BindTo(Model.SbaOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new { 
-                                id = "ddlSbaCode", 
+                            .HtmlAttributes(new
+                            {
+                                id = "ddlSbaCode",
                                 required = "required"
                             })
                             .Events(e => e.Change("onSbaChange"))
-                        )
+                            )
                     </div>
 
                     <!-- SBU -->
@@ -92,12 +95,13 @@
                             .DataTextField("Value")
                             .DataValueField("Code")
                             .BindTo(Model.SbuOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new { 
-                                id = "ddlSbuCode", 
+                            .HtmlAttributes(new
+                            {
+                                id = "ddlSbuCode",
                                 required = "required"
                             })
                             .Events(e => e.Change("onSbuChange"))
-                        )
+                            )
                     </div>
 
                     <!-- Division -->
@@ -113,25 +117,7 @@
                             .BindTo(Model.DivisionOptions ?? new List<LookupItem>())
                             .HtmlAttributes(new { id = "ddlDivision" })
                             .Events(e => e.Change("onDivisionChange"))
-                        )
-                    </div>
-
-                    <!-- Department -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Department <span class="text-red-500">*</span>
-                        </label>
-                        @(Html.Kendo().DropDownList()
-                            .Name("Department")
-                            .OptionLabel("Select Department")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .BindTo(Model.DepartmentOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new { 
-                                id = "ddlDepartment", 
-                                required = "required"
-                            })
-                        )
+                            )
                     </div>
 
                     <!-- Location -->
@@ -139,51 +125,54 @@
                         <label class="block text-sm font-medium text-gray-700">
                             Location <span class="text-red-500">*</span>
                         </label>
-                        @(Html.Kendo().DropDownList()
-                            .Name("Location")
-                            .OptionLabel("Select Location")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .BindTo(Model.LocationOptions ?? new List<LookupItem>())
-                            .HtmlAttributes(new { 
-                                id = "ddlLocation", 
-                                required = "required"
-                            })
-                        )
-                    </div>
-
-                    <!-- Exact Location -->
-                    <div class="space-y-2 xl:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Exact Location <span class="text-red-500">*</span>
-                        </label>
                         @(Html.Kendo().TextBox()
-                            .Name("ExactLocation")
-                            .Placeholder("Enter exact location details")
-                            .HtmlAttributes(new { 
-                                id = "txtExactLocation", 
+                            .Name("Location")
+                            .Placeholder("Enter incident location")
+                            .HtmlAttributes(new
+                            {
+                                id = "txtLocation",
                                 required = "required",
-                                maxlength = "500"
+                                maxlength = "200"
                             })
-                        )
+                            )
                     </div>
                 </div>
 
-                <!-- Incident Description -->
+                <!-- Description -->
                 <div class="mt-6 space-y-2">
                     <label class="block text-sm font-medium text-gray-700">
-                        Incident Description <span class="text-red-500">*</span>
+                        Description <span class="text-red-500">*</span>
                     </label>
                     @(Html.Kendo().TextArea()
-                        .Name("IncidentDesc")
-                        .Placeholder("Describe the incident in detail")
+                        .Name("Description")
+                        .Placeholder("Describe what happened")
                         .Rows(4)
-                        .HtmlAttributes(new { 
-                            id = "txtIncidentDesc", 
+                        .HtmlAttributes(new
+                        {
+                            id = "txtDescription",
                             required = "required",
                             maxlength = "2000"
                         })
-                    )
+                        )
+                </div>
+
+                <!-- Incident Type -->
+                <div class="mt-6 space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Incident Type <span class="text-red-500">*</span>
+                    </label>
+                    @(Html.Kendo().DropDownList()
+                        .Name("IncidentType")
+                        .OptionLabel("Select incident type...")
+                        .DataTextField("Value")
+                        .DataValueField("Code")
+                        .BindTo(Model.IncidentTypes)
+                        .HtmlAttributes(new
+                        {
+                            id = "ddlIncidentType",
+                            required = "required"
+                        })
+                        )
                 </div>
             </div>
         </div>
@@ -194,57 +183,138 @@
                 <h2 class="card-title">Superior Information</h2>
             </div>
             <div class="card-body">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Superior Employee Number -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Superior Employee Number <span class="text-red-500">*</span>
-                        </label>
-                        <div class="flex gap-2">
-                            <div class="flex-1">
-                                @(Html.Kendo().TextBox()
-                                    .Name("SuperiorEmpNo")
-                                    .Placeholder("Employee number")
-                                    .HtmlAttributes(new { 
-                                        id = "txtSuperiorEmpNo", 
-                                        required = "required"
-                                    })
-                                )
-                            </div>
-                            <button type="button" class="btn-primary" onclick="openSuperiorSearch()">Search</button>
-                        </div>
-                    </div>
-
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Superior Name -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
                             Superior Name <span class="text-red-500">*</span>
                         </label>
-                        @(Html.Kendo().TextBox()
-                            .Name("SuperiorName")
-                            .Placeholder("Superior's name")
-                            .HtmlAttributes(new { 
-                                id = "txtSuperiorName", 
-                                required = "required",
-                                readonly = "readonly"
-                            })
-                        )
+                        <div class="flex gap-2">
+                            @(Html.Kendo().TextBox()
+                                .Name("SuperiorName")
+                                .Placeholder("Enter superior name")
+                                .HtmlAttributes(new
+                                {
+                                    id = "txtSuperiorName",
+                                    required = "required",
+                                    @readonly = "readonly",
+                                    @class = "flex-1"
+                                })
+                                )
+                            @(Html.Kendo().Button()
+                                .Name("btnSearchSuperior")
+                                .Content("Search")
+                                .HtmlAttributes(new { @class = "btn-secondary" })
+                                .Events(e => e.Click("function() { openEmployeeSearch('superior'); }"))
+                                )
+                        </div>
+                        <input type="hidden" id="hdnSuperiorEmployeeId" name="SuperiorEmployeeId" />
                     </div>
 
-                    <!-- Superior Designation -->
+                    <!-- Superior Department -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
-                            Superior Designation
+                            Department
                         </label>
                         @(Html.Kendo().TextBox()
-                            .Name("SuperiorDesignation")
-                            .Placeholder("Superior's designation")
-                            .HtmlAttributes(new { 
-                                id = "txtSuperiorDesignation",
-                                readonly = "readonly"
+                            .Name("SuperiorDepartment")
+                            .Placeholder("Department will be auto-filled")
+                            .HtmlAttributes(new
+                            {
+                                id = "txtSuperiorDepartment",
+                                @readonly = "readonly"
                             })
-                        )
+                            )
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Injured Person Information Card -->
+        <div class="card overflow-hidden">
+            <div class="card-header">
+                <h2 class="card-title">Injured Person Information</h2>
+            </div>
+            <div class="card-body">
+                <div id="injuredPersonsContainer">
+                    <!-- Initial injured person form -->
+                    <div class="injured-person-section" data-index="0">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+                            <!-- Injured Person Name -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">
+                                    Name <span class="text-red-500">*</span>
+                                </label>
+                                <div class="flex gap-2">
+                                    @(Html.Kendo().TextBox()
+                                        .Name("InjuredPersons[0].Name")
+                                        .Placeholder("Enter injured person name")
+                                        .HtmlAttributes(new
+                                        {
+                                            id = "txtInjuredName_0",
+                                            required = "required",
+                                            @readonly = "readonly",
+                                            @class = "flex-1"
+                                        })
+                                        )
+                                    @(Html.Kendo().Button()
+                                        .Name("btnSearchInjured_0")
+                                        .Content("Search")
+                                        .HtmlAttributes(new { @class = "btn-secondary" })
+                                        .Events(e => e.Click("function() { openEmployeeSearch('injured', 0); }"))
+                                        )
+                                </div>
+                                <input type="hidden" name="InjuredPersons[0].EmployeeId" id="hdnInjuredEmployeeId_0" />
+                            </div>
+
+                            <!-- Injured Person Department -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">
+                                    Department
+                                </label>
+                                @(Html.Kendo().TextBox()
+                                    .Name("InjuredPersons[0].Department")
+                                    .Placeholder("Department will be auto-filled")
+                                    .HtmlAttributes(new
+                                    {
+                                        id = "txtInjuredDepartment_0",
+                                        @readonly = "readonly"
+                                    })
+                                    )
+                            </div>
+                        </div>
+
+                        <!-- Case Type -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700">
+                                    Case Type <span class="text-red-500">*</span>
+                                </label>
+                                @(Html.Kendo().DropDownList()
+                                    .Name("InjuredPersons[0].CaseType")
+                                    .OptionLabel("Select case type...")
+                                    .DataTextField("Value")
+                                    .DataValueField("Code")
+                                    .BindTo(new List<LookupItem>())
+                                    .HtmlAttributes(new
+                                    {
+                                        id = "ddlInjuredCaseType_0",
+                                        required = "required"
+                                    })
+                                    )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Injured Person Button -->
+                <div class="mt-4">
+                    @(Html.Kendo().Button()
+                        .Name("btnAddInjuredPerson")
+                        .Content("<i class='k-icon k-i-plus'></i> Add Another Injured Person")
+                        .HtmlAttributes(new { @class = "btn-secondary" })
+                        .Events(e => e.Click("addInjuredPerson"))
+                        )
                 </div>
             </div>
         </div>
@@ -256,55 +326,34 @@
             </div>
             <div class="card-body">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Any Eyewitness -->
+                    <!-- Overtime -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
-                            Any Eyewitness?
+                            Overtime Status
                         </label>
-                        <select name="AnyEyewitness" id="ddlAnyEyewitness" class="form-control">
-                            <option value="">Select option</option>
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-
-                    <!-- Working Overtime -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Was Working Overtime?
-                        </label>
-                        <select name="IsWorkingOvertime" id="ddlIsWorkingOvertime" class="form-control">
-                            <option value="">Select option</option>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
-                        </select>
+                        @(Html.Kendo().DropDownList()
+                            .Name("OvertimeStatus")
+                            .OptionLabel("Select overtime status...")
+                            .DataTextField("Value")
+                            .DataValueField("Code")
+                            .BindTo(Model.OvertimeOptions ?? new List<LookupItem>())
+                            .HtmlAttributes(new { id = "ddlOvertimeStatus" })
+                            )
                     </div>
 
                     <!-- Job Related -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
-                            Job Related?
-                        </label>
-                        <select name="IsJobrelated" id="ddlIsJobrelated" class="form-control">
-                            <option value="">Select option</option>
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
-                        </select>
-                    </div>
-
-                    <!-- Injured Case Type -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Injured Case Type
+                            Job Related
                         </label>
                         @(Html.Kendo().DropDownList()
-                            .Name("InjuredCaseType")
-                            .OptionLabel("Select type")
-                            .BindTo(Model.InjuredCaseTypeOptions ?? new List<LookupItem>())
+                            .Name("JobRelated")
+                            .OptionLabel("Select...")
                             .DataTextField("Value")
                             .DataValueField("Code")
-                            .HtmlAttributes(new { id = "ddlInjuredCaseType" })
-                        )
+                            .BindTo(Model.JobRelatedOptions ?? new List<LookupItem>())
+                            .HtmlAttributes(new { id = "ddlJobRelated" })
+                            )
                     </div>
                 </div>
 
@@ -317,11 +366,12 @@
                         .Name("DamageDescription")
                         .Placeholder("Describe any damages")
                         .Rows(3)
-                        .HtmlAttributes(new { 
+                        .HtmlAttributes(new
+                        {
                             id = "txtDamageDescription",
                             maxlength = "1000"
                         })
-                    )
+                        )
                 </div>
 
                 <!-- Hospital/Clinic Name -->
@@ -332,24 +382,38 @@
                     @(Html.Kendo().TextBox()
                         .Name("ExaminedHospitalClinicName")
                         .Placeholder("Hospital or clinic name")
-                        .HtmlAttributes(new { 
+                        .HtmlAttributes(new
+                        {
                             id = "txtExaminedHospitalClinicName",
                             maxlength = "200"
                         })
-                    )
+                        )
                 </div>
             </div>
         </div>
 
         <!-- Form Actions -->
         <div class="flex justify-end space-x-4">
-            <button type="button" class="btn-secondary" onclick="cancelForm()">Cancel</button>
-            <button type="button" class="btn-primary" onclick="saveDraft()">Save Draft</button>
-            <button type="submit" class="btn-success">Submit Report</button>
+            @(Html.Kendo().Button()
+                .Name("btnCancel")
+                .Content("Cancel")
+                .HtmlAttributes(new { @class = "btn-secondary" })
+                .Events(e => e.Click("cancelForm"))
+                )
+            @(Html.Kendo().Button()
+                .Name("btnSaveDraft")
+                .Content("Save Draft")
+                .HtmlAttributes(new { @class = "btn-primary" })
+                .Events(e => e.Click("saveDraft"))
+                )
+            @(Html.Kendo().Button()
+                .Name("btnSubmit")
+                .Content("Submit Report")
+                .HtmlAttributes(new { @class = "btn-success", type = "submit" })
+                )
         </div>
     </form>
 </div>
-
 
 @section Scripts {
     <script src="~/js/incident/incident-create-viewmodel.js"></script>

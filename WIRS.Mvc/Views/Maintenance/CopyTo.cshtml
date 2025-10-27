@@ -8,108 +8,89 @@
 }
 
 <div class="p-6 max-w-7xl mx-auto">
-    <!-- Header -->
-    <div class="mb-6 flex justify-between items-center">
-        <div>
-            <h1 class="text-xl font-bold text-gray-900 mb-2">Copy To List Maintenance</h1>
-            <p class="text-gray-600 text-sm">Manage copy-to list for user access permissions</p>
-        </div>
-        <div>
-            @(Html.Kendo().Button()
-                .Name("btnBackToMaintenance")
-                .Content("<i class='k-icon k-i-arrow-left'></i> Back to Maintenance")
-                .HtmlAttributes(new { @class = "btn-cancel" })
-                .Events(e => e.Click("function() { window.location.href = '/'; }"))
-            )
-        </div>
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-900 mb-2">Copy To List Maintenance</h1>
+        <p class="text-gray-600 text-sm">Manage copy-to list for user access permissions</p>
     </div>
 
-    <!-- Search/Filter Section -->
     <div class="card overflow-hidden mb-6" id="searchSection">
         <div class="card-header">
             <h2 class="card-title">Search Filters</h2>
         </div>
         <div class="card-body">
             <form id="searchForm" class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                <!-- Sector (SBA) -->
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700">Sector</label>
                     @(Html.Kendo().DropDownList()
                         .Name("SearchSector")
                         .OptionLabel("--Select--")
-                        .DataTextField("Value")
-                        .DataValueField("Code")
+                        .DataTextField("value")
+                        .DataValueField("code")
                         .DataSource(source => source.Read(read => read.Action("GetSectors", "MasterData")))
                         .HtmlAttributes(new { id = "ddlSearchSector" })
                         .Events(e => e.Change("onSearchSectorChange"))
-                    )
+                        )
                 </div>
 
-                <!-- LOB (SBU) -->
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700">LOB</label>
                     @(Html.Kendo().DropDownList()
                         .Name("SearchLOB")
                         .OptionLabel("--Select--")
-                        .DataTextField("Value")
-                        .DataValueField("Code")
+                        .DataTextField("value")
+                        .DataValueField("code")
                         .HtmlAttributes(new { id = "ddlSearchLOB" })
                         .Events(e => e.Change("onSearchLOBChange"))
-                    )
+                        )
                 </div>
 
-                <!-- Department -->
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700">Department</label>
                     @(Html.Kendo().DropDownList()
                         .Name("SearchDepartment")
                         .OptionLabel("--Select--")
-                        .DataTextField("Value")
-                        .DataValueField("Code")
+                        .DataTextField("value")
+                        .DataValueField("code")
                         .HtmlAttributes(new { id = "ddlSearchDepartment" })
                         .Events(e => e.Change("onSearchDepartmentChange"))
-                    )
+                        )
                 </div>
 
-                <!-- Location -->
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700">Location</label>
                     @(Html.Kendo().DropDownList()
                         .Name("SearchLocation")
                         .OptionLabel("--Select--")
-                        .DataTextField("Value")
-                        .DataValueField("Code")
+                        .DataTextField("value")
+                        .DataValueField("code")
                         .HtmlAttributes(new { id = "ddlSearchLocation" })
-                    )
+                        )
                 </div>
             </form>
-            
-            <div class="flex justify-between items-center mt-4">
+
+            <div class="flex justify-end items-center mt-4">
                 <div class="flex space-x-3">
                     @(Html.Kendo().Button()
                         .Name("btnSearch")
                         .Content("<i class='k-icon k-i-search'></i> Search")
                         .HtmlAttributes(new { @class = "btn-primary" })
                         .Events(e => e.Click("searchCopyToList"))
-                    )
-                </div>
-                <div>
-                    @(Html.Kendo().Button()
-                        .Name("btnNew")
-                        .Content("<i class='k-icon k-i-plus'></i> New Entry")
-                        .HtmlAttributes(new { @class = "btn-success" })
-                        .Events(e => e.Click("showNewForm"))
-                    )
+                        )
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Results Grid Section -->
     <div class="card overflow-hidden" id="resultsSection">
-        <div class="card-header">
-            <div class="flex justify-between items-center">
-                <h2 class="card-title">Copy To List</h2>
+        <div class="card-header flex justify-between items-center">
+            <h2 class="card-title">Copy To List</h2>
+            <div>
+                @(Html.Kendo().Button()
+                    .Name("btnNew")
+                    .Content("New")
+                    .HtmlAttributes(new { @class = "btn-primary" })
+                    .Events(e => e.Click("showNewForm"))
+                    )
             </div>
         </div>
         <div class="card-body p-0">
@@ -117,56 +98,60 @@
                 .Name("copyToGrid")
                 .Columns(columns =>
                 {
-                    columns.Bound("SbaName").Title("Sector").Width(120);
-                    columns.Bound("SbuName").Title("LOB").Width(120);
-                    columns.Bound("DepartmentName").Title("Department").Width(150);
-                    columns.Bound("LocationName").Title("Location").Width(150);
-                    columns.Bound("UserId").Title("User ID").Width(100);
-                    columns.Bound("UserName").Title("User Name").Width(200);
-                    columns.Bound("InactiveDate").Title("Inactive Date").Width(120).Format("{0:dd/MM/yyyy}");
-                    columns.Command(command => {
-                        command.Custom("Edit").Text("Edit").Click("editCopyTo").HtmlAttributes(new { @class = "btn-sm btn-primary" });
+                    columns.Bound("sbaName").Title("Sector").Width(120);
+                    columns.Bound("sbuName").Title("LOB").Width(120);
+                    columns.Bound("departmentName").Title("Department").Width(150);
+                    columns.Bound("locationName").Title("Location").Width(150);
+                    columns.Bound("userId").Title("User ID").Width(100);
+                    columns.Bound("userName").Title("User Name").Width(200);
+                    columns.Bound("inactiveDate").Title("Inactive Date").Width(120).Format("{0:dd/MM/yyyy}");
+                    columns.Command(command =>
+                    {
+                        command.Custom("Edit")
+                        .Click("editCopyTo")
+                        .IconClass("k-icon k-svg-icon k-svg-i-pencil k-button-icon")
+                        .Text("Edit");
                     }).Title("Actions").Width(80);
                 })
                 .Pageable(pageable => pageable
-                    .Refresh(true)
-                    .PageSizes(true)
-                    .ButtonCount(5)
+                .Refresh(true)
+                .PageSizes(true)
+                .ButtonCount(5)
                 )
                 .Sortable()
                 .Filterable()
                 .NoRecords(noRecords => noRecords.Template(@"
-                    <div class='text-center p-8'>
-                        <p class='text-gray-500'>No copy-to list entries found. Use the search filters above or create a new entry.</p>
-                    </div>
-                "))
+            <div class='text-center p-8'>
+            <p class='text-gray-500'>No copy-to list entries found. Use the search filters above or create a new entry.</p>
+            </div>
+            "))
                 .DataSource(dataSource => dataSource
-                    .Custom()
-                    .PageSize(20)
-                    .Schema(schema => schema
-                    .Model(model => {
-                            model.Id("Uid");
-                            model.Field("SbaCode", typeof(string));
-                            model.Field("SbaName", typeof(string));
-                            model.Field("SbuCode", typeof(string));
-                            model.Field("SbuName", typeof(string));
-                            model.Field("DepartmentCode", typeof(string));
-                            model.Field("DepartmentName", typeof(string));
-                            model.Field("LocationCode", typeof(string));
-                            model.Field("LocationName", typeof(string));
-                            model.Field("UserId", typeof(string));
-                            model.Field("UserName", typeof(string));
-                            model.Field("InactiveDate", typeof(DateTime));
-                            model.Field("Uid", typeof(string));
-                        })
-                    )
-                    .Events(events => events.Error("onGridError"))
+                .Custom()
+                .PageSize(20)
+                .Schema(schema => schema
+                .Model(model =>
+                {
+                    model.Id("uid");
+                    model.Field("sbaCode", typeof(string));
+                    model.Field("sbaName", typeof(string));
+                    model.Field("sbuCode", typeof(string));
+                    model.Field("sbuName", typeof(string));
+                    model.Field("departmentCode", typeof(string));
+                    model.Field("departmentName", typeof(string));
+                    model.Field("locationCode", typeof(string));
+                    model.Field("locationName", typeof(string));
+                    model.Field("userId", typeof(string));
+                    model.Field("userName", typeof(string));
+                    model.Field("inactiveDate", typeof(DateTime));
+                    model.Field("uid", typeof(string));
+                })
                 )
-            )
+                .Events(events => events.Error("onGridError"))
+                )
+                )
         </div>
     </div>
 
-    <!-- Entry Form Section (Hidden by default) -->
     <div class="card overflow-hidden" id="entryFormSection" style="display: none;">
         <div class="card-header">
             <h2 class="card-title" id="formTitle">Create Copy To Entry</h2>
@@ -174,10 +159,8 @@
         <div class="card-body">
             <form id="copyToForm" class="space-y-6">
                 <input type="hidden" id="hiddenUid" />
-                
-                <!-- Basic Location Information -->
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Sector -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
                             Sector <span class="text-red-500">*</span>
@@ -185,19 +168,19 @@
                         @(Html.Kendo().DropDownList()
                             .Name("Sector")
                             .OptionLabel("--Select--")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
+                            .DataTextField("value")
+                            .DataValueField("code")
                             .DataSource(source => source.Read(read => read.Action("GetSectors", "MasterData")))
-                            .HtmlAttributes(new { 
-                                id = "ddlSector", 
-                                required = "required" 
+                            .HtmlAttributes(new
+                            {
+                                id = "ddlSector",
+                                required = "required"
                             })
                             .Events(e => e.Change("onSectorChange"))
-                        )
+                            )
                         <div id="sectorError" class="validation-error"></div>
                     </div>
 
-                    <!-- LOB -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
                             LOB <span class="text-red-500">*</span>
@@ -205,18 +188,18 @@
                         @(Html.Kendo().DropDownList()
                             .Name("LOB")
                             .OptionLabel("--Select--")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .HtmlAttributes(new { 
-                                id = "ddlLOB", 
-                                required = "required" 
+                            .DataTextField("value")
+                            .DataValueField("code")
+                            .HtmlAttributes(new
+                            {
+                                id = "ddlLOB",
+                                required = "required"
                             })
                             .Events(e => e.Change("onLOBChange"))
-                        )
+                            )
                         <div id="lobError" class="validation-error"></div>
                     </div>
 
-                    <!-- Department -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
                             Department <span class="text-red-500">*</span>
@@ -224,36 +207,36 @@
                         @(Html.Kendo().DropDownList()
                             .Name("Department")
                             .OptionLabel("--Select--")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .HtmlAttributes(new { 
-                                id = "ddlDepartment", 
-                                required = "required" 
+                            .DataTextField("value")
+                            .DataValueField("code")
+                            .HtmlAttributes(new
+                            {
+                                id = "ddlDepartment",
+                                required = "required"
                             })
                             .Events(e => e.Change("onDepartmentChange"))
-                        )
+                            )
                         <div id="departmentError" class="validation-error"></div>
                     </div>
 
-                    <!-- Location -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
-                            Location <span class="text-red-500">*</span>
+                            Location
                         </label>
                         @(Html.Kendo().DropDownList()
                             .Name("Location")
                             .OptionLabel("--Select--")
-                            .DataTextField("Value")
-                            .DataValueField("Code")
-                            .HtmlAttributes(new { 
-                                id = "ddlLocation", 
-                                required = "required" 
+                            .DataTextField("value")
+                            .DataValueField("code")
+                            .HtmlAttributes(new
+                            {
+                                id = "ddlLocation",
+                                required = "required"
                             })
-                        )
+                            )
                         <div id="locationError" class="validation-error"></div>
                     </div>
-                    
-                    <!-- User ID -->
+
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
                             User ID <span class="text-red-500">*</span>
@@ -261,18 +244,18 @@
                         @(Html.Kendo().TextBox()
                             .Name("UserId")
                             .Placeholder("Enter 8-digit user ID")
-                            .HtmlAttributes(new { 
-                                id = "txtUserId", 
+                            .HtmlAttributes(new
+                            {
+                                id = "txtUserId",
                                 required = "required",
                                 maxlength = "8",
                                 pattern = "[0-9]{8}",
                                 title = "Please enter exactly 8 digits"
                             })
-                        )
+                            )
                         <div id="userIdError" class="validation-error"></div>
                     </div>
 
-                    <!-- User Name -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
                             User Name <span class="text-red-500">*</span>
@@ -280,45 +263,45 @@
                         @(Html.Kendo().TextBox()
                             .Name("UserName")
                             .Placeholder("Enter user name")
-                            .HtmlAttributes(new { 
-                                id = "txtUserName", 
+                            .HtmlAttributes(new
+                            {
+                                id = "txtUserName",
                                 required = "required",
                                 maxlength = "100"
                             })
-                        )
+                            )
                         <div id="userNameError" class="validation-error"></div>
                     </div>
                 </div>
 
-                <!-- Inactive Date -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">Inactive Date</label>
                         @(Html.Kendo().DatePicker()
                             .Name("InactiveDate")
-                            .HtmlAttributes(new { 
+                            .HtmlAttributes(new
+                            {
                                 id = "dtpInactiveDate",
                                 @class = "w-full"
                             })
                             .Format("dd/MM/yyyy")
-                        )
+                            )
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="flex justify-end space-x-3 pt-6">
                     @(Html.Kendo().Button()
                         .Name("btnCancel")
                         .Content("Cancel")
                         .HtmlAttributes(new { @class = "btn-cancel" })
                         .Events(e => e.Click("cancelForm"))
-                    )
+                        )
                     @(Html.Kendo().Button()
                         .Name("btnSave")
                         .Content("Save")
                         .HtmlAttributes(new { @class = "btn-primary" })
                         .Events(e => e.Click("saveCopyTo"))
-                    )
+                        )
                 </div>
             </form>
         </div>
@@ -328,7 +311,7 @@
 @section Scripts {
     <script src="~/js/telerik-notifications.js"></script>
     <script src="~/js/telerik-skeleton-loading.js"></script>
-    <script src="~/js/maintenance/maintenance-copyto-viewmodel.js"></script>
+    <script src="~/js/maintenance/copyto-viewmodel.js"></script>
     <script>
         $(document).ready(function() {
             maintenanceCopyToViewModel.init();

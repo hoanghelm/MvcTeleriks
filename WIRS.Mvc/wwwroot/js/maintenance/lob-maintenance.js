@@ -1,51 +1,63 @@
-// LOB Maintenance View Model
-var lobMaintenanceViewModel = {
-    // Current state
-    currentSectorCode: null,
-    isEditMode: false,
-    currentLOBData: null,
+var lobMaintenanceViewModel = (function () {
 
-    // Initialize the view model
-    init: function() {
-        this.bindEvents();
-        this.initializeEmptyGrid();
-    },
+    var _currentMode = 'search';
+    var _isEditMode = false;
 
-    // Bind event handlers
-    bindEvents: function() {
-        // Form validation
-        $('#lobForm').on('submit', function(e) {
+    var _elements = {
+        ddlSector: null,
+        ddlFormSector: null,
+        lobGrid: null,
+        txtLOBCode: null,
+        txtLOBName: null,
+        dtpInactiveDate: null,
+        searchSection: null,
+        resultsSection: null,
+        entryFormSection: null,
+        formTitle: null
+    };
+
+    var _currentSectorCode = null;
+
+    function init() {
+        initializeElements();
+        bindEvents();
+        showSearchSection();
+    }
+
+    function initializeElements() {
+        _elements.ddlSector = $("#ddlSector").data("kendoDropDownList");
+        _elements.ddlFormSector = $("#ddlFormSector").data("kendoDropDownList");
+        _elements.lobGrid = $("#lobGrid").data("kendoGrid");
+        _elements.searchSection = $("#searchSection");
+        _elements.resultsSection = $("#resultsSection");
+        _elements.entryFormSection = $("#entryFormSection");
+        _elements.formTitle = $("#formTitle");
+
+        $('#lobForm').on('submit', function (e) {
             e.preventDefault();
             return false;
         });
-    },
+    }
 
-    // Initialize empty grid
-    initializeEmptyGrid: function() {
-        var grid = $('#lobGrid').data('kendoGrid');
-        if (grid) {
-            grid.dataSource.data([]);
-        }
-        $('#pnlLOBUpdate').hide();
-    },
+    function bindEvents() {
+        $(document).on('click', '.edit-lob-btn', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var sbaCode = $this.data('sba-code');
+            var sbuCode = $this.data('sbu-code');
+            editLOBRecord(sbaCode, sbuCode);
+        });
+    }
 
-    // Hide all panels
-    hideAllPanels: function() {
-        $('#pnlLOBUpdate').hide();
-    },
+    function showLoading() {
+        kendo.ui.progress($("#lobGrid"), true);
+    }
 
-    // Show loading overlay
-    showLoading: function() {
-        $('#loadingOverlay').show();
-    },
+    function hideLoading() {
+        kendo.ui.progress($("#lobGrid"), false);
+    }
 
-    // Hide loading overlay
-    hideLoading: function() {
-        $('#loadingOverlay').hide();
-    },
-
-    // Show notification
-    showNotification: function(message, type) {
+    function showNotification(message, type) {
         var notification = $("#notification").kendoNotification({
             position: {
                 pinned: true,
@@ -63,240 +75,400 @@ var lobMaintenanceViewModel = {
         } else {
             notification.info(message);
         }
-    },
+    }
 
-    // Clear validation errors
-    clearValidationErrors: function() {
-        $('.validation-error').removeClass('show').text('');
-    },
+    function clearValidationErrors() {
+        $('.validation-error').text('');
+    }
 
-    // Show validation error
-    showValidationError: function(fieldId, message) {
-        $('#' + fieldId + 'Error').text(message).addClass('show');
-    },
+    function showValidationError(fieldId, message) {
+        $('#' + fieldId).text(message);
+    }
 
-    // Validate LOB form
-    validateLOBForm: function() {
-        this.clearValidationErrors();
+    function validateLOBForm() {
+        clearValidationErrors();
         var isValid = true;
 
-        var lobName = $('#txtLOBName').data('kendoTextBox').value();
-        var lobCode = $('#txtLOBCode').data('kendoTextBox').value();
+        var codeTextBox = $("#txtLOBCode").data("kendoTextBox");
+        var nameTextBox = $("#txtLOBName").data("kendoTextBox");
 
-        if (!lobCode || lobCode.trim() === '') {
-            this.showValidationError('lobCode', 'LOB Code is required');
+        var lobName = nameTextBox ? nameTextBox.value().trim() : '';
+        var lobCode = codeTextBox ? codeTextBox.value().trim() : '';
+
+        if (!lobCode) {
+            showValidationError('lobCodeError', 'LOB Code is required');
             isValid = false;
         }
 
-        if (!lobName || lobName.trim() === '') {
-            this.showValidationError('lobName', 'LOB Name is required');
+        if (!lobName) {
+            showValidationError('lobNameError', 'LOB Name is required');
             isValid = false;
         } else if (lobName.length > 100) {
-            this.showValidationError('lobName', 'LOB Name cannot exceed 100 characters');
+            showValidationError('lobNameError', 'LOB Name cannot exceed 100 characters');
             isValid = false;
         }
 
         return isValid;
-    },
+    }
 
-    // Load LOB list for selected sector
-    loadLOBList: function(sectorCode) {
-        var self = this;
-        self.showLoading();
+    function onSectorChange() {
+        if (!_elements.ddlSector) return;
+
+        var sectorCode = _elements.ddlSector.value();
+        _currentSectorCode = sectorCode;
+
+        if (_elements.lobGrid) {
+            _elements.lobGrid.dataSource.data([]);
+        }
+
+        if (sectorCode) {
+            loadLOBList(sectorCode);
+        }
+    }
+
+    function loadLOBList(sectorCode) {
+        showLoading();
 
         $.ajax({
             url: '/Maintenance/GetLOBList',
             type: 'POST',
             data: { sbaCode: sectorCode },
-            success: function(response) {
-                self.hideLoading();
+            success: function (response) {
+                hideLoading();
+
                 if (response && Array.isArray(response)) {
-                    var grid = $('#lobGrid').data('kendoGrid');
-                    grid.dataSource.data(response);
-                    
-                    $('#pnlLOBUpdate').hide();
+                    if (_elements.lobGrid) {
+                        var dataSource = new kendo.data.DataSource({
+                            data: response,
+                            pageSize: 15,
+                            schema: {
+                                model: {
+                                    id: "uid",
+                                    fields: {
+                                        sbaCode: { type: "string" },
+                                        sbaName: { type: "string" },
+                                        sbuCode: { type: "string" },
+                                        sbuName: { type: "string" },
+                                        inactiveDate: { type: "string" },
+                                        uid: { type: "string" }
+                                    }
+                                }
+                            }
+                        });
+
+                        _elements.lobGrid.setDataSource(dataSource);
+                    }
                 } else {
-                    self.showNotification('Failed to load LOB list', 'error');
+                    showNotification('Failed to load LOB list', 'error');
                 }
             },
-            error: function(xhr, status, error) {
-                self.hideLoading();
-                self.showNotification('Error loading LOB list: ' + error, 'error');
+            error: function (xhr, status, error) {
+                hideLoading();
+                showNotification('Error loading LOB list: ' + error, 'error');
             }
         });
-    },
+    }
 
-    // Load LOB record for editing
-    loadLOBRecord: function(sbaCode, sbuCode) {
-        var self = this;
-        self.showLoading();
-
-        $.ajax({
-            url: '/Maintenance/GetLOBByUid',
-            type: 'POST',
-            data: { 
-                sbaCode: sbaCode,
-                sbuCode: sbuCode 
-            },
-            success: function(response) {
-                self.hideLoading();
-                if (response) {
-                    self.populateLOBForm(response);
-                    self.currentLOBData = response;
-                    self.isEditMode = true;
-                    $('#pnlLOBUpdate').show();
-                } else {
-                    self.showNotification('LOB record not found', 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                self.hideLoading();
-                self.showNotification('Error loading LOB record: ' + error, 'error');
-            }
-        });
-    },
-
-    // Populate LOB form with data
-    populateLOBForm: function(data) {
-        $('#txtLOBCode').data('kendoTextBox').value(data.SbuCode || '');
-        $('#txtLOBName').data('kendoTextBox').value(data.SbuName || '');
-        
-        if (data.InactiveDate) {
-            var datePicker = $('#txtInactiveDate').data('kendoDatePicker');
-            if (datePicker) {
-                datePicker.value(new Date(data.InactiveDate));
-            }
-        }
-    },
-
-    // Clear LOB form
-    clearLOBForm: function() {
-        $('#txtLOBCode').data('kendoTextBox').value('');
-        $('#txtLOBName').data('kendoTextBox').value('');
-        
-        var datePicker = $('#txtInactiveDate').data('kendoDatePicker');
-        if (datePicker) {
-            datePicker.value(null);
-        }
-        
-        this.clearValidationErrors();
-    },
-
-    // Generate new LOB code
-    generateLOBCode: function() {
-        var self = this;
-        
-        if (!self.currentSectorCode) {
-            self.showNotification('Please select a sector first', 'error');
+    function showNewForm() {
+        if (!_currentSectorCode) {
+            showNotification('Please select a sector first', 'error');
             return;
         }
+
+        _isEditMode = false;
+        _currentMode = 'form';
+
+        clearLOBForm();
+
+        if (_elements.ddlFormSector) {
+            _elements.ddlFormSector.value(_currentSectorCode);
+        }
+
+        if (_elements.formTitle) {
+            _elements.formTitle.text('Create LOB');
+        }
+
+        showFormSection();
+
+        setTimeout(function () {
+            generateLOBCodeDirect();
+        }, 200);
+    }
+
+    function generateLOBCodeDirect() {
+        showLoading();
 
         $.ajax({
             url: '/Maintenance/GenerateLOBCode',
             type: 'POST',
-            data: { sbaCode: self.currentSectorCode },
-            success: function(response) {
-                if (response.success) {
-                    $('#txtLOBCode').data('kendoTextBox').value(response.code);
+            data: { sbaCode: _currentSectorCode },
+            success: function (response) {
+                hideLoading();
+
+                if (response && response.success) {
+                    var codeTextBox = $("#txtLOBCode").data("kendoTextBox");
+                    var nameTextBox = $("#txtLOBName").data("kendoTextBox");
+
+                    if (codeTextBox) {
+                        codeTextBox.value(response.code);
+                    }
+                    if (nameTextBox && nameTextBox.element) {
+                        nameTextBox.element.focus();
+                    }
                 } else {
-                    self.showNotification('Failed to generate LOB code: ' + response.message, 'error');
+                    showNotification('Error generating LOB code: ' + (response.message || 'Unknown error'), 'error');
                 }
             },
-            error: function(xhr, status, error) {
-                self.showNotification('Error generating LOB code: ' + error, 'error');
+            error: function (xhr, status, error) {
+                hideLoading();
+                showNotification('Error generating LOB code: ' + error, 'error');
             }
         });
-    },
+    }
 
-    // Save LOB record
-    saveLOBRecord: function() {
-        var self = this;
+    function editLOBRecord(sbaCode, sbuCode) {
+        _isEditMode = true;
+        _currentMode = 'form';
 
-        if (!self.validateLOBForm()) {
+        if (_elements.formTitle) {
+            _elements.formTitle.text('Edit LOB');
+        }
+
+        showFormSection();
+
+        setTimeout(function () {
+            var codeTextBox = $("#txtLOBCode").data("kendoTextBox");
+            var nameTextBox = $("#txtLOBName").data("kendoTextBox");
+            var datePicker = $("#txtInactiveDate").data("kendoDatePicker");
+
+            if (!codeTextBox || !nameTextBox || !datePicker) {
+                showNotification('Form controls not initialized', 'error');
+                return;
+            }
+
+            loadLOBRecord(sbaCode, sbuCode);
+        }, 200);
+    }
+
+    function loadLOBRecord(sbaCode, sbuCode) {
+        showLoading();
+
+        $.ajax({
+            url: '/Maintenance/GetLOBByUid',
+            type: 'POST',
+            data: {
+                sbaCode: sbaCode,
+                sbuCode: sbuCode
+            },
+            success: function (response) {
+                hideLoading();
+
+                if (response) {
+                    populateLOBFormDirect(response);
+                } else {
+                    showNotification('LOB record not found', 'error');
+                }
+            },
+            error: function (xhr, status, error) {
+                hideLoading();
+                showNotification('Error loading LOB record: ' + error, 'error');
+            }
+        });
+    }
+
+    function populateLOBFormDirect(data) {
+        setTimeout(function () {
+            var codeTextBox = $("#txtLOBCode").data("kendoTextBox");
+            var nameTextBox = $("#txtLOBName").data("kendoTextBox");
+            var datePicker = $("#txtInactiveDate").data("kendoDatePicker");
+            var formSectorDdl = $("#ddlFormSector").data("kendoDropDownList");
+
+            var sectorCode = data.SbaCode || data.sbaCode || '';
+            var lobCode = data.SbuCode || data.sbuCode || '';
+            var lobName = data.SbuName || data.sbuName || '';
+            var inactiveDate = data.InactiveDate || data.inactiveDate;
+
+            if (formSectorDdl && sectorCode) {
+                formSectorDdl.value(sectorCode);
+            }
+
+            if (codeTextBox) {
+                codeTextBox.value(lobCode);
+            }
+
+            if (nameTextBox) {
+                nameTextBox.value(lobName);
+            }
+
+            if (datePicker && inactiveDate) {
+                try {
+                    var dateValue = new Date(inactiveDate);
+                    if (!isNaN(dateValue.getTime())) {
+                        datePicker.value(dateValue);
+                    }
+                } catch (e) {
+                    console.log('Date parsing error:', e);
+                }
+            }
+
+            if (nameTextBox && nameTextBox.element) {
+                nameTextBox.element.focus();
+            }
+        }, 100);
+    }
+
+    function populateLOBForm(data) {
+        var lobCode = data.SbuCode || data.sbuCode || '';
+        var lobName = data.SbuName || data.sbuName || '';
+        var inactiveDate = data.InactiveDate || data.inactiveDate;
+
+        if (_elements.txtLOBCode) {
+            _elements.txtLOBCode.value(lobCode);
+        }
+        if (_elements.txtLOBName) {
+            _elements.txtLOBName.value(lobName);
+        }
+
+        if (inactiveDate && _elements.dtpInactiveDate) {
+            try {
+                var dateValue = new Date(inactiveDate);
+                if (!isNaN(dateValue.getTime())) {
+                    _elements.dtpInactiveDate.value(dateValue);
+                }
+            } catch (e) {
+            }
+        }
+    }
+
+    function clearLOBForm() {
+        if (_elements.txtLOBCode) {
+            _elements.txtLOBCode.value('');
+        }
+        if (_elements.txtLOBName) {
+            _elements.txtLOBName.value('');
+        }
+        if (_elements.dtpInactiveDate) {
+            _elements.dtpInactiveDate.value(null);
+        }
+
+        clearValidationErrors();
+    }
+
+    function saveLOBRecord() {
+        if (!validateLOBForm()) {
             return;
         }
 
+        var formSectorDdl = $("#ddlFormSector").data("kendoDropDownList");
+        var sectorCode = formSectorDdl ? formSectorDdl.value() : _currentSectorCode;
+
         var formData = {
-            SbaCode: self.currentSectorCode,
-            SbuCode: $('#txtLOBCode').data('kendoTextBox').value(),
-            SbuName: $('#txtLOBName').data('kendoTextBox').value(),
+            SbaCode: sectorCode,
+            SbuCode: _elements.txtLOBCode ? _elements.txtLOBCode.value() : '',
+            SbuName: _elements.txtLOBName ? _elements.txtLOBName.value().trim() : '',
             InactiveDate: ''
         };
 
-        var datePicker = $('#txtInactiveDate').data('kendoDatePicker');
-        if (datePicker && datePicker.value()) {
-            formData.InactiveDate = kendo.toString(datePicker.value(), 'dd/MM/yyyy');
+        if (_elements.dtpInactiveDate && _elements.dtpInactiveDate.value()) {
+            formData.InactiveDate = kendo.toString(_elements.dtpInactiveDate.value(), 'dd/MM/yyyy');
         }
 
-        self.showLoading();
+        showLoading();
 
         $.ajax({
             url: '/Maintenance/SaveLOB',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(formData),
-            success: function(response) {
-                self.hideLoading();
-                if (response.success) {
-                    self.showNotification(response.message, 'success');
-                    self.loadLOBList(self.currentSectorCode);
-                    self.currentLOBData = null;
-                    self.isEditMode = false;
+            success: function (response) {
+                hideLoading();
+
+                if (response && response.success) {
+                    showNotification(response.message || 'LOB record saved successfully', 'success');
+                    loadLOBList(sectorCode);
+                    showSearchSection();
                 } else {
-                    self.showNotification(response.message, 'error');
+                    showNotification('Save failed: ' + (response.message || 'Unknown error'), 'error');
                 }
             },
-            error: function(xhr, status, error) {
-                self.hideLoading();
-                self.showNotification('Error saving LOB record: ' + error, 'error');
+            error: function (xhr, status, error) {
+                hideLoading();
+                showNotification('Error saving LOB record: ' + error, 'error');
             }
         });
     }
-};
 
-// Global event handlers
-function onSectorChange() {
-    var sectorDropDown = $('#ddlSector').data('kendoDropDownList');
-    var selectedValue = sectorDropDown.value();
-    
-    if (selectedValue && selectedValue !== '') {
-        lobMaintenanceViewModel.currentSectorCode = selectedValue;
-        lobMaintenanceViewModel.loadLOBList(selectedValue);
-    } else {
-        lobMaintenanceViewModel.currentSectorCode = null;
-        var grid = $('#lobGrid').data('kendoGrid');
-        if (grid) {
-            grid.dataSource.data([]);
+    function cancelLOBEdit() {
+        if (_isEditMode || hasFormChanges()) {
+            if (confirm("Are you sure you want to cancel? All unsaved changes will be lost.")) {
+                clearLOBForm();
+                showSearchSection();
+            }
+        } else {
+            clearLOBForm();
+            showSearchSection();
         }
     }
+
+    function hasFormChanges() {
+        return !!(_elements.txtLOBCode && _elements.txtLOBCode.value()) ||
+            !!(_elements.txtLOBName && _elements.txtLOBName.value());
+    }
+
+    function showSearchSection() {
+        _currentMode = 'search';
+        _isEditMode = false;
+        if (_elements.entryFormSection) {
+            _elements.entryFormSection.hide();
+        }
+        if (_elements.searchSection) {
+            _elements.searchSection.show();
+        }
+        if (_elements.resultsSection) {
+            _elements.resultsSection.show();
+        }
+    }
+
+    function showFormSection() {
+        _currentMode = 'form';
+        if (_elements.searchSection) {
+            _elements.searchSection.hide();
+        }
+        if (_elements.resultsSection) {
+            _elements.resultsSection.hide();
+        }
+        if (_elements.entryFormSection) {
+            _elements.entryFormSection.show();
+        }
+    }
+
+    return {
+        init: init,
+        onSectorChange: onSectorChange,
+        showNewForm: showNewForm,
+        editLOBRecord: editLOBRecord,
+        saveLOBRecord: saveLOBRecord,
+        cancelLOBEdit: cancelLOBEdit
+    };
+
+})();
+
+function onSectorChange() {
+    lobMaintenanceViewModel.onSectorChange();
 }
 
 function newLOBRecord() {
-    if (!lobMaintenanceViewModel.currentSectorCode) {
-        lobMaintenanceViewModel.showNotification('Please select a sector first', 'error');
-        return;
-    }
-
-    lobMaintenanceViewModel.clearLOBForm();
-    lobMaintenanceViewModel.isEditMode = false;
-    lobMaintenanceViewModel.currentLOBData = null;
-    lobMaintenanceViewModel.generateLOBCode();
-    
-    $('#pnlLOBUpdate').show();
+    lobMaintenanceViewModel.showNewForm();
 }
 
 function editLOBRecord(sbaCode, sbuCode) {
-    lobMaintenanceViewModel.loadLOBRecord(sbaCode, sbuCode);
-}
-
-function cancelLOBEdit() {
-    lobMaintenanceViewModel.clearLOBForm();
-    lobMaintenanceViewModel.currentLOBData = null;
-    lobMaintenanceViewModel.isEditMode = false;
-    
-    $('#pnlLOBUpdate').hide();
+    lobMaintenanceViewModel.editLOBRecord(sbaCode, sbuCode);
 }
 
 function saveLOBRecord() {
     lobMaintenanceViewModel.saveLOBRecord();
+}
+
+function cancelLOBEdit() {
+    lobMaintenanceViewModel.cancelLOBEdit();
 }

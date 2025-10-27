@@ -181,13 +181,11 @@ namespace WIRS.Services.Implementations
 							Designation = row["empdesignation"]?.ToString() ?? string.Empty,
 							Email = row["empemailaddress"]?.ToString() ?? string.Empty,
 							ContactNo = row["empcontactno"]?.ToString() ?? string.Empty,
-							Nric = row["empnric"]?.ToString() ?? string.Empty,
 							Age = row["empage"]?.ToString() ?? string.Empty,
 							Race = row["emprace"]?.ToString() ?? string.Empty,
 							Nationality = row["empnationality"]?.ToString() ?? string.Empty,
 							Gender = row["empgender"]?.ToString() ?? string.Empty,
 							EmploymentType = row["empemploymenttype"]?.ToString() ?? string.Empty,
-							DateOfEmployment = row["empdateofemployment"]?.ToString() ?? string.Empty
 						});
 					}
 
@@ -202,32 +200,26 @@ namespace WIRS.Services.Implementations
 			}
 		}
 
-		public async Task<UserListResult> SearchUsers(string sector, string lob, string userId, string userName, string userRole)
+		public async Task<UserListResult> SearchUsers(string currentUserId, string sector, string lob, string userId, string userName, string userRole)
 		{
 			try
 			{
-				var dataSet = await _userCredentialsDataAccess.SearchUsers(sector, lob, userId, userName, userRole);
+				var dataSet = await _userCredentialsDataAccess.SearchUsers(currentUserId, sector, lob, userId, userName, userRole);
 				var result = new UserListResult();
 
 				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
 				{
 					foreach (DataRow row in dataSet.Tables[0].Rows)
 					{
-						result.Users.Add(new UserListItem
-						{
-							UserId = row["userid"]?.ToString() ?? string.Empty,
-							UserName = row["username"]?.ToString() ?? string.Empty,
-							UserRole = row["userrole"]?.ToString() ?? string.Empty,
-							UserRoleName = row["userrolename"]?.ToString() ?? string.Empty,
-							Email = row["email"]?.ToString() ?? string.Empty,
-							AccountStatus = row["accountstatus"]?.ToString() ?? string.Empty,
-							AccountStatusName = row["accountstatusname"]?.ToString() ?? string.Empty,
-							LastLoginDate = row["lastlogindate"] != DBNull.Value ? Convert.ToDateTime(row["lastlogindate"]) : null,
-							InactiveDate = row["inactivedate"] != DBNull.Value ? Convert.ToDateTime(row["inactivedate"]) : null,
-							SectorName = row["sectorname"]?.ToString() ?? string.Empty,
-							LOBName = row["lobname"]?.ToString() ?? string.Empty
-						});
-					}
+                        result.Users.Add(new UserListItem
+                        {
+                            UserId = row["user_id"]?.ToString() ?? string.Empty,
+                            UserName = row["user_name"]?.ToString() ?? string.Empty,
+                            UserRoleName = row["user_role_name"]?.ToString() ?? string.Empty,
+                            Email = row["email_address"]?.ToString() ?? string.Empty,
+                            AccountStatusName = row["statusdesc"]?.ToString() ?? string.Empty
+                        });
+                    }
 
 					result.TotalCount = result.Users.Count;
 				}
@@ -240,66 +232,70 @@ namespace WIRS.Services.Implementations
 			}
 		}
 
-		public async Task<UserDetailsModel?> GetUserDetails(string userId)
-		{
-			try
-			{
-				var userCredentials = await _userCredentialsDataAccess.GetUserCredentialsWithAccess(userId);
-				
-				if (userCredentials == null) return null;
+        public async Task<UserDetailsModel?> GetUserDetails(string userId)
+        {
+            try
+            {
+                UserCredentials user = new UserCredentials() { UserId = userId };
 
-				var userDetails = new UserDetailsModel
-				{
-					UserId = userCredentials.UserId,
-					UserName = userCredentials.UserName,
-					Email = userCredentials.Email,
-					UserRole = userCredentials.UserRole,
-					AccountStatus = userCredentials.AccountStatus,
-					Creator = userCredentials.Creator,
-					Modifier = userCredentials.Modifiedby,
-					CreationDate = userCredentials.CreationDate,
-					ModificationDate = userCredentials.LastModifyDate
-				};
+                var errorCode = await _userCredentialsDataAccess.GetUser(user);
 
-				if (!string.IsNullOrEmpty(userCredentials.InactiveDate))
-				{
-					if (DateTime.TryParse(userCredentials.InactiveDate, out var inactiveDate))
-					{
-						userDetails.InactiveDate = inactiveDate;
-						userDetails.InactiveDateString = inactiveDate.ToString("dd-MMM-yyyy");
-					}
-				}
+                if (!string.IsNullOrEmpty(errorCode))
+                {
+                    return null;
+                }
 
-				// Get user access details
-				if (userCredentials.UserAccess != null && userCredentials.UserAccess.Rows.Count > 0)
-				{
-					foreach (DataRow row in userCredentials.UserAccess.Rows)
-					{
-						userDetails.UserAccess.Add(new UserAccessDetails
-						{
-							UserRoleCode = row["ua_user_role_code"]?.ToString() ?? string.Empty,
-							UserRoleName = row["user_role_name"]?.ToString() ?? string.Empty,
-							SectorCode = row["sba_code"]?.ToString() ?? string.Empty,
-							SectorValue = row["sba_value"]?.ToString() ?? string.Empty,
-							LOBCode = row["sbu_code"]?.ToString() ?? string.Empty,
-							LOBValue = row["sbu_value"]?.ToString() ?? string.Empty,
-							DepartmentCode = row["department_code"]?.ToString() ?? string.Empty,
-							DepartmentValue = row["department_value"]?.ToString() ?? string.Empty,
-							LocationCode = row["location_code"]?.ToString() ?? string.Empty,
-							LocationValue = row["location_value"]?.ToString() ?? string.Empty
-						});
-					}
-				}
+                var userDetails = new UserDetailsModel
+                {
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    UserRole = user.UserRole,
+                    AccountStatus = user.AccountStatus,
+                    Creator = user.Creator,
+                    Modifier = user.Modifiedby,
+                    CreationDate = user.CreationDate,
+                    ModificationDate = user.LastModifyDate
+                };
 
-				return userDetails;
-			}
-			catch
-			{
-				return null;
-			}
-		}
+                if (!string.IsNullOrEmpty(user.InactiveDate))
+                {
+                    if (DateTime.TryParse(user.InactiveDate, out var inactiveDate))
+                    {
+                        userDetails.InactiveDate = inactiveDate;
+                        userDetails.InactiveDateString = inactiveDate.ToString("dd-MMM-yyyy");
+                    }
+                }
 
-		public async Task<string> UpdateUser(UserUpdateRequest request, string modifierUserId)
+                if (user.UserAccess != null && user.UserAccess.Rows.Count > 0)
+                {
+                    foreach (DataRow row in user.UserAccess.Rows)
+                    {
+                        userDetails.UserAccess.Add(new UserAccessDetails
+                        {
+                            UserRoleCode = row["ua_user_role_code"]?.ToString() ?? string.Empty,
+                            UserRoleName = row["user_role_name"]?.ToString() ?? string.Empty,
+                            SectorCode = row["sba_code"]?.ToString() ?? string.Empty,
+                            SectorValue = row["sba_value"]?.ToString() ?? string.Empty,
+                            LOBCode = row["sbu_code"]?.ToString() ?? string.Empty,
+                            LOBValue = row["sbu_value"]?.ToString() ?? string.Empty,
+                            DepartmentCode = row["department_code"]?.ToString() ?? string.Empty,
+                            DepartmentValue = row["department_value"]?.ToString() ?? string.Empty,
+                            LocationCode = row["location_code"]?.ToString() ?? string.Empty,
+                            LocationValue = row["location_value"]?.ToString() ?? string.Empty
+                        });
+                    }
+                }
+
+                return userDetails;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<string> UpdateUser(UserUpdateRequest request, string modifierUserId)
 		{
 			try
 			{
@@ -309,7 +305,7 @@ namespace WIRS.Services.Implementations
 					Email = request.Email,
 					UserRole = request.UserRole,
 					AccountStatus = request.AccountStatus,
-					InactiveDate = request.InactiveDate,
+					InactiveDate = !string.IsNullOrEmpty(request.InactiveDate) ? request.InactiveDate : string.Empty,
 					Modifiedby = modifierUserId,
 					LastModifyDate = DateTime.Now
 				};

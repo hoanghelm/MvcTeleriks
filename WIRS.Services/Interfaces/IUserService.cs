@@ -16,8 +16,7 @@ namespace WIRS.Services.Interfaces
         Task<string> CreateUser(UserCreationRequest request, string creatorId);
         Task<EmployeeSearchResult> SearchEmployees(string empId, string empName, int pageNo = 1, int pageSize = 10);
         
-        // User management methods
-        Task<UserListResult> SearchUsers(string sector, string lob, string userId, string userName, string userRole);
+        Task<UserListResult> SearchUsers(string currentUserId, string sector, string lob, string userId, string userName, string userRole);
         Task<UserDetailsModel?> GetUserDetails(string userId);
         Task<string> UpdateUser(UserUpdateRequest request, string modifierUserId);
         Task<string> InactiveUser(string userId, string modifierUserId);

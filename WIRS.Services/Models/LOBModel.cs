@@ -96,8 +96,7 @@ namespace WIRS.Services.Models
 
         public string? DepartmentName { get; set; }
 
-        [Required(ErrorMessage = "Location is required")]
-        public string LocationCode { get; set; } = string.Empty;
+        public string? LocationCode { get; set; } = string.Empty;
 
         public string? LocationName { get; set; }
 

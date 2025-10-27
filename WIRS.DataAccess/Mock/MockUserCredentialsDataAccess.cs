@@ -80,7 +80,7 @@ namespace WIRS.DataAccess.Mock
 			throw new NotImplementedException();
 		}
 
-		public async Task<DataSet> SearchUsers(string sector, string lob, string userId, string userName, string userRole)
+		public async Task<DataSet> SearchUsers(string currentUserId, string sector, string lob, string userId, string userName, string userRole)
 		{
 			var dataSet = new DataSet();
 			var table = new DataTable();

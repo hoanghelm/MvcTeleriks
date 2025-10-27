@@ -51,7 +51,6 @@ namespace WIRS.Services.Implementations
                 return new LOBModel
                 {
                     SbaCode = row["sba_code"]?.ToString(),
-                    SbaName = row["sba_name"]?.ToString(),
                     SbuCode = row["sbu_code"]?.ToString(),
                     SbuName = row["sbu_name"]?.ToString(),
                     InactiveDate = row["inactive_date"]?.ToString(),

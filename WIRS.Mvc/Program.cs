@@ -12,13 +12,14 @@ namespace WIRS.Mvc
             builder.Services.AddServices(builder.Configuration);
 
             // Add services to the container.
-            builder.Services.AddRazorPages();
+            var mvcBuilder = builder.Services.AddRazorPages();
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
+                mvcBuilder.AddRazorRuntimeCompilation();
                 app.UseExceptionHandler("/Error");
             }
             app.UseHttpsRedirection();

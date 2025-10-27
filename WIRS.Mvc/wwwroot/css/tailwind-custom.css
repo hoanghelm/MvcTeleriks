@@ -1,6 +1,156 @@
-/* Custom Tailwind CSS additions for WIRS */
+:root {
+    --kendo-color-primary: #3b82f6;
+    --kendo-color-primary-hover: #2563eb;
+    --kendo-color-primary-active: #1d4ed8;
+    --kendo-color-on-primary: #ffffff;
+    --kendo-color-secondary: #6b7280;
+    --kendo-color-secondary-hover: #4b5563;
+    --kendo-color-secondary-active: #374151;
+    --kendo-color-on-secondary: #ffffff;
+    --kendo-color-success: #10b981;
+    --kendo-color-success-hover: #059669;
+    --kendo-color-on-success: #ffffff;
+    --kendo-color-info: #3b82f6;
+    --kendo-color-info-hover: #2563eb;
+    --kendo-color-on-info: #ffffff;
+    --kendo-color-warning: #f59e0b;
+    --kendo-color-warning-hover: #d97706;
+    --kendo-color-on-warning: #ffffff;
+    --kendo-color-error: #ef4444;
+    --kendo-color-error-hover: #dc2626;
+    --kendo-color-on-error: #ffffff;
+    --kendo-color-border: #e5e7eb;
+    --kendo-color-base-hover: #f9fafb;
+}
 
-/* Kendo Grid customizations */
+.k-button-solid-primary,
+.k-button.k-primary,
+.k-button.btn-primary {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: white !important;
+}
+
+    .k-button-solid-primary:hover,
+    .k-button.k-primary:hover,
+    .k-button.btn-primary:hover {
+        background-color: #2563eb !important;
+        border-color: #2563eb !important;
+    }
+
+    .k-button-solid-primary:active,
+    .k-button.k-primary:active,
+    .k-button.btn-primary:active {
+        background-color: #1d4ed8 !important;
+        border-color: #1d4ed8 !important;
+    }
+
+.k-button-solid-secondary,
+.k-button.k-secondary,
+.k-button.btn-secondary {
+    background-color: #6b7280 !important;
+    border-color: #6b7280 !important;
+    color: white !important;
+}
+
+    .k-button-solid-secondary:hover,
+    .k-button.k-secondary:hover,
+    .k-button.btn-secondary:hover {
+        background-color: #4b5563 !important;
+        border-color: #4b5563 !important;
+    }
+
+.k-grid-header {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #334155 !important;
+}
+
+.k-grid tr:hover {
+    background-color: #f1f5f9 !important;
+}
+
+.k-grid tr.k-selected {
+    background-color: #dbeafe !important;
+    color: #1e40af !important;
+}
+
+.k-textbox,
+.k-input,
+.k-dropdown-wrap,
+.k-picker-wrap {
+    border-color: #d1d5db !important;
+}
+
+    .k-textbox:focus,
+    .k-input:focus,
+    .k-dropdown-wrap.k-focus,
+    .k-picker-wrap.k-focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    }
+
+.k-list-item.k-selected {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+
+.k-list-item:hover {
+    background-color: #f3f4f6 !important;
+}
+
+.k-notification-success {
+    background-color: #d1fae5 !important;
+    border-color: #10b981 !important;
+    color: #065f46 !important;
+}
+
+.k-notification-info {
+    background-color: #dbeafe !important;
+    border-color: #3b82f6 !important;
+    color: #1e40af !important;
+}
+
+.k-notification-warning {
+    background-color: #fef3c7 !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+}
+
+.k-notification-error {
+    background-color: #fee2e2 !important;
+    border-color: #ef4444 !important;
+    color: #991b1b !important;
+}
+
+.k-window-titlebar {
+    background: linear-gradient(to right, #334155, #1e293b) !important;
+    color: white !important;
+    border-color: #475569 !important;
+}
+
+.k-pager .k-pager-nav.k-selected {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: white !important;
+}
+
+.k-calendar .k-selected {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+
+.k-switch-on .k-switch-track {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+.k-picker-solid {
+    border-color: rgba(0, 0, 0, 0.12) !important;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
 .k-grid {
     border: none !important;
     font-family: 'Inter', sans-serif !important;
@@ -25,21 +175,32 @@
     transition: all 0.2s ease-in-out !important;
 }
 
-/* Custom animations for cards */
 @keyframes cardSelectPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .dashboard-card.selected {
     animation: cardSelectPulse 0.3s ease-in-out;
 }
 
-/* Loading skeleton animation */
 @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
 }
 
 .animate-shimmer {
@@ -48,7 +209,6 @@
     animation: shimmer 2s infinite;
 }
 
-/* Global Telerik Button Styling - Exclude pagination buttons */
 .k-button.btn-primary {
     background-color: #3b82f6 !important;
     border-color: #3b82f6 !important;
@@ -60,16 +220,16 @@
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
-.k-button.btn-primary:hover {
-    background-color: #1d4ed8 !important;
-    border-color: #1d4ed8 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-}
+    .k-button.btn-primary:hover {
+        background-color: #1d4ed8 !important;
+        border-color: #1d4ed8 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    }
 
-.k-button.btn-primary:focus {
-    outline: 2px solid #3b82f6 !important;
-    outline-offset: 2px !important;
-}
+    .k-button.btn-primary:focus {
+        outline: 2px solid #3b82f6 !important;
+        outline-offset: 2px !important;
+    }
 
 .k-button.btn-secondary {
     background-color: #6b7280 !important;
@@ -81,10 +241,10 @@
     transition: all 0.2s ease-in-out !important;
 }
 
-.k-button.btn-secondary:hover {
-    background-color: #374151 !important;
-    border-color: #374151 !important;
-}
+    .k-button.btn-secondary:hover {
+        background-color: #374151 !important;
+        border-color: #374151 !important;
+    }
 
 .k-button.btn-cancel {
     background-color: #d1d5db !important;
@@ -96,12 +256,11 @@
     transition: all 0.2s ease-in-out !important;
 }
 
-.k-button.btn-cancel:hover {
-    background-color: #9ca3af !important;
-    border-color: #9ca3af !important;
-}
+    .k-button.btn-cancel:hover {
+        background-color: #9ca3af !important;
+        border-color: #9ca3af !important;
+    }
 
-/* Reset pagination buttons to default size */
 .k-grid .k-pager .k-button {
     padding: 0.125rem 0.375rem !important;
     font-size: 0.75rem !important;
@@ -117,17 +276,17 @@
     height: 1.5rem !important;
 }
 
-.k-grid .k-pager .k-dropdownlist .k-dropdown-wrap {
-    height: 1.5rem !important;
-    min-height: 1.5rem !important;
-}
+    .k-grid .k-pager .k-dropdownlist .k-dropdown-wrap {
+        height: 1.5rem !important;
+        min-height: 1.5rem !important;
+    }
 
-.k-grid .k-pager .k-dropdownlist .k-input {
-    height: 1.5rem !important;
-    line-height: 1.5rem !important;
-    padding: 0 0.25rem !important;
-    font-size: 0.75rem !important;
-}
+    .k-grid .k-pager .k-dropdownlist .k-input {
+        height: 1.5rem !important;
+        line-height: 1.5rem !important;
+        padding: 0 0.25rem !important;
+        font-size: 0.75rem !important;
+    }
 
 .k-grid .k-pager .k-textbox {
     font-size: 0.75rem !important;
@@ -137,12 +296,11 @@
     line-height: 1.2 !important;
 }
 
-/* Inline Grid Editor Controls - Higher specificity to override user-create.css */
 .k-grid tbody .k-edit-cell .k-dropdownlist .k-dropdown-wrap,
 .k-grid tbody .k-edit-cell .k-textbox,
 #userAccessGrid tbody .k-edit-cell .k-dropdownlist .k-dropdown-wrap,
 #userAccessGrid tbody .k-edit-cell .k-textbox {
-    height: 1.75rem !important; /* 28px - smaller than regular 2.5rem controls */
+    height: 1.75rem !important;
     min-height: 1.75rem !important;
     font-size: 0.75rem !important;
     border-radius: 0.25rem !important;
@@ -163,7 +321,6 @@
     line-height: 1.2 !important;
 }
 
-/* Extra specific for User Access Grid to ensure override */
 #userAccessGrid tbody td.k-edit-cell .k-dropdownlist .k-dropdown-wrap {
     height: 1.75rem !important;
     border: 1px solid #d1d5db !important;
@@ -180,7 +337,6 @@
     padding: 0.25rem 0.5rem !important;
 }
 
-/* Global Kendo Notification Styling */
 .k-notification {
     min-width: 320px !important;
     max-width: 500px !important;
@@ -192,127 +348,121 @@
     line-height: 1.5 !important;
 }
 
-.k-notification .k-notification-content {
-    padding: 0 !important;
-    font-size: 0.875rem !important;
-    line-height: 1.5 !important;
-    font-weight: 500 !important;
-}
+    .k-notification .k-notification-content {
+        padding: 0 !important;
+        font-size: 0.875rem !important;
+        line-height: 1.5 !important;
+        font-weight: 500 !important;
+    }
 
-.k-notification.k-notification-info {
-    background-color: #eff6ff !important;
-    border-color: #3b82f6 !important;
-    color: #1e40af !important;
-}
+    .k-notification.k-notification-info {
+        background-color: #eff6ff !important;
+        border-color: #3b82f6 !important;
+        color: #1e40af !important;
+    }
 
-.k-notification.k-notification-success {
-    background-color: #f0f9ff !important;
-    border-color: #10b981 !important;
-    color: #065f46 !important;
-}
+    .k-notification.k-notification-success {
+        background-color: #f0f9ff !important;
+        border-color: #10b981 !important;
+        color: #065f46 !important;
+    }
 
-.k-notification.k-notification-error {
-    background-color: #fef2f2 !important;
-    border-color: #ef4444 !important;
-    color: #991b1b !important;
-}
+    .k-notification.k-notification-error {
+        background-color: #fef2f2 !important;
+        border-color: #ef4444 !important;
+        color: #991b1b !important;
+    }
 
-.k-notification.k-notification-warning {
-    background-color: #fffbeb !important;
-    border-color: #f59e0b !important;
-    color: #92400e !important;
-    border-color: #9ca3af !important;
-}
+    .k-notification.k-notification-warning {
+        background-color: #fffbeb !important;
+        border-color: #f59e0b !important;
+        color: #92400e !important;
+        border-color: #9ca3af !important;
+    }
 
-/* ===== REUSABLE COMPONENT CLASSES ===== */
-
-/* Card Components */
 .card {
     background-color: white;
-    border-radius: 0.75rem; /* rounded-xl */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
-    border: 1px solid #e5e7eb; /* border-gray-200 */
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
 }
 
 .card-header {
-    background-color: #f9fafb; /* bg-gray-50 */
-    padding: 1.5rem; /* px-6 py-4 */
-    border-bottom: 1px solid #e5e7eb; /* border-gray-200 */
+    background-color: #f9fafb;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
 }
 
 .card-body {
-    padding: 1.5rem; /* p-6 */
+    padding: 1.5rem;
 }
 
 .card-title {
-    font-size: 1.125rem; /* text-lg */
-    font-weight: 600; /* font-semibold */
-    color: #111827; /* text-gray-900 */
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
 }
 
-/* Input Components */
 .input-base {
-    padding: 0.5rem 1rem; /* px-4 py-2 */
-    border: 1px solid #d1d5db; /* border-gray-300 */
-    border-radius: 0.5rem; /* rounded-lg */
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
     transition: all 0.2s ease-in-out;
     background-color: white;
-    font-size: 0.875rem; /* text-sm */
+    font-size: 0.875rem;
 }
 
-.input-base:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); /* focus:ring-2 focus:ring-blue-500 */
-    border-color: #3b82f6; /* focus:border-blue-500 */
-}
+    .input-base:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #3b82f6;
+    }
 
 .search-input {
     @apply input-base;
 }
 
-/* Status Badge Components */
 .badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.75rem; /* px-3 py-1 */
-    border-radius: 9999px; /* rounded-full */
-    font-size: 0.75rem; /* text-xs */
-    font-weight: 500; /* font-medium */
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 .badge-success {
     @apply badge;
-    background-color: #dcfce7; /* bg-green-100 */
-    color: #166534; /* text-green-800 */
+    background-color: #dcfce7;
+    color: #166534;
 }
 
 .badge-warning {
     @apply badge;
-    background-color: #fef3c7; /* bg-yellow-100 */
-    color: #92400e; /* text-yellow-800 */
+    background-color: #fef3c7;
+    color: #92400e;
 }
 
 .badge-info {
     @apply badge;
-    background-color: #dbeafe; /* bg-blue-100 */
-    color: #1e40af; /* text-blue-800 */
+    background-color: #dbeafe;
+    color: #1e40af;
 }
 
 .badge-purple {
     @apply badge;
-    background-color: #e9d5ff; /* bg-purple-100 */
-    color: #6b21a8; /* text-purple-800 */
+    background-color: #e9d5ff;
+    color: #6b21a8;
 }
 
 .badge-gray {
     @apply badge;
-    background-color: #f3f4f6; /* bg-gray-100 */
-    color: #374151; /* text-gray-800 */
+    background-color: #f3f4f6;
+    color: #374151;
 }
 
-/* Loading Components */
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -343,60 +493,56 @@
     margin: 0 auto 1rem;
 }
 
-/* Icon Container */
 .icon-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.75rem; /* rounded-xl */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* shadow-md */
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .icon-container-sm {
     @apply icon-container;
-    width: 2rem; /* w-8 */
-    height: 2rem; /* h-8 */
+    width: 2rem;
+    height: 2rem;
 }
 
 .icon-container-md {
     @apply icon-container;
-    width: 2.5rem; /* w-10 */
-    height: 2.5rem; /* h-10 */
+    width: 2.5rem;
+    height: 2.5rem;
 }
 
 .icon-container-lg {
     @apply icon-container;
-    width: 3.5rem; /* w-14 */
-    height: 3.5rem; /* h-14 */
+    width: 3.5rem;
+    height: 3.5rem;
 }
 
-/* Primary Theme Icons */
 .icon-primary {
-    background: linear-gradient(135deg, #3b82f6, #9333ea); /* from-blue-500 to-purple-600 */
+    background: linear-gradient(135deg, #3b82f6, #9333ea);
     color: white;
 }
 
 .icon-warning {
-    background: linear-gradient(135deg, #eab308, #ea580c); /* from-yellow-500 to-orange-600 */
+    background: linear-gradient(135deg, #eab308, #ea580c);
     color: white;
 }
 
 .icon-success {
-    background: linear-gradient(135deg, #059669, #047857); /* from-emerald-600 to-emerald-700 */
+    background: linear-gradient(135deg, #059669, #047857);
     color: white;
 }
 
-/* Form Validation */
 .validation-error {
-    color: #dc2626; /* text-red-600 */
-    font-size: 0.875rem; /* text-sm */
+    color: #dc2626;
+    font-size: 0.875rem;
     margin-top: 0.25rem;
 }
 
-/* Button spacing utilities */
 .btn-group {
     display: flex;
-    gap: 0.75rem; /* space-x-3 */
+    gap: 0.75rem;
 }
 
 .btn-group-end {
@@ -404,28 +550,27 @@
     justify-content: flex-end;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .dashboard-card {
         transform: none !important;
     }
-    
-    .dashboard-card:hover {
-        transform: none !important;
-    }
-    
+
+        .dashboard-card:hover {
+            transform: none !important;
+        }
+
     .card-header {
         padding: 1rem;
     }
-    
+
     .card-body {
         padding: 1rem;
     }
-    
+
     .btn-group {
         flex-direction: column;
     }
-    
+
     .loading-content {
         margin: 1rem;
         padding: 1.5rem;

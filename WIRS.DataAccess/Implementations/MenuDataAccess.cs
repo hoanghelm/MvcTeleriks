@@ -18,10 +18,8 @@ namespace WIRS.DataAccess.Implementations
         }
 
 
-		public async Task<NpgsqlDataReader> GetTopMenuByRole(string role)
+        public async Task<IDataReader> GetTopMenuByRole(string role)
         {
-            NpgsqlDataReader dr = null;
-
             NpgsqlConnection con = _dBHelper.GetConnection();
             NpgsqlCommand cmd = new NpgsqlCommand();
             try
@@ -31,7 +29,7 @@ namespace WIRS.DataAccess.Implementations
                 cmd.CommandText = "spc_gettopmenubyrole";
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@p_user_role_code", role);
-                dr = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
+                return await cmd.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
             }
             catch (Exception ex)
             {
@@ -41,14 +39,10 @@ namespace WIRS.DataAccess.Implementations
             {
                 cmd.Dispose();
             }
-            return dr;
         }
 
-
-        public async Task<NpgsqlDataReader> GetSubMenuByRoleAndMenu(string role, decimal menuId)
+        public async Task<IDataReader> GetSubMenuByRoleAndMenu(string role, decimal menuId)
         {
-            NpgsqlDataReader dr = null;
-
             NpgsqlConnection con = _dBHelper.GetConnection();
             NpgsqlCommand cmd = new NpgsqlCommand();
             try
@@ -59,8 +53,7 @@ namespace WIRS.DataAccess.Implementations
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@p_user_role_code", role);
                 cmd.Parameters.AddWithValue("@p_menu_opt_no", Convert.ToString(menuId));
-
-                dr = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
+                return await cmd.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
             }
             catch (Exception ex)
             {
@@ -70,12 +63,9 @@ namespace WIRS.DataAccess.Implementations
             {
                 cmd.Dispose();
             }
-            return dr;
         }
 
-
-
-		public async Task<DataSet> GetMenuInfoByRole(string role)
+        public async Task<DataSet> GetMenuInfoByRole(string role)
         {
             DataSet ds = new DataSet();
 

@@ -1,5 +1,5 @@
 var userCreateViewModel = (function () {
-    
+
     var _employeeSearchWindow;
     var _userAccessData = [];
     var _currentUserAccessId = 0;
@@ -10,7 +10,7 @@ var userCreateViewModel = (function () {
         departments: [],
         locations: []
     };
-    
+
     var _elements = {
         txtUserId: null,
         txtUserName: null,
@@ -18,32 +18,31 @@ var userCreateViewModel = (function () {
         ddlUserRole: null,
         userAccessGrid: null
     };
-    
+
     function init() {
         initializeElements();
         loadMasterData();
-        // Wait for DOM to be ready before initializing the window
-        setTimeout(function() {
+
+        setTimeout(function () {
             initializeEmployeeSearchWindow();
         }, 100);
         initializeUserAccessGrid();
     }
-    
+
     function initializeElements() {
         _elements.txtUserId = $("#txtUserId").data("kendoTextBox");
         _elements.txtUserName = $("#txtUserName").data("kendoTextBox");
         _elements.txtEmail = $("#txtEmail").data("kendoTextBox");
         _elements.ddlUserRole = $("#ddlUserRole").data("kendoDropDownList");
         _elements.userAccessGrid = $("#userAccessGrid").data("kendoGrid");
-        
-        // Add real-time validation
+
         setupRealTimeValidation();
     }
-    
+
     function setupRealTimeValidation() {
-        // User Name validation
+
         if (_elements.txtUserName) {
-            _elements.txtUserName.bind("change", function() {
+            _elements.txtUserName.bind("change", function () {
                 var value = this.value();
                 if (value && (value.length < 2 || value.length > 100)) {
                     showValidationError('userNameError', 'User name must be between 2 and 100 characters');
@@ -52,10 +51,9 @@ var userCreateViewModel = (function () {
                 }
             });
         }
-        
-        // Email validation
+
         if (_elements.txtEmail) {
-            _elements.txtEmail.bind("change", function() {
+            _elements.txtEmail.bind("change", function () {
                 var value = this.value();
                 var emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
                 if (value && !emailRegex.test(value)) {
@@ -65,10 +63,9 @@ var userCreateViewModel = (function () {
                 }
             });
         }
-        
-        // User ID validation
+
         if (_elements.txtUserId) {
-            _elements.txtUserId.bind("change", function() {
+            _elements.txtUserId.bind("change", function () {
                 var value = this.value();
                 if (value && (value.length !== 8 || !/^\d{8}$/.test(value))) {
                     showValidationError('userIdError', 'User ID must be exactly 8 digits');
@@ -78,35 +75,31 @@ var userCreateViewModel = (function () {
             });
         }
     }
-    
+
     function loadMasterData() {
-        // Show skeleton loading only for dropdowns that need data
+
         TelerikSkeleton.showDropdownSkeleton("#ddlUserRole");
-        
-        // Load all master data in parallel
+
         var requests = [
             $.get('/MasterData/GetUserRoles'),
-            $.get('/MasterData/GetSectors'),
-            $.get('/MasterData/GetLocations')
+            $.get('/MasterData/GetSectors')
         ];
-        
-        $.when.apply($, requests).done(function(userRoles, sectors, locations) {
-            _masterData.userRoles = userRoles[0].success ? userRoles[0].data : [];
-            _masterData.sectors = sectors[0].success ? sectors[0].data : [];
-            _masterData.locations = locations[0].success ? locations[0].data : [];
-            
-            // Cache empty arrays for LOBs and Departments - they'll be loaded on demand
+
+        $.when.apply($, requests).done(function (userRoles, sectors) {
+            _masterData.userRoles = userRoles[0] ? userRoles[0] : [];
+            _masterData.sectors = sectors[0] ? sectors[0] : [];
+
             _masterData.lobs = [];
             _masterData.departments = [];
-            
-            // Hide skeleton loading for dropdowns
+            _masterData.locations = [];
+
             TelerikSkeleton.hideDropdownSkeleton("#ddlUserRole");
-        }).fail(function() {
+        }).fail(function () {
             TelerikSkeleton.hideDropdownSkeleton("#ddlUserRole");
             TelerikNotification.error('Error loading master data');
         });
     }
-    
+
     function initializeUserAccessGrid() {
         if (_elements.userAccessGrid) {
             _elements.userAccessGrid.setDataSource(new kendo.data.DataSource({
@@ -130,43 +123,40 @@ var userCreateViewModel = (function () {
                     }
                 }
             }));
-            
-            // Bind to edit events for cascading dropdowns
+
             _elements.userAccessGrid.bind("edit", onGridEdit);
+            _elements.userAccessGrid.bind("remove", onGridRemove);
         }
     }
-    
+
     function initializeEmployeeSearchWindow() {
-        // Employee search is now handled by the EmployeeSearchComponent
+
         _employeeSearchWindow = $("#employeeSearchWindow").data("kendoWindow");
     }
-    
-    
-    // Removed old showNotification - now using TelerikNotification
-    
+
     function onUserIdChange() {
         var userId = _elements.txtUserId.value();
-        
+
         if (userId && userId.length === 8 && /^\d+$/.test(userId)) {
             validateUserExists(userId);
         } else {
             clearUserInfo();
         }
     }
-    
+
     function validateUserExists(userId) {
         TelerikSkeleton.showTextboxSkeleton("#txtUserName");
         TelerikSkeleton.showTextboxSkeleton("#txtEmail");
-        
+
         $.ajax({
             url: '/User/ValidateUserExists',
             type: 'POST',
             data: JSON.stringify(userId),
             contentType: 'application/json',
-            success: function(response) {
+            success: function (response) {
                 TelerikSkeleton.hideTextboxSkeleton("#txtUserName");
                 TelerikSkeleton.hideTextboxSkeleton("#txtEmail");
-                
+
                 if (response.success) {
                     _elements.txtUserName.value(response.user.userName);
                     _elements.txtEmail.value(response.user.email);
@@ -177,45 +167,49 @@ var userCreateViewModel = (function () {
                     clearUserInfo();
                 }
             },
-            error: function() {
+            error: function () {
                 TelerikSkeleton.hideTextboxSkeleton("#txtUserName");
                 TelerikSkeleton.hideTextboxSkeleton("#txtEmail");
                 TelerikNotification.error('Error validating user. Please try again.');
             }
         });
     }
-    
+
     function clearUserInfo() {
         _elements.txtUserName.value('');
         _elements.txtEmail.value('');
     }
-    
-    // Employee search functions are now handled by EmployeeSearchComponent
-    
+
     function addNewAccess() {
         if (!_elements.userAccessGrid) return;
-        
+
         var newAccess = {
             Id: ++_currentUserAccessId,
             UserRoleCode: '',
-            UserRoleName: 'Select Role',
+            UserRoleName: '--Select--',
             SectorCode: '',
-            SectorValue: 'Select Sector',
+            SectorValue: '--Select--',
             LOBCode: '',
-            LOBValue: 'Select LOB',
+            LOBValue: '--Select--',
             DepartmentCode: '',
-            DepartmentValue: 'Select Department',
+            DepartmentValue: '--Select--',
             LocationCode: '',
-            LocationValue: 'Select Location'
+            LocationValue: '--Select--'
         };
-        
+
         _userAccessData.push(newAccess);
         refreshUserAccessGrid();
+
+        setTimeout(function () {
+            var grid = _elements.userAccessGrid;
+            var lastRow = grid.tbody.find("tr:last");
+            grid.editRow(lastRow);
+        }, 100);
     }
-    
+
     function refreshUserAccessGrid() {
         if (!_elements.userAccessGrid) return;
-        
+
         var dataSource = new kendo.data.DataSource({
             data: _userAccessData,
             schema: {
@@ -237,21 +231,32 @@ var userCreateViewModel = (function () {
                 }
             }
         });
-        
+
         _elements.userAccessGrid.setDataSource(dataSource);
     }
-    
+
+    function onGridRemove(e) {
+        var dataItem = e.model;
+        var index = _userAccessData.findIndex(function (item) {
+            return item.Id === dataItem.Id;
+        });
+
+        if (index !== -1) {
+            _userAccessData.splice(index, 1);
+        }
+    }
+
     function saveUser() {
         if (!validateForm()) {
             return;
         }
-        
+
         var userData = {
             UserId: _elements.txtUserId.value(),
             UserName: _elements.txtUserName.value(),
             Email: _elements.txtEmail.value(),
             UserRole: _elements.ddlUserRole.value(),
-            UserAccess: _userAccessData.map(function(item) {
+            UserAccess: _userAccessData.map(function (item) {
                 return {
                     UserRoleCode: item.UserRoleCode || _elements.ddlUserRole.value(),
                     SectorCode: item.SectorCode,
@@ -261,41 +266,38 @@ var userCreateViewModel = (function () {
                 };
             })
         };
-        
-        // Disable the save button during submission
+
         $("#btnCreateUser").data("kendoButton").enable(false);
-        
+
         $.ajax({
             url: '/User/CreateUser',
             type: 'POST',
             data: JSON.stringify(userData),
             contentType: 'application/json',
-            success: function(response) {
+            success: function (response) {
                 $("#btnCreateUser").data("kendoButton").enable(true);
-                
+
                 if (response.success) {
                     TelerikNotification.success("User created successfully!");
-                    setTimeout(function() {
-                        window.location.href = '/Home';
+                    setTimeout(function () {
+                        window.location.href = '/User';
                     }, 2000);
                 } else {
                     TelerikNotification.error(response.message);
                 }
             },
-            error: function() {
+            error: function () {
                 $("#btnCreateUser").data("kendoButton").enable(true);
                 TelerikNotification.error('Error creating user. Please try again.');
             }
         });
     }
-    
+
     function validateForm() {
         var isValid = true;
-        
-        // Clear previous errors
+
         $('.validation-error').empty();
-        
-        // Validate User ID
+
         var userId = _elements.txtUserId.value();
         if (!userId) {
             showValidationError('userIdError', 'User ID is required');
@@ -307,8 +309,7 @@ var userCreateViewModel = (function () {
             showValidationError('userIdError', 'User ID must contain only numbers');
             isValid = false;
         }
-        
-        // Validate User Name
+
         var userName = _elements.txtUserName.value();
         if (!userName) {
             showValidationError('userNameError', 'User Name is required');
@@ -320,8 +321,7 @@ var userCreateViewModel = (function () {
             showValidationError('userNameError', 'User Name cannot exceed 100 characters');
             isValid = false;
         }
-        
-        // Validate Email
+
         var email = _elements.txtEmail.value();
         var emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
         if (!email) {
@@ -331,182 +331,365 @@ var userCreateViewModel = (function () {
             showValidationError('emailError', 'Please enter a valid email address (e.g., user@company.com)');
             isValid = false;
         }
-        
-        // Validate User Role
+
         if (!_elements.ddlUserRole.value()) {
             showValidationError('userRoleError', 'User Role is required');
             isValid = false;
         }
-        
-        // Validate User Access
+
         if (_userAccessData.length === 0) {
             showValidationError('accessError', 'At least one user access permission is required');
             isValid = false;
         } else {
-            // Validate each access entry
+
             for (var i = 0; i < _userAccessData.length; i++) {
                 var access = _userAccessData[i];
-                if (!access.UserRoleCode || !access.SectorCode || !access.LocationCode) {
-                    showValidationError('accessError', 'All user access fields must be completed');
+                if (!access.UserRoleCode || !access.SectorCode || !access.LOBCode) {
+                    showValidationError('accessError', 'User Role, Sector and LOB are required for all access rows');
                     isValid = false;
                     break;
                 }
             }
         }
-        
+
         return isValid;
     }
-    
+
     function cancelForm() {
         if (confirm("Are you sure you want to cancel? All unsaved changes will be lost.")) {
-            window.location.href = '/Home';
+            window.location.href = '/User';
         }
     }
-    
+
     function showValidationError(elementId, message) {
         $("#" + elementId).html(`<span class="validation-error">${message}</span>`);
     }
-    
+
     function clearValidationError(elementId) {
         $("#" + elementId).empty();
     }
-    
+
     function onGridError(e) {
         console.error('Grid error:', e);
     }
-    
+
     function onGridEdit(e) {
+        var dataItem = e.model;
+        var row = $(e.container).closest("tr");
+
+        var userRoleDropDown = row.find('[name*="UserRoleName"]').data('kendoDropDownList');
+        if (userRoleDropDown) {
+            userRoleDropDown.setDataSource(_masterData.userRoles);
+            if (!e.model.isNew() && dataItem.UserRoleCode) {
+                setTimeout(function () {
+                    userRoleDropDown.value(dataItem.UserRoleCode);
+                }, 50);
+            }
+        }
+
+        var sectorDropDown = row.find('[name*="SectorValue"]').data('kendoDropDownList');
+        if (sectorDropDown) {
+            sectorDropDown.setDataSource(_masterData.sectors);
+            if (!e.model.isNew() && dataItem.SectorCode) {
+                setTimeout(function () {
+                    sectorDropDown.value(dataItem.SectorCode);
+                }, 50);
+            }
+        }
+
         if (e.model.isNew()) {
-            // For new rows, set default values
-            e.model.set('UserRoleName', 'Select Role');
-            e.model.set('SectorValue', 'Select Sector');
-            e.model.set('LOBValue', 'Select LOB');
-            e.model.set('DepartmentValue', 'Select Department');
-            e.model.set('LocationValue', 'Select Location');
+            dataItem.set('UserRoleName', '--Select--');
+            dataItem.set('SectorValue', '--Select--');
+            dataItem.set('LOBValue', '--Select--');
+            dataItem.set('DepartmentValue', '--Select--');
+            dataItem.set('LocationValue', '--Select--');
+        } else {
+            if (dataItem.SectorCode) {
+                loadLOBsBySector(dataItem.SectorCode, function (lobs) {
+                    var lobDropDown = row.find('[name*="LOBValue"]').data('kendoDropDownList');
+                    if (lobDropDown) {
+                        lobDropDown.setDataSource(lobs);
+                        setTimeout(function () {
+                            lobDropDown.value(dataItem.LOBCode);
+                        }, 50);
+                    }
+                });
+            }
+
+            if (dataItem.SectorCode && dataItem.LOBCode) {
+                loadDepartmentsByLOB(dataItem.SectorCode, dataItem.LOBCode, function (departments) {
+                    var deptDropDown = row.find('[name*="DepartmentValue"]').data('kendoDropDownList');
+                    if (deptDropDown) {
+                        deptDropDown.setDataSource(departments);
+                        setTimeout(function () {
+                            deptDropDown.value(dataItem.DepartmentCode);
+                        }, 50);
+                    }
+                });
+            }
+
+            if (dataItem.SectorCode && dataItem.LOBCode && dataItem.DepartmentCode) {
+                loadLocationsByDepartment(dataItem.SectorCode, dataItem.LOBCode, dataItem.DepartmentCode, function (locations) {
+                    var locationDropDown = row.find('[name*="LocationValue"]').data('kendoDropDownList');
+                    if (locationDropDown) {
+                        locationDropDown.setDataSource(locations);
+                        setTimeout(function () {
+                            locationDropDown.value(dataItem.LocationCode);
+                        }, 50);
+                    }
+                });
+            }
         }
     }
-    
-    // Load LOBs when sector changes
+
     function loadLOBsBySector(sectorCode, callback) {
         if (!sectorCode) {
             _masterData.lobs = [];
             callback && callback([]);
             return;
         }
-        
+
         $.get('/MasterData/GetLOBs', { sectorCode: sectorCode })
-            .done(function(response) {
-                if (response.success) {
-                    _masterData.lobs = response.data;
-                    callback && callback(response.data);
-                } else {
-                    _masterData.lobs = [];
-                    callback && callback([]);
-                }
+            .done(function (response) {
+                _masterData.lobs = response;
+                callback && callback(response);
             })
-            .fail(function() {
+            .fail(function () {
                 _masterData.lobs = [];
                 callback && callback([]);
             });
     }
-    
-    // Load departments when LOB changes
+
     function loadDepartmentsByLOB(sectorCode, lobCode, callback) {
         if (!sectorCode || !lobCode) {
             _masterData.departments = [];
             callback && callback([]);
             return;
         }
-        
+
         $.get('/MasterData/GetDepartments', { sectorCode: sectorCode, lobCode: lobCode })
-            .done(function(response) {
-                if (response.success) {
-                    _masterData.departments = response.data;
-                    callback && callback(response.data);
-                } else {
-                    _masterData.departments = [];
-                    callback && callback([]);
-                }
+            .done(function (response) {
+                _masterData.departments = response;
+                callback && callback(response);
             })
-            .fail(function() {
+            .fail(function () {
                 _masterData.departments = [];
                 callback && callback([]);
             });
     }
-    
-    // Handle sector dropdown change in grid
+
+    function loadLocationsByDepartment(sectorCode, lobCode, deptCode, callback) {
+        if (!sectorCode || !lobCode || !deptCode) {
+            _masterData.locations = [];
+            callback && callback([]);
+            return;
+        }
+
+        $.get('/MasterData/GetLocations', { sectorCode: sectorCode, lobCode: lobCode, deptCode: deptCode })
+            .done(function (response) {
+                _masterData.locations = response;
+                callback && callback(response);
+            })
+            .fail(function () {
+                _masterData.locations = [];
+                callback && callback([]);
+            });
+    }
+
+    function updateDataItemInGrid(dataItem) {
+        var grid = $("#userAccessGrid").data("kendoGrid");
+        if (!grid) return;
+
+        var index = _userAccessData.findIndex(function (item) {
+            return item.Id === dataItem.Id;
+        });
+
+        if (index !== -1) {
+            _userAccessData[index] = {
+                Id: dataItem.Id,
+                UserRoleCode: dataItem.UserRoleCode,
+                UserRoleName: dataItem.UserRoleName,
+                SectorCode: dataItem.SectorCode,
+                SectorValue: dataItem.SectorValue,
+                LOBCode: dataItem.LOBCode,
+                LOBValue: dataItem.LOBValue,
+                DepartmentCode: dataItem.DepartmentCode,
+                DepartmentValue: dataItem.DepartmentValue,
+                LocationCode: dataItem.LocationCode,
+                LocationValue: dataItem.LocationValue
+            };
+        }
+    }
+
+    function onUserRoleChange(e) {
+        var grid = $("#userAccessGrid").data("kendoGrid");
+        if (!grid) return;
+
+        var dataItem = grid.dataItem($(e.sender.element).closest("tr"));
+        if (!dataItem) return;
+
+        var roleCode = e.sender.value();
+        var roleText = e.sender.text();
+
+        dataItem.set('UserRoleCode', roleCode);
+        dataItem.set('UserRoleName', roleText);
+
+        updateDataItemInGrid(dataItem);
+    }
+
     function onSectorChange(e) {
         var grid = $("#userAccessGrid").data("kendoGrid");
         if (!grid) return;
-        
-        var dataItem = grid.dataItem($(e.sender.element).closest("tr"));
+
+        var row = $(e.sender.element).closest("tr");
+        var dataItem = grid.dataItem(row);
         if (!dataItem) return;
-        
+
         var sectorCode = e.sender.value();
         var sectorText = e.sender.text();
-        
-        // Update the current row's sector info
-        dataItem.set('SectorCode', sectorCode);
-        dataItem.set('SectorValue', sectorText);
-        
-        // Reset dependent dropdowns
-        dataItem.set('LOBCode', '');
-        dataItem.set('LOBValue', 'Select LOB');
-        dataItem.set('DepartmentCode', '');
-        dataItem.set('DepartmentValue', 'Select Department');
-        
-        // Load LOBs for this sector
+
+        dataItem.SectorCode = sectorCode;
+        dataItem.SectorValue = sectorText;
+
+        dataItem.LOBCode = '';
+        dataItem.LOBValue = '--Select--';
+        dataItem.DepartmentCode = '';
+        dataItem.DepartmentValue = '--Select--';
+        dataItem.LocationCode = '';
+        dataItem.LocationValue = '--Select--';
+
+        var lobDropDown = row.find('[name*="LOBValue"]').data('kendoDropDownList');
+        var deptDropDown = row.find('[name*="DepartmentValue"]').data('kendoDropDownList');
+        var locationDropDown = row.find('[name*="LocationValue"]').data('kendoDropDownList');
+
+        if (lobDropDown) {
+            lobDropDown.setDataSource([]);
+            lobDropDown.value('');
+        }
+        if (deptDropDown) {
+            deptDropDown.setDataSource([]);
+            deptDropDown.value('');
+        }
+        if (locationDropDown) {
+            locationDropDown.setDataSource([]);
+            locationDropDown.value('');
+        }
+
         if (sectorCode) {
-            loadLOBsBySector(sectorCode, function(lobs) {
-                // Find LOB dropdown in the current row and update its data source
-                var row = $(e.sender.element).closest("tr");
-                var lobDropDown = row.find('[data-role="dropdownlist"]').filter(function() {
-                    return $(this).attr('name').indexOf('LOBValue') >= 0;
-                }).data('kendoDropDownList');
-                
+            loadLOBsBySector(sectorCode, function (lobs) {
                 if (lobDropDown) {
                     lobDropDown.setDataSource(lobs);
                 }
             });
         }
     }
-    
-    // Handle LOB dropdown change in grid
+
     function onLOBChange(e) {
         var grid = $("#userAccessGrid").data("kendoGrid");
         if (!grid) return;
-        
-        var dataItem = grid.dataItem($(e.sender.element).closest("tr"));
+
+        var row = $(e.sender.element).closest("tr");
+        var dataItem = grid.dataItem(row);
         if (!dataItem) return;
-        
+
         var lobCode = e.sender.value();
         var lobText = e.sender.text();
         var sectorCode = dataItem.SectorCode;
-        
-        // Update the current row's LOB info
-        dataItem.set('LOBCode', lobCode);
-        dataItem.set('LOBValue', lobText);
-        
-        // Reset dependent dropdowns
-        dataItem.set('DepartmentCode', '');
-        dataItem.set('DepartmentValue', 'Select Department');
-        
-        // Load departments for this sector/LOB combination
+
+        dataItem.LOBCode = lobCode;
+        dataItem.LOBValue = lobText;
+
+        dataItem.DepartmentCode = '';
+        dataItem.DepartmentValue = '--Select--';
+        dataItem.LocationCode = '';
+        dataItem.LocationValue = '--Select--';
+
+        var deptDropDown = row.find('[name*="DepartmentValue"]').data('kendoDropDownList');
+        var locationDropDown = row.find('[name*="LocationValue"]').data('kendoDropDownList');
+
+        if (deptDropDown) {
+            deptDropDown.setDataSource([]);
+            deptDropDown.value('');
+        }
+        if (locationDropDown) {
+            locationDropDown.setDataSource([]);
+            locationDropDown.value('');
+        }
+
         if (sectorCode && lobCode) {
-            loadDepartmentsByLOB(sectorCode, lobCode, function(departments) {
-                // Find Department dropdown in the current row and update its data source
-                var row = $(e.sender.element).closest("tr");
-                var deptDropDown = row.find('[data-role="dropdownlist"]').filter(function() {
-                    return $(this).attr('name').indexOf('DepartmentValue') >= 0;
-                }).data('kendoDropDownList');
-                
+            loadDepartmentsByLOB(sectorCode, lobCode, function (departments) {
                 if (deptDropDown) {
                     deptDropDown.setDataSource(departments);
                 }
             });
         }
     }
-    
+
+    function onDepartmentChange(e) {
+        var grid = $("#userAccessGrid").data("kendoGrid");
+        if (!grid) return;
+
+        var row = $(e.sender.element).closest("tr");
+        var dataItem = grid.dataItem(row);
+        if (!dataItem) return;
+
+        var deptCode = e.sender.value();
+        var deptText = e.sender.text();
+        var sectorCode = dataItem.SectorCode;
+        var lobCode = dataItem.LOBCode;
+
+        dataItem.DepartmentCode = deptCode;
+        dataItem.DepartmentValue = deptText;
+
+        dataItem.LocationCode = '';
+        dataItem.LocationValue = '--Select--';
+
+        var locationDropDown = row.find('[name*="LocationValue"]').data('kendoDropDownList');
+
+        if (locationDropDown) {
+            locationDropDown.setDataSource([]);
+            locationDropDown.value('');
+        }
+
+        if (sectorCode && lobCode && deptCode) {
+            loadLocationsByDepartment(sectorCode, lobCode, deptCode, function (locations) {
+                if (locationDropDown) {
+                    locationDropDown.setDataSource(locations);
+                }
+            });
+        }
+    }
+
+    function onLocationChange(e) {
+        var grid = $("#userAccessGrid").data("kendoGrid");
+        if (!grid) return;
+
+        var row = $(e.sender.element).closest("tr");
+        var dataItem = grid.dataItem(row);
+        if (!dataItem) return;
+
+        var locationCode = e.sender.value();
+        var locationText = e.sender.text();
+
+        dataItem.LocationCode = locationCode;
+        dataItem.LocationValue = locationText;
+    }
+
+    function onUserRoleChange(e) {
+        var grid = $("#userAccessGrid").data("kendoGrid");
+        if (!grid) return;
+
+        var row = $(e.sender.element).closest("tr");
+        var dataItem = grid.dataItem(row);
+        if (!dataItem) return;
+
+        var roleCode = e.sender.value();
+        var roleText = e.sender.text();
+
+        dataItem.UserRoleCode = roleCode;
+        dataItem.UserRoleName = roleText;
+    }
+
     return {
         init: init,
         onUserIdChange: onUserIdChange,
@@ -516,17 +699,30 @@ var userCreateViewModel = (function () {
         onGridError: onGridError,
         loadLOBsBySector: loadLOBsBySector,
         loadDepartmentsByLOB: loadDepartmentsByLOB,
+        loadLocationsByDepartment: loadLocationsByDepartment,
+        onUserRoleChange: onUserRoleChange,
         onSectorChange: onSectorChange,
-        onLOBChange: onLOBChange
+        onLOBChange: onLOBChange,
+        onDepartmentChange: onDepartmentChange,
+        onLocationChange: onLocationChange,
+        showNotification: function (message, type) {
+            if (type === 'success') {
+                TelerikNotification.success(message);
+            } else if (type === 'error') {
+                TelerikNotification.error(message);
+            }
+        }
     };
-    
+
 })();
 
-// Global functions for event handlers
 window.onUserIdChange = userCreateViewModel.onUserIdChange;
 window.addNewAccess = userCreateViewModel.addNewAccess;
 window.saveUser = userCreateViewModel.saveUser;
 window.cancelForm = userCreateViewModel.cancelForm;
 window.onGridError = userCreateViewModel.onGridError;
+window.onUserRoleChange = userCreateViewModel.onUserRoleChange;
 window.onSectorChange = userCreateViewModel.onSectorChange;
 window.onLOBChange = userCreateViewModel.onLOBChange;
+window.onDepartmentChange = userCreateViewModel.onDepartmentChange;
+window.onLocationChange = userCreateViewModel.onLocationChange;

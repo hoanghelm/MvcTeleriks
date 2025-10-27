@@ -6,95 +6,78 @@
     var onSelectCallback = Model?.OnSelectCallback ?? "onEmployeeSelected";
 }
 
-<!-- Employee Search Modal -->
 @(Html.Kendo().Window()
     .Name(modalId)
     .Title("Search Employee")
     .Modal(true)
-    .Width(800)
-    .Height(650)
+    .Width(1000)
+    .Height(600)
     .Resizable(r => r.Enabled(false))
     .Visible(false)
     .Actions(actions => actions.Close())
-    .Events(e => e.Close("onEmployeeSearchModalClose"))
+    .Events(e => e.Close("onEmployeeSearchModalClose").Open("onEmployeeSearchModalOpen"))
     .Content(@<text>
-        <div class="simple-search-container">
-            <!-- Simple Search Form -->
-            <div class="search-form">
-                <div class="search-fields">
-                    <div class="field-group">
-                        <label>Employee ID</label>
-                        @(Html.Kendo().TextBox()
-                            .Name("filterEmployeeId")
-                            .Placeholder("Enter Employee ID")
-                            .HtmlAttributes(new { @class = "search-input" })
-                        )
-                    </div>
-                    <div class="field-group">
-                        <label>Employee Name</label>
-                        @(Html.Kendo().TextBox()
-                            .Name("filterEmployeeName")
-                            .Placeholder("Enter Employee Name")
-                            .HtmlAttributes(new { @class = "search-input" })
-                        )
-                    </div>
-                    <div class="search-button">
-                        @(Html.Kendo().Button()
-                            .Name("btnSearch")
-                            .Content("Search")
-                            .HtmlAttributes(new { @class = "btn-primary" })
-                            .Events(e => e.Click("performAdvancedSearch"))
-                        )
-                    </div>
+    <div class="simple-search-container">
+        <div class="search-form">
+            <div class="search-fields">
+                <div class="field-group" style="flex: 1;">
+                    @(Html.Kendo().TextBox()
+                    .Name("filterEmployeeName")
+                    .Placeholder("Search by employee name...")
+                    .HtmlAttributes(new {
+                    @class = "search-input",
+                    style = "width: 100%;",
+                    onkeydown = "if(event.keyCode===13) performAdvancedSearch();"
+                    })
+                    )
+                </div>
+                <div class="search-button">
+                    @(Html.Kendo().Button()
+                    .Name("btnSearch")
+                    .Content("<svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'></path></svg>")
+                    .HtmlAttributes(new { @class = "btn-primary" })
+                    .Events(e => e.Click("performAdvancedSearch"))
+                    )
                 </div>
             </div>
-
-            <!-- Results Grid -->
-            <div class="results-section">
-                @(Html.Kendo().Grid<dynamic>()
-                    .Name(gridId)
-                    .Columns(columns =>
-                    {
-                        columns.Bound("EmployeeId").Title("Employee ID").Width(120);
-                        columns.Bound("EmployeeName").Title("Employee Name").Width(200);
-                        columns.Bound("Email").Title("Email").Width(200);
-                        columns.Bound("Designation").Title("Position").Width(150);
-                    })
-                    .Selectable(sel => sel.Mode(GridSelectionMode.Single).Type(GridSelectionType.Row))
-                    .Sortable()
-                    .Pageable(pageable => pageable.PageSizes(new[] { 10, 25, 50 }))
-                    .Height(300)
-                    .DataSource(dataSource => dataSource
-                        .Custom()
-                        .PageSize(10)
-                        .Schema(schema => schema
-                            .Model(model => {
-                                model.Id("EmployeeId");
-                                model.Field("EmployeeId", typeof(string));
-                                model.Field("EmployeeName", typeof(string));
-                                model.Field("Email", typeof(string));
-                                model.Field("Designation", typeof(string));
-                            })
-                        )
-                    )
-                    .NoRecords(noRecords => noRecords.Template(@"
-                        <div class='simple-empty-state'>
-                            <p>No employees found. Please search to see results.</p>
-                        </div>
-                    "))
-                    .Events(e => e.Change("onEmployeeGridSelectionChange"))
-                )
-            </div>
-
-            <!-- Actions -->
-            <div class="modal-actions">
-                @(Html.Kendo().Button()
-                    .Name("btnSelectEmployee")
-                    .Content("Select Employee")
-                    .HtmlAttributes(new { @class = "btn-primary", disabled = "disabled" })
-                    .Events(e => e.Click(onSelectCallback))
-                )
-            </div>
         </div>
-    </text>)
+
+        <div class="results-section">
+            @(Html.Kendo().Grid<dynamic>()
+            .Name(gridId)
+            .Columns(columns =>
+            {
+            columns.Bound("EmployeeId").Title("Employee No").Width(120).ClientTemplate("<a href='\\#' onclick='selectEmployeeById(\"#=EmployeeId#\"); return false;' style='color: \\#0066cc; text-decoration: underline;'>#=EmployeeId#</a>");
+            columns.Bound("EmployeeName").Title("Employee Name").Width(200);
+            columns.Bound("CostCentreName").Title("Cost Center").Width(200);
+            columns.Bound("Designation").Title("Designation").Width(180);
+            columns.Bound("ContactNo").Title("Contact No").Width(120);
+            })
+            .Sortable()
+            .Pageable(pageable => pageable.PageSizes(new[] { 10, 25, 50 }))
+            .Height(350)
+            .DataSource(dataSource => dataSource
+            .Custom()
+            .PageSize(10)
+            .Schema(schema => schema
+            .Model(model => {
+            model.Id("EmployeeId");
+            model.Field("EmployeeId", typeof(string));
+            model.Field("EmployeeName", typeof(string));
+            model.Field("CostCentreName", typeof(string));
+            model.Field("Designation", typeof(string));
+            model.Field("Email", typeof(string));
+            model.Field("ContactNo", typeof(string));
+            })
+            )
+            )
+            .NoRecords(noRecords => noRecords.Template(@"
+            <div class='simple-empty-state'>
+            <p>No employees found.</p>
+            </div>
+            "))
+            )
+        </div>
+    </div>
+</text>)
 )

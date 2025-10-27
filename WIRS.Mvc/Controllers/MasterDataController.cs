@@ -20,7 +20,7 @@ namespace WIRS.Mvc.Controllers
             try
             {
                 var roles = await _masterDataService.GetUserRoles();
-                return Json(new { success = true, data = roles });
+                return Json(roles);
             }
             catch (Exception ex)
             {
@@ -34,7 +34,7 @@ namespace WIRS.Mvc.Controllers
             try
             {
                 var sectors = await _masterDataService.GetSectors();
-                return Json(new { success = true, data = sectors });
+                return Json(sectors);
             }
             catch (Exception ex)
             {
@@ -53,7 +53,7 @@ namespace WIRS.Mvc.Controllers
                 }
 
                 var lobs = await _masterDataService.GetLOBsBySector(sectorCode);
-                return Json(new { success = true, data = lobs });
+                return Json(lobs);
             }
             catch (Exception ex)
             {
@@ -72,7 +72,7 @@ namespace WIRS.Mvc.Controllers
                 }
 
                 var departments = await _masterDataService.GetDepartmentsByLOB(sectorCode, lobCode);
-                return Json(new { success = true, data = departments });
+                return Json(departments);
             }
             catch (Exception ex)
             {
@@ -81,12 +81,12 @@ namespace WIRS.Mvc.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetLocations()
+        public async Task<IActionResult> GetLocations(string sectorCode, string lobCode, string deptCode)
         {
             try
             {
-                var locations = await _masterDataService.GetLocations();
-                return Json(new { success = true, data = locations });
+                var locations = await _masterDataService.GetLocations(sectorCode, lobCode, deptCode);
+                return Json(locations);
             }
             catch (Exception ex)
             {
@@ -100,7 +100,7 @@ namespace WIRS.Mvc.Controllers
             try
             {
                 var statuses = await _masterDataService.GetAccountStatuses();
-                return Json(new { success = true, data = statuses });
+                return Json(statuses);
             }
             catch (Exception ex)
             {
@@ -140,7 +140,7 @@ namespace WIRS.Mvc.Controllers
                     }
                 }
 
-                return Json(new { success = true, data = result });
+                return Json(result);
             }
             catch (Exception ex)
             {

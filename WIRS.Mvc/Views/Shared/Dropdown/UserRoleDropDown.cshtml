@@ -1,12 +1,8 @@
-@{
-    var userRoles = ViewBag.UserRoles as IEnumerable<dynamic> ?? new List<dynamic>();
-}
-
 @(Html.Kendo().DropDownList()
     .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
-    .DataTextField("Value")
-    .DataValueField("Code")
-    .OptionLabel("Select Role")
-    .BindTo(userRoles)
+    .DataTextField("value")
+    .DataValueField("code")
+    .OptionLabel("--Select--")
     .HtmlAttributes(new { @class = "form-control", style = "width: 100%" })
+    .Events(e => e.Change("onUserRoleChange"))
 )

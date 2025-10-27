@@ -117,7 +117,9 @@ namespace WIRS.Mvc.Extensions
 				services.AddScoped<IErrorMessageDataAccess, ErrorMessageDataAccess>();
 				services.AddScoped<IIncidentDataAccess, IncidentDataAccess>();
 				services.AddScoped<IManHoursDataAccess, ManHoursDataAccess>();
-				services.AddScoped<IMenuDataAccess, MenuDataAccess>();
+				// we used mock menu for now to not impact the behavior
+                services.AddScoped<IMenuDataAccess, MockMenuDataAccess>();
+                //services.AddScoped<IMenuDataAccess, MenuDataAccess>();
 				services.AddScoped<IPrintDataAccess, PrintDataAccess>();
 				services.AddScoped<IStatisticsReportDataAccess, StatisticsReportDataAccess>();
 				services.AddScoped<IUserCredentialsDataAccess, UserCredentialsDataAccess>();

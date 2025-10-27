@@ -25,25 +25,6 @@ namespace WIRS.Mvc.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            try
-            {
-                // Load master data for dropdowns
-                var userRoles = await _masterDataService.GetUserRoles();
-                var sectors = await _masterDataService.GetSectors();
-                var locations = await _masterDataService.GetLocations();
-
-                ViewBag.UserRoles = userRoles;
-                ViewBag.Sectors = sectors;
-                ViewBag.Locations = locations;
-            }
-            catch (Exception)
-            {
-                // If master data fails to load, continue with empty collections
-                ViewBag.UserRoles = new List<LookupItem>();
-                ViewBag.Sectors = new List<LookupItem>();
-                ViewBag.Locations = new List<LookupItem>();
-            }
-
             return View();
         }
 
@@ -217,22 +198,6 @@ namespace WIRS.Mvc.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            try
-            {
-                // Load master data for dropdowns
-                var userRoles = await _masterDataService.GetUserRoles();
-                var sectors = await _masterDataService.GetSectors();
-
-                ViewBag.UserRoles = userRoles;
-                ViewBag.Sectors = sectors;
-            }
-            catch (Exception)
-            {
-                // If master data fails to load, continue with empty collections
-                ViewBag.UserRoles = new List<LookupItem>();
-                ViewBag.Sectors = new List<LookupItem>();
-            }
-
             return View();
         }
 
@@ -241,7 +206,15 @@ namespace WIRS.Mvc.Controllers
         {
             try
             {
+                var userSession = await GetCurrentUserSessionAsync();
+
+                if (userSession == null)
+                {
+                    throw new Exception();
+                }
+
                 var result = await _userService.SearchUsers(
+                    userSession.UserId,
                     request.Sector ?? string.Empty,
                     request.LOB ?? string.Empty,
                     request.UserId ?? string.Empty,
@@ -280,15 +253,6 @@ namespace WIRS.Mvc.Controllers
                     return RedirectToAction("Index");
                 }
 
-                // Load master data for dropdowns
-                var userRoles = await _masterDataService.GetUserRoles();
-                var sectors = await _masterDataService.GetSectors();
-                var locations = await _masterDataService.GetLocations();
-
-                ViewBag.UserRoles = userRoles;
-                ViewBag.Sectors = sectors;
-                ViewBag.Locations = locations;
-
                 return View(userDetails);
             }
             catch (Exception ex)
@@ -305,7 +269,16 @@ namespace WIRS.Mvc.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return Json(new { success = false, message = "Invalid data provided" });
+                    var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage);
+
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Invalid data provided",
+                        errors = errors
+                    });
                 }
 
                 var currentUser = await GetCurrentUserSessionAsync();

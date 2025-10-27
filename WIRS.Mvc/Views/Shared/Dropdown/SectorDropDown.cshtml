@@ -1,13 +1,9 @@
-@{
-    var sectors = ViewBag.Sectors as IEnumerable<dynamic> ?? new List<dynamic>();
-}
-
 @(Html.Kendo().DropDownList()
     .Name(ViewData.TemplateInfo.GetFullHtmlFieldName(""))
-    .DataTextField("Value")
-    .DataValueField("Code")
-    .OptionLabel("Select Sector")
-    .BindTo(sectors)
+    .DataTextField("value")
+    .DataValueField("code")
+    .OptionLabel("--Select--")
+    .BindTo(new List<dynamic>())
     .HtmlAttributes(new { @class = "form-control", style = "width: 100%" })
     .Events(e => e.Change("onSectorChange"))
 )
