@@ -16,6 +16,7 @@
         vm.wshoList = [];
         vm.alternateWshoList = [];
         vm.emailToList = [];
+        vm.activeTab = 'A';
 
         vm.partB = {
             isReadOnly: false,
@@ -242,8 +243,28 @@
         function loadIncident(incidentId) {
             return IncidentUpdateService.getIncidentById(incidentId)
                 .then(function(incident) {
+                    console.log('Loaded incident data:', incident);
                     vm.incident = incident;
+                    return loadStatusName();
+                })
+                .then(function() {
                     determinePartBMode();
+                });
+        }
+
+        function loadStatusName() {
+            if (!vm.incident.status) {
+                return Promise.resolve();
+            }
+
+            return IncidentUpdateService.getStatusName(vm.incident.status)
+                .then(function(statusName) {
+                    vm.incident.statusName = statusName;
+                    console.log('Status name loaded:', statusName);
+                })
+                .catch(function(error) {
+                    console.error('Error loading status name:', error);
+                    vm.incident.statusName = vm.incident.status;
                 });
         }
 
@@ -320,6 +341,8 @@
         function mapIncidentToPartA() {
             if (!vm.incident) return;
 
+            console.log('Mapping incident to Part A', vm.incident);
+
             // Basic incident details
             vm.partA.incidentType = vm.incident.incidentTypes || vm.incident.incidentType || '';
             vm.partA.incidentOther = vm.incident.incidentOther || '';
@@ -378,6 +401,8 @@
             vm.partA.hodId = vm.incident.hodId || '';
             vm.partA.wshoId = vm.incident.wshoId || '';
             vm.partA.ahodId = vm.incident.ahodId || '';
+
+            console.log('Part A data after mapping:', vm.partA);
         }
 
         function loadPartBData() {

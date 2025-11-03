@@ -9,6 +9,7 @@
         var service = {
             getIncidentById: getIncidentById,
             getCurrentUser: getCurrentUser,
+            getStatusName: getStatusName,
             getIncidentTypes: getIncidentTypes,
             getSectors: getSectors,
             getLOBs: getLOBs,
@@ -63,6 +64,23 @@
                     return $q.reject(response.data.message || 'Failed to load user');
                 })
                 .catch(handleError);
+        }
+
+        function getStatusName(statusCode) {
+            return $http.get('/MasterData/GetLookupByType?type=Actions')
+                .then(function(response) {
+                    if (response.data && Array.isArray(response.data)) {
+                        var statusItem = response.data.find(function(item) {
+                            return item.code === statusCode;
+                        });
+                        return statusItem ? statusItem.value : statusCode;
+                    }
+                    return statusCode;
+                })
+                .catch(function(error) {
+                    console.error('Error loading status name:', error);
+                    return statusCode;
+                });
         }
 
         function getIncidentTypes() {
