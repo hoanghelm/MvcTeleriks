@@ -1,5 +1,17 @@
 namespace WIRS.Services.Models
 {
+
+    public class PartACopyToItem
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+    public class UserItem
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
     public class LookupItem
     {
         public string Code { get; set; } = string.Empty;

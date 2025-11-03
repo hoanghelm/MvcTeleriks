@@ -18,22 +18,71 @@ namespace WIRS.Services.Implementations
             _dataMapper = dataMapper;
         }
 
-        public async Task<(string incidentId, string errorCode)> CreateIncidentAsync(WorkflowIncidentCreateModel model, string userId)
+        public async Task<(string incidentId, string errorCode)> CreateIncidentAsync(IncidentCreateModel model, string userId)
         {
             try
             {
-                var workflowIncident = MapCreateModelToEntity(model, userId);
+                var incident = MapCreateModelToEntity(model, userId);
                 var incidentTypeXml = ConvertIncidentTypesToXml(model.IncidentTypes);
                 var injuredPersonXml = ConvertInjuredPersonsToXml(model.InjuredPersons);
                 var eyewitnessXml = ConvertEyewitnessesToXml(model.Eyewitnesses);
-                var workflowXml = CreateInitialWorkflowXml(userId);
+
+                // init workflow
+                DataSet workflow = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
+
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                List<User> assignedUsers = new List<User>();
+                assignedUsers.Add(new User() { UserId = model.HodId, UserRole = "HOD" });
+                
+                if(!string.IsNullOrEmpty(model.AhodId))
+                {
+                    assignedUsers.Add(new User() { UserId = model.AhodId, UserRole = "AHOD" });
+                }
+
+                if (!string.IsNullOrEmpty(model.WshoId))
+                {
+                    assignedUsers.Add(new User() { UserId = model.WshoId, UserRole = "WSHO" });
+                }
+
+                if (model.CopyToList != null)
+                {
+                    foreach (var copyTo in model.CopyToList)
+                    {
+                        assignedUsers.Add(new User() { UserId = copyTo, UserRole = "COPYTO" });
+                    }
+                }
+
+                foreach (var assignedUser in assignedUsers)
+                {
+                    DataRow row = dt.NewRow();
+                    row["incident_id"] = ""; // for creation
+                    row["actions_code"] = "01";
+                    row["actions_role"] = assignedUser.UserRole;
+                    row["from"] = userId;
+                    row["to"] = assignedUser.UserId;
+                    row["remarks"] = "";
+                    row["Date"] = "";
+                    row["attachment"] = "";
+                    dt.Rows.Add(row);
+                }
+
+                workflow.Tables.Add(dt);
 
                 return await _workflowIncidentDataAccess.insert_Incidents(
-                    workflowIncident,
+                    incident,
                     incidentTypeXml,
                     injuredPersonXml,
                     eyewitnessXml,
-                    workflowXml);
+                    workflow.GetXml());
             }
             catch (Exception)
             {
@@ -169,38 +218,38 @@ namespace WIRS.Services.Implementations
                     
                     permissions.Add(new IncidentStagePermissionModel
                     {
-                        Stage = "A",
+                        Stage = "01",
                         StageDescription = "Initial Report",
                         CanView = true,
                         CanEdit = await CanUserEditIncidentAsync(incidentId, userId),
-                        IsCurrentStage = currentStatus == "A" || string.IsNullOrEmpty(currentStatus),
+                        IsCurrentStage = currentStatus == "01" || string.IsNullOrEmpty(currentStatus),
                         RequiredRole = "Reporter"
                     });
 
                     permissions.Add(new IncidentStagePermissionModel
                     {
-                        Stage = "B",
+                        Stage = "02",
                         StageDescription = "Investigation",
                         CanView = !string.IsNullOrEmpty(currentStatus),
-                        CanEdit = await CanUserWorkflowIncidentAsync(incidentId, userId) && (currentStatus == "B" || currentStatus == "C"),
-                        IsCurrentStage = currentStatus == "B",
+                        CanEdit = await CanUserWorkflowIncidentAsync(incidentId, userId) && (currentStatus == "02" || currentStatus == "03"),
+                        IsCurrentStage = currentStatus == "02",
                         RequiredRole = "Investigator"
                     });
 
                     permissions.Add(new IncidentStagePermissionModel
                     {
-                        Stage = "C",
+                        Stage = "03",
                         StageDescription = "Final Report",
-                        CanView = currentStatus == "C" || currentStatus == "D",
-                        CanEdit = await CanUserWorkflowIncidentAsync(incidentId, userId) && currentStatus == "C",
-                        IsCurrentStage = currentStatus == "C",
+                        CanView = currentStatus == "03" || currentStatus == "04",
+                        CanEdit = await CanUserWorkflowIncidentAsync(incidentId, userId) && currentStatus == "03",
+                        IsCurrentStage = currentStatus == "03",
                         RequiredRole = "Approver"
                     });
                 }
             }
             catch (Exception)
             {
-                // Return default permissions on error
+
             }
 
             return permissions;
@@ -227,7 +276,7 @@ namespace WIRS.Services.Implementations
             }
         }
 
-        private WorkflowIncident MapCreateModelToEntity(WorkflowIncidentCreateModel model, string userId)
+        private WorkflowIncident MapCreateModelToEntity(IncidentCreateModel model, string userId)
         {
             return new WorkflowIncident
             {
@@ -251,7 +300,7 @@ namespace WIRS.Services.Implementations
                 examined_hospital_clinic_name = model.ExaminedHospitalClinicName,
                 official_working_hrs = model.OfficialWorkingHrs,
                 injured_case_type = model.InjuredCaseType,
-                status = "A",
+                status = "01",
                 created_by = userId,
                 creation_date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             };
@@ -343,22 +392,91 @@ namespace WIRS.Services.Implementations
         private string ConvertIncidentTypesToXml(List<IncidentTypeModel> incidentTypes)
         {
             if (incidentTypes?.Any() != true) return string.Empty;
-            
-            return JsonSerializer.Serialize(incidentTypes);
+
+            DataSet ds = new DataSet("NewDataSet");
+            DataTable dt = new DataTable("incidenttype");
+
+            dt.Columns.Add("incident_type", typeof(string));
+            dt.Columns.Add("type_description", typeof(string));
+
+            foreach (var type in incidentTypes)
+            {
+                DataRow row = dt.NewRow();
+                row["incident_type"] = type.Type ?? "";
+                row["type_description"] = type.Description ?? "";
+                dt.Rows.Add(row);
+            }
+
+            ds.Tables.Add(dt);
+            return ds.GetXml();
         }
 
         private string ConvertInjuredPersonsToXml(List<InjuredPersonModel> injuredPersons)
         {
             if (injuredPersons?.Any() != true) return string.Empty;
-            
-            return JsonSerializer.Serialize(injuredPersons);
+
+            DataSet ds = new DataSet("NewDataSet");
+            DataTable dt = new DataTable("Table1");
+
+            dt.Columns.Add("injured_name", typeof(string));
+            dt.Columns.Add("injured_emp_no", typeof(string));
+            dt.Columns.Add("injured_nric_fin_no", typeof(string));
+            dt.Columns.Add("injured_race", typeof(string));
+            dt.Columns.Add("injured_gender", typeof(string));
+            dt.Columns.Add("injured_contact_no", typeof(string));
+            dt.Columns.Add("injured_age_text", typeof(string));
+            dt.Columns.Add("injured_nationality", typeof(string));
+            dt.Columns.Add("injured_employment_type", typeof(string));
+            dt.Columns.Add("injured_employment_date_text", typeof(string));
+            dt.Columns.Add("injured_designation", typeof(string));
+            dt.Columns.Add("injured_company", typeof(string));
+
+            foreach (var person in injuredPersons)
+            {
+                DataRow row = dt.NewRow();
+                row["injured_name"] = person.Name ?? "";
+                row["injured_emp_no"] = person.EmpNo ?? "";
+                row["injured_nric_fin_no"] = person.NricFinNo ?? "";
+                row["injured_race"] = person.Race ?? "";
+                row["injured_gender"] = person.Gender ?? "";
+                row["injured_contact_no"] = person.ContactNo ?? "";
+                row["injured_age_text"] = person.Age ?? "";
+                row["injured_nationality"] = person.Nationality ?? "";
+                row["injured_employment_type"] = person.EmploymentType ?? "";
+                row["injured_employment_date_text"] = person.EmploymentDate ?? "";
+                row["injured_designation"] = person.Designation ?? "";
+                row["injured_company"] = person.Company ?? "";
+                dt.Rows.Add(row);
+            }
+
+            ds.Tables.Add(dt);
+            return ds.GetXml();
         }
 
         private string ConvertEyewitnessesToXml(List<EyewitnessModel> eyewitnesses)
         {
             if (eyewitnesses?.Any() != true) return string.Empty;
-            
-            return JsonSerializer.Serialize(eyewitnesses);
+
+            DataSet ds = new DataSet("NewDataSet");
+            DataTable dt = new DataTable("EyeWitnesses");
+
+            dt.Columns.Add("empid", typeof(string));
+            dt.Columns.Add("empname", typeof(string));
+            dt.Columns.Add("empdesignation", typeof(string));
+            dt.Columns.Add("empcontactno", typeof(string));
+
+            foreach (var eyewitness in eyewitnesses)
+            {
+                DataRow row = dt.NewRow();
+                row["empid"] = eyewitness.EmpNo ?? "";
+                row["empname"] = eyewitness.Name ?? "";
+                row["empdesignation"] = eyewitness.Designation ?? "";
+                row["empcontactno"] = eyewitness.ContactNo ?? "";
+                dt.Rows.Add(row);
+            }
+
+            ds.Tables.Add(dt);
+            return ds.GetXml();
         }
 
         private string ConvertIntervieweesToXml(List<IntervieweeModel> interviewees)
@@ -403,21 +521,29 @@ namespace WIRS.Services.Implementations
             return JsonSerializer.Serialize(attachments);
         }
 
-        private string CreateInitialWorkflowXml(string userId)
+        public Task<string> SubmitPartBAsync(PartBSubmitModel model, string userId)
         {
-            var initialWorkflow = new List<IncidentWorkflowModel>
-            {
-                new()
-                {
-                    Status = "A",
-                    UserId = userId,
-                    ActionDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    ActionType = "CREATE",
-                    Comments = "Incident created"
-                }
-            };
-            
-            return JsonSerializer.Serialize(initialWorkflow);
+            throw new NotImplementedException();
+        }
+
+        public Task<string> SavePartCAsync(PartCSubmitModel model, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> SubmitPartCAsync(PartCSubmitModel model, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> ClosePartCAsync(PartCCloseModel model, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> SubmitPartDAsync(PartDSubmitModel model, string userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

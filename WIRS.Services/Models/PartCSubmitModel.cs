@@ -39,16 +39,16 @@ namespace WIRS.Services.Models
         public string ContactNo { get; set; }
     }
 
-    public class InjuryDetailModel
-    {
-        public string InjuredPersonId { get; set; }
-        public string InjuredPersonName { get; set; }
-        public List<string> NatureOfInjury { get; set; }
-        public List<string> HeadNeckTorso { get; set; }
-        public List<string> UpperLimbs { get; set; }
-        public List<string> LowerLimbs { get; set; }
-        public string Description { get; set; }
-    }
+    //public class InjuryDetailModel
+    //{
+    //    public string InjuredPersonId { get; set; }
+    //    public string InjuredPersonName { get; set; }
+    //    public List<string> NatureOfInjury { get; set; }
+    //    public List<string> HeadNeckTorso { get; set; }
+    //    public List<string> UpperLimbs { get; set; }
+    //    public List<string> LowerLimbs { get; set; }
+    //    public string Description { get; set; }
+    //}
 
     public class MedicalCertificateModel
     {

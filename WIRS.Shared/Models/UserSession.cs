@@ -8,6 +8,8 @@ namespace WIRS.Shared.Models
         public string UserName { get; set; } = string.Empty;
         public UserRole UserRole { get; set; }
         public string SbaName { get; set; } = string.Empty;
+        public string SbuName { get; set; } = string.Empty;
+        public string Designation { get; set; } = string.Empty;
         public List<string> Permissions { get; set; } = new List<string>();
         public DateTime LoginTime { get; set; }
         public DateTime LastActivity { get; set; }

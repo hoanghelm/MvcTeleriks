@@ -129,8 +129,8 @@ namespace WIRS.Mvc.Controllers
                     userName = currentUser.UserName,
                     userRole = currentUser.UserRole.ToString(),
                     sbaName = currentUser.SbaName,
-                    sectorCode = currentUser.SectorCode,
-                    designation = string.Empty,
+                    sbuName = currentUser.SbuName,
+                    designation = currentUser.Designation,
                     displayName = !string.IsNullOrEmpty(currentUser.UserName) ? currentUser.UserName : "User",
                     loginTime = currentUser.LoginTime,
                     lastActivity = currentUser.LastActivity
@@ -372,7 +372,7 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = "Sector and LOB codes are required" });
                 }
 
-                var hods = await _userService.GetHODsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                var hods = await _userService.GetHODs(sectorCode, lobCode, departmentCode, locationCode);
                 return Json(hods);
             }
             catch (Exception ex)
@@ -391,7 +391,7 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = "Sector and LOB codes are required" });
                 }
 
-                var wshos = await _userService.GetWSHOsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                var wshos = await _userService.GetWSHOs(sectorCode, lobCode, departmentCode, locationCode);
                 return Json(wshos);
             }
             catch (Exception ex)
@@ -410,7 +410,7 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = "Sector and LOB codes are required" });
                 }
 
-                var ahods = await _userService.GetAHODsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                var ahods = await _userService.GetAHODs(sectorCode, lobCode, departmentCode, locationCode);
                 return Json(ahods);
             }
             catch (Exception ex)
@@ -448,7 +448,7 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = "Sector and LOB codes are required" });
                 }
 
-                var cwshos = await _userService.GetCWSHOsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                var cwshos = await _userService.GetCWSHOs(sectorCode, lobCode, departmentCode, locationCode);
                 return Json(cwshos);
             }
             catch (Exception ex)
@@ -467,7 +467,7 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = "Sector and LOB codes are required" });
                 }
 
-                var hsbus = await _userService.GetHSBUsBySBU(sectorCode, lobCode, departmentCode, locationCode);
+                var hsbus = await _userService.GetHSBUs(sectorCode, lobCode, departmentCode, locationCode);
                 return Json(hsbus);
             }
             catch (Exception ex)

@@ -50,7 +50,7 @@ namespace WIRS.Services.Models
         public List<IncidentStagePermissionModel> StagePermissions { get; set; } = new();
     }
 
-    public class WorkflowIncidentUpdateModel : WorkflowIncidentCreateModel
+    public class WorkflowIncidentUpdateModel : IncidentCreateModel
     {
         public string IncidentId { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
@@ -100,12 +100,13 @@ namespace WIRS.Services.Models
 
     public class InjuryDetailModel
     {
-        public string InjuryId { get; set; } = string.Empty;
-        public string InjuredId { get; set; } = string.Empty;
-        public string BodyPart { get; set; } = string.Empty;
-        public string InjuryType { get; set; } = string.Empty;
-        public string Severity { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        public string InjuredPersonId { get; set; }
+        public string InjuredPersonName { get; set; }
+        public List<string> NatureOfInjury { get; set; }
+        public List<string> HeadNeckTorso { get; set; }
+        public List<string> UpperLimbs { get; set; }
+        public List<string> LowerLimbs { get; set; }
+        public string Description { get; set; }
     }
 
     public class IntervieweeModel

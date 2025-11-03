@@ -15,14 +15,16 @@ var EmployeeSearchComponent = (function () {
     EmployeeSearchInstance.prototype.init = function () {
         var self = this;
 
-        this.modal = $("#" + this.modalId).data("kendoWindow");
-        this.grid = $("#" + this.gridId).data("kendoGrid");
+        setTimeout(function () {
+            self.modal = $("#" + self.modalId).data("kendoWindow");
+            self.grid = $("#" + self.gridId).data("kendoGrid");
 
-        if (this.modal) {
-            this.modal.bind("open", function () {
-                self.loadAllEmployees();
-            });
-        }
+            if (self.modal) {
+                self.modal.bind("open", function () {
+                    self.loadAllEmployees();
+                });
+            }
+        }, 500);
     };
 
     EmployeeSearchInstance.prototype.loadAllEmployees = function () {
@@ -53,7 +55,13 @@ var EmployeeSearchComponent = (function () {
                             CostCentreName: emp.costCentreName,
                             Designation: emp.designation,
                             Email: emp.email,
-                            ContactNo: emp.contactNo
+                            ContactNo: emp.contactNo,
+                            Age: emp.age,
+                            Race: emp.race,
+                            Nationality: emp.nationality,
+                            Gender: emp.gender,
+                            EmploymentType: emp.employmentType,
+                            DateOfEmployment: emp.dateOfEmployment
                         };
                     });
 
@@ -161,8 +169,7 @@ function onEmployeeSearchModalClose() {
 }
 
 function performAdvancedSearch() {
-    var employeeNameBox = $("#filterEmployeeName").data("kendoTextBox");
-    var employeeName = employeeNameBox ? employeeNameBox.value() : '';
+    var searchVal = $("#filterEmployeeName").val();
     var grid = $("#employeeSearchGrid").data("kendoGrid");
 
     if (!grid) return;
@@ -175,7 +182,7 @@ function performAdvancedSearch() {
         contentType: 'application/json',
         data: JSON.stringify({
             employeeId: '',
-            employeeName: employeeName,
+            employeeName: searchVal,
             pageNo: 1,
             pageSize: 100
         }),

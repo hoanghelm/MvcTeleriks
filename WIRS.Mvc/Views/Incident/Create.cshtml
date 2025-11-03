@@ -45,10 +45,10 @@
                     <label for="incidentOther" class="block text-sm font-medium text-gray-700 mb-1">
                         If 'Others', please specify <span class="text-red-600">*</span>
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.incident.incidentOther"
                            id="incidentOther"
-                           ng-model="vm.incident.incidentOther"
-                           class="form-input w-full"
+                           style="width: 100%;"
                            ng-required="vm.showOtherIncidentType" />
                 </div>
             </div>
@@ -141,21 +141,22 @@
                 <label for="exactLocation" class="block text-sm font-medium text-gray-700 mb-1">
                     Exact Location
                 </label>
-                <input type="text"
+                <input kendo-text-box
+                       k-ng-model="vm.incident.exactLocation"
                        id="exactLocation"
-                       ng-model="vm.incident.exactLocation"
-                       class="form-input w-full" />
+                       style="width: 100%;" />
             </div>
 
             <div class="form-group mt-4">
                 <label for="incidentDescription" class="block text-sm font-medium text-gray-700 mb-1">
                     Near-miss / Incident Description <span class="text-red-600">*</span>
                 </label>
-                <textarea id="incidentDescription"
-                          ng-model="vm.incident.incidentDescription"
-                          rows="4"
-                          maxlength="2000"
-                          class="form-textarea w-full"
+                <textarea kendo-text-area
+                          k-ng-model="vm.incident.incidentDescription"
+                          k-rows="4"
+                          k-max-length="2000"
+                          id="incidentDescription"
+                          style="width: 100%;"
                           required></textarea>
                 <div class="text-xs text-gray-500 mt-1">{{vm.incident.incidentDescription.length || 0}}/2000 characters</div>
             </div>
@@ -184,13 +185,16 @@
                         Name <span class="text-red-600">*</span>
                     </label>
                     <div class="flex gap-2">
-                        <input type="text"
+                        <input kendo-text-box
+                               k-ng-model="vm.injuredPerson.name"
                                id="injuredName"
-                               ng-model="vm.injuredPerson.name"
-                               class="form-input flex-1" />
-                        <button type="button"
-                                class="btn-secondary px-3"
-                                ng-click="vm.searchInjuredPerson()">...</button>
+                               style="width: 100%;" />
+                        <button kendo-button
+                                class="k-primary"
+                                type="button"
+                                ng-click="vm.searchInjuredPerson()">
+                            ...
+                        </button>
                     </div>
                 </div>
 
@@ -198,10 +202,10 @@
                     <label for="injuredContactNo" class="block text-sm font-medium text-gray-700 mb-1">
                         Contact Number
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.injuredPerson.contactNo"
                            id="injuredContactNo"
-                           ng-model="vm.injuredPerson.contactNo"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
             </div>
 
@@ -210,21 +214,21 @@
                     <label for="injuredEmpNo" class="block text-sm font-medium text-gray-700 mb-1">
                         Employee Number <span class="text-red-600" ng-show="vm.injuredPersonType == 'E'">*</span>
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.injuredPerson.employeeNo"
                            id="injuredEmpNo"
-                           ng-model="vm.injuredPerson.employeeNo"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
 
                 <div class="form-group" ng-show="vm.injuredPersonType == 'P'">
                     <label for="injuredCompany" class="block text-sm font-medium text-gray-700 mb-1">
                         Company
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.injuredPerson.company"
+                           k-max-length="50"
                            id="injuredCompany"
-                           ng-model="vm.injuredPerson.company"
-                           maxlength="50"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
             </div>
 
@@ -233,33 +237,33 @@
                     <label for="injuredRace" class="block text-sm font-medium text-gray-700 mb-1">
                         Race
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.injuredPerson.race"
+                           k-max-length="10"
                            id="injuredRace"
-                           ng-model="vm.injuredPerson.race"
-                           maxlength="10"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
 
                 <div class="form-group">
                     <label for="injuredNationality" class="block text-sm font-medium text-gray-700 mb-1">
                         Nationality
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.injuredPerson.nationality"
+                           k-max-length="20"
                            id="injuredNationality"
-                           ng-model="vm.injuredPerson.nationality"
-                           maxlength="20"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
 
                 <div class="form-group">
                     <label for="injuredGender" class="block text-sm font-medium text-gray-700 mb-1">
                         Gender
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.injuredPerson.gender"
+                           k-max-length="10"
                            id="injuredGender"
-                           ng-model="vm.injuredPerson.gender"
-                           maxlength="10"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
             </div>
 
@@ -268,22 +272,22 @@
                     <label for="injuredDesignation" class="block text-sm font-medium text-gray-700 mb-1">
                         Designation
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.injuredPerson.designation"
+                           k-max-length="40"
                            id="injuredDesignation"
-                           ng-model="vm.injuredPerson.designation"
-                           maxlength="40"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
 
                 <div class="form-group">
                     <label for="injuredEmploymentType" class="block text-sm font-medium text-gray-700 mb-1">
                         Employment Type
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.injuredPerson.employmentType"
+                           k-max-length="10"
                            id="injuredEmploymentType"
-                           ng-model="vm.injuredPerson.employmentType"
-                           maxlength="10"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
             </div>
 
@@ -291,17 +295,20 @@
                 <label for="injuredDateOfEmployment" class="block text-sm font-medium text-gray-700 mb-1">
                     Date of Employment
                 </label>
-                <input type="text"
+                <input kendo-text-box
+                       k-ng-model="vm.injuredPerson.dateOfEmployment"
+                       k-placeholder="'dd-MMM-yyyy'"
                        id="injuredDateOfEmployment"
-                       ng-model="vm.injuredPerson.dateOfEmployment"
-                       placeholder="dd-MMM-yyyy"
-                       class="form-input w-full" />
+                       style="width: 100%;" />
             </div>
 
             <div class="mt-4">
-                <button type="button"
-                        class="btn-primary"
-                        ng-click="vm.addInjuredPerson()">Add Injured Person</button>
+                <button kendo-button
+                        class="k-primary"
+                        type="button"
+                        ng-click="vm.addInjuredPerson()">
+                    Add Injured Person
+                </button>
             </div>
 
             <div class="mt-6" ng-show="vm.injuredPersons.length > 0">
@@ -332,32 +339,34 @@
                     <label for="hospitalName" class="block text-sm font-medium text-gray-700 mb-1">
                         Hospital / Clinic where the injured person was examined or treated
                     </label>
-                    <textarea id="hospitalName"
-                              ng-model="vm.incident.hospitalClinicName"
-                              rows="2"
-                              maxlength="2000"
-                              class="form-textarea w-full"></textarea>
+                    <textarea kendo-text-area
+                              k-ng-model="vm.incident.hospitalClinicName"
+                              k-rows="2"
+                              k-max-length="2000"
+                              id="hospitalName"
+                              style="width: 100%;"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="workingOvertime" class="block text-sm font-medium text-gray-700 mb-1">
                         Was the injured person working overtime when the accident happened?
                     </label>
-                    <textarea id="workingOvertime"
-                              ng-model="vm.incident.workingOvertime"
-                              rows="2"
-                              maxlength="2000"
-                              class="form-textarea w-full"></textarea>
+                    <textarea kendo-text-area
+                              k-ng-model="vm.incident.workingOvertime"
+                              k-rows="2"
+                              k-max-length="2000"
+                              id="workingOvertime"
+                              style="width: 100%;"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="officialWorkingHours" class="block text-sm font-medium text-gray-700 mb-1">
                         What is the official working hours of the injured person on the day of incident?
                     </label>
-                    <input type="text"
+                    <input kendo-text-box
+                           k-ng-model="vm.incident.officialWorkingHours"
                            id="officialWorkingHours"
-                           ng-model="vm.incident.officialWorkingHours"
-                           class="form-input w-full" />
+                           style="width: 100%;" />
                 </div>
             </div>
         </fieldset>
@@ -369,11 +378,12 @@
                 <label for="damageDescription" class="block text-sm font-medium text-gray-700 mb-1">
                     Damage Description / Impact of Environment Incident <span class="text-red-600">*</span>
                 </label>
-                <textarea id="damageDescription"
-                          ng-model="vm.incident.damageDescription"
-                          rows="4"
-                          maxlength="2000"
-                          class="form-textarea w-full"
+                <textarea kendo-text-area
+                          k-ng-model="vm.incident.damageDescription"
+                          k-rows="4"
+                          k-max-length="2000"
+                          id="damageDescription"
+                          style="width: 100%;"
                           ng-required="vm.incident.incidentType != '1'"></textarea>
             </div>
         </fieldset>
@@ -404,13 +414,16 @@
                             Name
                         </label>
                         <div class="flex gap-2">
-                            <input type="text"
+                            <input kendo-text-box
+                                   k-ng-model="vm.eyeWitness.name"
                                    id="witnessName"
-                                   ng-model="vm.eyeWitness.name"
-                                   class="form-input flex-1" />
-                            <button type="button"
-                                    class="btn-secondary px-3"
-                                    ng-click="vm.searchEyeWitness()">...</button>
+                                   style="width: 100%;" />
+                            <button kendo-button
+                                    class="k-primary"
+                                    type="button"
+                                    ng-click="vm.searchEyeWitness()">
+                                ...
+                            </button>
                         </div>
                     </div>
 
@@ -418,10 +431,10 @@
                         <label for="witnessEmpNo" class="block text-sm font-medium text-gray-700 mb-1">
                             Employee Number/NRIC/Passport/Fin Number
                         </label>
-                        <input type="text"
+                        <input kendo-text-box
+                               k-ng-model="vm.eyeWitness.employeeNo"
                                id="witnessEmpNo"
-                               ng-model="vm.eyeWitness.employeeNo"
-                               class="form-input w-full" />
+                               style="width: 100%;" />
                     </div>
                 </div>
 
@@ -430,27 +443,30 @@
                         <label for="witnessDesignation" class="block text-sm font-medium text-gray-700 mb-1">
                             Designation
                         </label>
-                        <input type="text"
+                        <input kendo-text-box
+                               k-ng-model="vm.eyeWitness.designation"
                                id="witnessDesignation"
-                               ng-model="vm.eyeWitness.designation"
-                               class="form-input w-full" />
+                               style="width: 100%;" />
                     </div>
 
                     <div class="form-group">
                         <label for="witnessContactNo" class="block text-sm font-medium text-gray-700 mb-1">
                             Contact Number
                         </label>
-                        <input type="text"
+                        <input kendo-text-box
+                               k-ng-model="vm.eyeWitness.contactNo"
                                id="witnessContactNo"
-                               ng-model="vm.eyeWitness.contactNo"
-                               class="form-input w-full" />
+                               style="width: 100%;" />
                     </div>
                 </div>
 
                 <div class="mt-4">
-                    <button type="button"
-                            class="btn-primary"
-                            ng-click="vm.addEyeWitness()">Add Eye Witness</button>
+                    <button kendo-button
+                            class="k-primary"
+                            type="button"
+                            ng-click="vm.addEyeWitness()">
+                        Add Eye Witness
+                    </button>
                 </div>
 
                 <div class="mt-6" ng-show="vm.eyeWitnesses.length > 0">
@@ -544,11 +560,14 @@
         </fieldset>
 
         <div class="flex justify-end gap-4 mt-6">
-            <button type="button"
-                    class="btn-secondary"
-                    ng-click="vm.cancel()">Cancel</button>
-            <button type="submit"
-                    class="btn-primary"
+            <button kendo-button
+                    type="button"
+                    ng-click="vm.cancel()">
+                Cancel
+            </button>
+            <button kendo-button
+                    class="k-primary"
+                    type="submit"
                     ng-disabled="incidentForm.$invalid || vm.isSubmitting">
                 <span ng-show="!vm.isSubmitting">Submit to HOD</span>
                 <span ng-show="vm.isSubmitting">Submitting...</span>
@@ -557,11 +576,52 @@
     </form>
 </div>
 
-@Html.Partial("_EmployeeSearchModal")
+@{
+    var employeeSearchModel = new WIRS.Mvc.ViewModels.EmployeeSearchViewModel("employeeSearchWindow", "employeeSearchGrid", "onEmployeeSearchSelect");
+}
+@Html.Partial("~/Views/Shared/Modal/_EmployeeSearchModal.cshtml", employeeSearchModel)
 
 @section Scripts {
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2023.3.1010/js/angular.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2023.3.1010/js/kendo.angular.min.js"></script>
+    <script src="~/js/components/employee-search.js"></script>
     <script src="~/js/incident/incident-create-app.js"></script>
     <script src="~/js/incident/incident-create-service.js"></script>
     <script src="~/js/incident/incident-create-controller.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            window.employeeSearchInstance = EmployeeSearchComponent.create({
+                modalId: 'employeeSearchWindow',
+                gridId: 'employeeSearchGrid',
+                onSelectCallback: 'onEmployeeSearchSelect'
+            });
+        });
+
+        function onEmployeeSearchSelect(employee) {
+            console.log('Employee selected:', employee);
+        }
+
+        window.openEmployeeSearch = function(searchType, callback) {
+            if (window.employeeSearchInstance) {
+                window.onEmployeeSearchSelect = function(employee) {
+                    var mappedEmployee = {
+                        name: employee.EmployeeName,
+                        empId: employee.EmployeeId,
+                        contactNo: employee.ContactNo,
+                        designation: employee.Designation,
+                        age: employee.Age,
+                        race: employee.Race,
+                        nationality: employee.Nationality,
+                        gender: employee.Gender,
+                        employmentType: employee.EmploymentType,
+                        dateOfEmployment: employee.DateOfEmployment
+                    };
+                    callback(mappedEmployee);
+                };
+
+                window.employeeSearchInstance.open();
+            }
+        };
+    </script>
 }

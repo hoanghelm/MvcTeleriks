@@ -1,6 +1,6 @@
 namespace WIRS.Services.Models
 {
-    public class WorkflowIncidentCreateModel
+    public class IncidentCreateModel
     {
         public string IncidentDateTime { get; set; } = string.Empty;
         public string IncidentTime { get; set; } = string.Empty;
@@ -25,6 +25,11 @@ namespace WIRS.Services.Models
         public string ExaminedHospitalClinicName { get; set; } = string.Empty;
         public string OfficialWorkingHrs { get; set; } = string.Empty;
         public string InjuredCaseType { get; set; } = string.Empty;
+        public string HodId { get; set; } = string.Empty;
+        public string WshoId { get; set; } = string.Empty;
+        public string AhodId { get; set; } = string.Empty;
+        public List<string> CopyToList { get; set; } = new();
+
     }
 
     public class IncidentTypeModel
@@ -48,6 +53,7 @@ namespace WIRS.Services.Models
         public string Designation { get; set; } = string.Empty;
         public string EmploymentType { get; set; } = string.Empty;
         public string EmploymentTypeOther { get; set; } = string.Empty;
+        public string EmploymentDate { get; set; } = string.Empty;
         public string Remarks { get; set; } = string.Empty;
     }
 

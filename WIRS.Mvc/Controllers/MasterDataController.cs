@@ -159,7 +159,7 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = "Lookup type is required" });
                 }
 
-                var lookupData = await _masterDataService.GetLookupByType(type);
+                var lookupData = await _masterDataService.GetLookup(type);
                 return Json(lookupData);
             }
             catch (Exception ex)

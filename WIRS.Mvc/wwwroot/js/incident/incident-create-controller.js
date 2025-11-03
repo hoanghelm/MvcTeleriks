@@ -49,56 +49,64 @@
             dataTextField: 'value',
             dataValueField: 'code',
             optionLabel: '--Select--',
-            dataSource: new kendo.data.DataSource({ data: [] })
+            dataSource: new kendo.data.DataSource({ data: [] }),
+            valuePrimitive: true
         };
 
         vm.sectorOptions = {
             dataTextField: 'value',
             dataValueField: 'code',
             optionLabel: '--Select--',
-            dataSource: new kendo.data.DataSource({ data: [] })
+            dataSource: new kendo.data.DataSource({ data: [] }),
+            valuePrimitive: true
         };
 
         vm.lobOptions = {
             dataTextField: 'value',
             dataValueField: 'code',
             optionLabel: '--Select--',
-            dataSource: new kendo.data.DataSource({ data: [] })
+            dataSource: new kendo.data.DataSource({ data: [] }),
+            valuePrimitive: true
         };
 
         vm.departmentOptions = {
             dataTextField: 'value',
             dataValueField: 'code',
             optionLabel: '--Select--',
-            dataSource: new kendo.data.DataSource({ data: [] })
+            dataSource: new kendo.data.DataSource({ data: [] }),
+            valuePrimitive: true
         };
 
         vm.locationOptions = {
             dataTextField: 'value',
             dataValueField: 'code',
             optionLabel: '--Select--',
-            dataSource: new kendo.data.DataSource({ data: [] })
+            dataSource: new kendo.data.DataSource({ data: [] }),
+            valuePrimitive: true
         };
 
         vm.hodOptions = {
             dataTextField: 'name',
             dataValueField: 'id',
             optionLabel: '--Select--',
-            dataSource: new kendo.data.DataSource({ data: [] })
+            dataSource: new kendo.data.DataSource({ data: [] }),
+            valuePrimitive: true
         };
 
         vm.wshoOptions = {
             dataTextField: 'name',
             dataValueField: 'id',
             optionLabel: '--Select--',
-            dataSource: new kendo.data.DataSource({ data: [] })
+            dataSource: new kendo.data.DataSource({ data: [] }),
+            valuePrimitive: true
         };
 
         vm.ahodOptions = {
             dataTextField: 'name',
             dataValueField: 'id',
             optionLabel: '--Select--',
-            dataSource: new kendo.data.DataSource({ data: [] })
+            dataSource: new kendo.data.DataSource({ data: [] }),
+            valuePrimitive: true
         };
 
         vm.injuredGridOptions = {
@@ -164,9 +172,10 @@
         init();
 
         function init() {
-            loadCurrentUser();
             loadIncidentTypes();
-            loadSectors();
+            loadSectors().then(function () {
+                loadCurrentUser();
+            })
         }
 
         function loadCurrentUser() {
@@ -176,7 +185,7 @@
                         userId: data.userId,
                         name: data.userName || data.displayName || 'User',
                         designation: data.designation || '',
-                        sectorCode: data.sectorCode || ''
+                        sectorCode: data.sbaName || ''
                     };
 
                     if (vm.currentUser.sectorCode) {
@@ -201,7 +210,7 @@
         }
 
         function loadSectors() {
-            IncidentService.getSectors()
+            return IncidentService.getSectors()
                 .then(function (data) {
                     vm.sectorOptions.dataSource.data(data);
                 })

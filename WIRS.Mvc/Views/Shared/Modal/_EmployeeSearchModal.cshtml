@@ -6,78 +6,94 @@
     var onSelectCallback = Model?.OnSelectCallback ?? "onEmployeeSelected";
 }
 
-@(Html.Kendo().Window()
-    .Name(modalId)
-    .Title("Search Employee")
-    .Modal(true)
-    .Width(1000)
-    .Height(600)
-    .Resizable(r => r.Enabled(false))
-    .Visible(false)
-    .Actions(actions => actions.Close())
-    .Events(e => e.Close("onEmployeeSearchModalClose").Open("onEmployeeSearchModalOpen"))
-    .Content(@<text>
+<div id="@modalId" style="display:none;">
     <div class="simple-search-container">
         <div class="search-form">
             <div class="search-fields">
                 <div class="field-group" style="flex: 1;">
-                    @(Html.Kendo().TextBox()
-                    .Name("filterEmployeeName")
-                    .Placeholder("Search by employee name...")
-                    .HtmlAttributes(new {
-                    @class = "search-input",
-                    style = "width: 100%;",
-                    onkeydown = "if(event.keyCode===13) performAdvancedSearch();"
-                    })
-                    )
+                    <input kendo-text-box
+                           id="filterEmployeeName"
+                           placeholder="Search by employee name..."
+                           class="search-input k-textbox"
+                           style="width: 100%;"
+                           onkeydown="if(event.keyCode===13) performAdvancedSearch();" />
                 </div>
                 <div class="search-button">
-                    @(Html.Kendo().Button()
-                    .Name("btnSearch")
-                    .Content("<svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'></path></svg>")
-                    .HtmlAttributes(new { @class = "btn-primary" })
-                    .Events(e => e.Click("performAdvancedSearch"))
-                    )
+                    <button type="button"
+                            id="btnSearch"
+                            class="btn-primary k-button"
+                            onclick="performAdvancedSearch()">
+                        <svg class='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z'></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
 
         <div class="results-section">
-            @(Html.Kendo().Grid<dynamic>()
-            .Name(gridId)
-            .Columns(columns =>
-            {
-            columns.Bound("EmployeeId").Title("Employee No").Width(120).ClientTemplate("<a href='\\#' onclick='selectEmployeeById(\"#=EmployeeId#\"); return false;' style='color: \\#0066cc; text-decoration: underline;'>#=EmployeeId#</a>");
-            columns.Bound("EmployeeName").Title("Employee Name").Width(200);
-            columns.Bound("CostCentreName").Title("Cost Center").Width(200);
-            columns.Bound("Designation").Title("Designation").Width(180);
-            columns.Bound("ContactNo").Title("Contact No").Width(120);
-            })
-            .Sortable()
-            .Pageable(pageable => pageable.PageSizes(new[] { 10, 25, 50 }))
-            .Height(350)
-            .DataSource(dataSource => dataSource
-            .Custom()
-            .PageSize(10)
-            .Schema(schema => schema
-            .Model(model => {
-            model.Id("EmployeeId");
-            model.Field("EmployeeId", typeof(string));
-            model.Field("EmployeeName", typeof(string));
-            model.Field("CostCentreName", typeof(string));
-            model.Field("Designation", typeof(string));
-            model.Field("Email", typeof(string));
-            model.Field("ContactNo", typeof(string));
-            })
-            )
-            )
-            .NoRecords(noRecords => noRecords.Template(@"
-            <div class='simple-empty-state'>
-            <p>No employees found.</p>
-            </div>
-            "))
-            )
+            <div id="@gridId"></div>
         </div>
     </div>
-</text>)
-)
+</div>
+
+<script>
+    $(document).ready(function() {
+
+        $("#@modalId").kendoWindow({
+            title: "Search Employee",
+            modal: true,
+            width: 1000,
+            height: 600,
+            visible: false,
+            resizable: false,
+            actions: ["Close"],
+            open: function() {
+                onEmployeeSearchModalOpen();
+            },
+            close: function() {
+                onEmployeeSearchModalClose.call(this);
+            }
+        });
+
+        $("#@gridId").kendoGrid({
+            columns: [
+                {
+                    field: "EmployeeId",
+                    title: "Employee No",
+                    width: 120,
+                    template: "<a href='\\#' onclick='selectEmployeeById(\"#=EmployeeId#\"); return false;' style='color: \\#0066cc; text-decoration: underline;'>#=EmployeeId#</a>"
+                },
+                { field: "EmployeeName", title: "Employee Name", width: 200 },
+                { field: "CostCentreName", title: "Cost Center", width: 200 },
+                { field: "Designation", title: "Designation", width: 180 },
+                { field: "ContactNo", title: "Contact No", width: 120 }
+            ],
+            sortable: true,
+            pageable: {
+                pageSizes: [10, 25, 50]
+            },
+            height: 350,
+            dataSource: {
+                data: [],
+                pageSize: 10,
+                schema: {
+                    model: {
+                        id: "EmployeeId",
+                        fields: {
+                            EmployeeId: { type: "string" },
+                            EmployeeName: { type: "string" },
+                            CostCentreName: { type: "string" },
+                            Designation: { type: "string" },
+                            Email: { type: "string" },
+                            ContactNo: { type: "string" }
+                        }
+                    }
+                }
+            },
+            noRecords: {
+                template: "<div class='simple-empty-state'><p>No employees found.</p></div>"
+            }
+        });
+    });
+</script>

@@ -444,7 +444,11 @@
     }
 </div>
 
-@Html.Partial("~/Views/Shared/Modal/_EmployeeSearchModal.cshtml")
+<!-- Employee Search Component -->
+@{
+    var employeeSearchModel = new WIRS.Mvc.ViewModels.EmployeeSearchViewModel("employeeSearchWindow", "employeeSearchGrid", "onEmployeeSearchSelect");
+}
+@Html.Partial("~/Views/Shared/Modal/_EmployeeSearchModal.cshtml", employeeSearchModel)
 
 @section Scripts {
     <script src="~/js/incident/incident-view-viewmodel.js"></script>

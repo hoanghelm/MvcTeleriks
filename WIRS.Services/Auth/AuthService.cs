@@ -127,6 +127,8 @@ namespace WIRS.Services.Auth
 				UserName = user.UserName,
 				UserRole = userRole,
 				SbaName = user.SbaName,
+				SbuName = user.SbuName,
+				Designation = user.Designation,
 				Permissions = permissions
 			};
 
@@ -350,8 +352,10 @@ namespace WIRS.Services.Auth
 					UserRole = userBE.UserRole,
 					AccountStatus = userBE.AccountStatus,
 					UnsuccessfulLogin = userBE.UnsuccessfulLogin ?? 0,
-					SbaName = userBE.sbaname ?? string.Empty
-				};
+					SbaName = userBE.sbaname ?? string.Empty,
+					SbuName = userBE.sbuname ?? string.Empty,
+					Designation = userBE.Designation ?? string.Empty,
+                };
 			}
 			catch
 			{

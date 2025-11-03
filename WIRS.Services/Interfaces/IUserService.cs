@@ -11,6 +11,13 @@ namespace WIRS.Services.Interfaces
     {
         Task<UserModel?> GetUserById(string userId);
         Task<UserModel?> GetUserByEIP(string eipId);
+        Task<List<PartACopyToItem>> GetPartACopyToList(string sba_code, string sbu_code, string department_code, string location_code);
+        Task<List<UserItem>> GetWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
+        Task<List<UserItem>> GetHODs(string sba_code, string sbu_code, string department_code, string location_code);
+        Task<List<UserItem>> GetAHODs(string sba_code, string sbu_code, string department_code, string location_code);
+        Task<List<UserItem>> GetCWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
+        Task<List<UserItem>> GetHSBUs(string sba_code, string sbu_code, string department_code, string location_code);
+
         Task<bool> CheckUserExists(string userId);
         Task<UserCreationModel?> ValidateUserExists(string userId);
         Task<string> CreateUser(UserCreationRequest request, string creatorId);

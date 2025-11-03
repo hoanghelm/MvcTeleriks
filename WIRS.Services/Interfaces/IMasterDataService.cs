@@ -11,5 +11,6 @@ namespace WIRS.Services.Interfaces
         Task<List<LookupItem>> GetLocations();
         Task<List<LookupItem>> GetLocations(string sectorCode, string lobCode, string deptCode);
         Task<List<LookupItem>> GetAccountStatuses();
+        Task<List<LookupItem>> GetLookup(string type);
     }
 }

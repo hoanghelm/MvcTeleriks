@@ -205,5 +205,32 @@ namespace WIRS.Services.Implementations
                 return new List<LookupItem>();
             }
         }
+
+        public async Task<List<LookupItem>> GetLookup(string type)
+        {
+            try
+            {
+                var result = new List<LookupItem>();
+                var dataSet = await _commonFunDataAccess.GetLookUpType(type);
+
+                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataSet.Tables[0].Rows)
+                    {
+                        result.Add(new LookupItem
+                        {
+                            Code = row["lookup_code"]?.ToString() ?? string.Empty,
+                            Value = row["lookup_value"]?.ToString() ?? string.Empty
+                        });
+                    }
+                }
+
+                return result;
+            }
+            catch
+            {
+                return new List<LookupItem>();
+            }
+        }
     }
 }

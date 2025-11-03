@@ -8,6 +8,8 @@ namespace WIRS.Services.Models
         public string AccountStatus { get; set; } = string.Empty;
         public int UnsuccessfulLogin { get; set; }
         public string SbaName { get; set; } = string.Empty;
+        public string SbuName { get; set; } = string.Empty;
+        public string Designation { get; set; } = string.Empty;
 
         public string RoleName => GetRoleName(UserRole);
         public string RoleValue => GetRoleValue(UserRole);

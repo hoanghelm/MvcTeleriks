@@ -24,7 +24,7 @@
         return service;
 
         function getIncidentTypes() {
-            return $http.get('/MasterData/GetLookupByType?type=IncidentType')
+            return $http.get('/MasterData/GetLookupByType?type=Incident Type')
                 .then(handleSuccess)
                 .catch(handleError);
         }

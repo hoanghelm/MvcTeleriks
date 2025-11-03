@@ -31,7 +31,7 @@ namespace WIRS.Mvc.Controllers
             }
 
             var viewModel = new IncidentCreateViewModel();
-            
+
             try
             {
                 await LoadCreateViewModelDropdowns(viewModel);
@@ -100,7 +100,7 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = "Invalid request data" });
                 }
 
-                var createModel = new WorkflowIncidentCreateModel
+                var createModel = new IncidentCreateModel
                 {
                     IncidentDateTime = $"{request.IncidentDate} {request.IncidentTime}",
                     IncidentTime = request.IncidentTime,
@@ -115,10 +115,37 @@ namespace WIRS.Mvc.Controllers
                     SuperiorName = request.SuperiorName ?? currentUser.UserName,
                     SuperiorEmpNo = request.SuperiorEmpNo ?? currentUser.UserId,
                     SuperiorDesignation = request.SuperiorDesignation ?? string.Empty,
-                    IncidentTypes = new[] { request.IncidentType },
-                    InjuredPersons = request.InjuredPersons ?? new List<InjuredPersonModel>(),
-                    Eyewitnesses = request.Eyewitnesses ?? new List<EyewitnessModel>(),
-                    AnyEyewitness = request.HasEyeWitness ? "1" : "0",
+                    IncidentTypes = new List<IncidentTypeModel>()
+                    {
+                        new IncidentTypeModel()
+                        {
+                            Type = request.IncidentType
+                        }
+                    },
+                    InjuredPersons = request.InjuredPersons?.Select(ip => new Services.Models.InjuredPersonModel()
+                    {
+                        Name = ip.Name,
+                        EmpNo = ip.EmployeeNo,
+                        ContactNo = ip.ContactNo,
+                        Age = ip.Age,
+                        Company = ip.Company,
+                        Race = ip.Race,
+                        Nationality = ip.Nationality,
+                        Designation = ip.Designation,
+                        EmploymentType = ip.EmploymentType,
+                        Gender = ip.Gender,
+                        EmploymentTypeOther = ip.Type,
+                        EmploymentDate = ip.DateOfEmployment,
+
+                    }).ToList() ?? new List<Services.Models.InjuredPersonModel>(),
+                    Eyewitnesses = request.Eyewitnesses?.Select(e => new Services.Models.EyewitnessModel()
+                    {
+                        ContactNo = e.ContactNo,
+                        Designation = e.Designation,
+                        EmpNo = e.EmployeeNo,
+                        Name = e.Name
+                    }).ToList() ?? new List<Services.Models.EyewitnessModel>(),
+                    AnyEyewitness = request.HasEyeWitness ? 1 : 0,
                     DamageDescription = request.DamageDescription ?? string.Empty,
                     IsWorkingOvertime = request.WorkingOvertime ?? string.Empty,
                     IsJobrelated = request.IsJobRelated ?? string.Empty,
@@ -281,14 +308,14 @@ namespace WIRS.Mvc.Controllers
             }
 
             var viewModel = new IncidentSearchViewModel();
-            
+
             try
             {
                 await LoadSearchViewModelDropdowns(viewModel);
             }
             catch (Exception)
             {
-                // Continue with empty dropdowns
+
             }
 
             return View(viewModel);
@@ -407,7 +434,12 @@ namespace WIRS.Mvc.Controllers
                     WshoId = request.WshoId,
                     AlternateWshoId = request.AlternateWshoId ?? string.Empty,
                     EmailToList = request.EmailToList ?? new List<string>(),
-                    AdditionalCopyToList = request.AdditionalCopyToList ?? new List<CopyToPersonModel>(),
+                    AdditionalCopyToList = request.AdditionalCopyToList?.Select(c => new Services.Models.CopyToPersonModel()
+                    {
+                        Name = c.Name,
+                        EmployeeNo = c.EmployeeNo,
+                        Designation = c.Designation
+                    }).ToList() ?? new List<Services.Models.CopyToPersonModel>(),
                     SubmitterName = currentUser.UserName,
                     SubmitterEmpId = currentUser.UserId,
                     SubmitterDesignation = string.Empty
@@ -564,7 +596,6 @@ namespace WIRS.Mvc.Controllers
                     return Json(new { success = false, message = "Invalid request data" });
                 }
 
-                // Validation
                 if (string.IsNullOrEmpty(request.Comments))
                 {
                     return Json(new { success = false, message = "Comments are required", errorCode = "ERR-137" });
@@ -581,7 +612,12 @@ namespace WIRS.Mvc.Controllers
                     Comments = request.Comments,
                     HsbuId = request.HsbuId,
                     EmailToList = request.EmailToList ?? new List<string>(),
-                    AdditionalCopyToList = request.AdditionalCopyToList ?? new List<CopyToPersonModel>(),
+                    AdditionalCopyToList = request.AdditionalCopyToList?.Select(c => new Services.Models.CopyToPersonModel()
+                    {
+                        Name = c.Name,
+                        EmployeeNo = c.EmployeeNo,
+                        Designation = c.Designation
+                    }).ToList() ?? new List<Services.Models.CopyToPersonModel>(),
                     SubmitterName = currentUser.UserName,
                     SubmitterEmpId = currentUser.UserId,
                     SubmitterDesignation = string.Empty
@@ -641,9 +677,33 @@ namespace WIRS.Mvc.Controllers
                 WhatHappenedAndWhy = request.WhatHappenedAndWhy,
                 RecommendedActions = request.RecommendedActions,
                 AdditionalComments = request.AdditionalComments ?? string.Empty,
-                PersonsInterviewed = request.PersonsInterviewed ?? new List<PersonInterviewedModel>(),
-                InjuryDetails = request.InjuryDetails ?? new List<InjuryDetailModel>(),
-                MedicalCertificates = request.MedicalCertificates ?? new List<MedicalCertificateModel>(),
+                PersonsInterviewed = request.PersonsInterviewed?.Select(c => new Services.Models.PersonInterviewedModel()
+                {
+                    Name = c.Name,
+                    ContactNo = c.ContactNo,
+                    EmployeeNo = c.EmployeeNo,
+                    Designation = c.Designation
+                }).ToList() ?? new List<Services.Models.PersonInterviewedModel>(),
+                InjuryDetails = request.InjuryDetails?.Select(c => new Services.Models.InjuryDetailModel()
+                {
+                    Description = c.Description,
+                    HeadNeckTorso = c.HeadNeckTorso,
+                    InjuredPersonId = c.InjuredPersonId,
+                    InjuredPersonName = c.InjuredPersonName,
+                    LowerLimbs = c.LowerLimbs,
+                    NatureOfInjury = c.NatureOfInjury,
+                    UpperLimbs = c.UpperLimbs
+                }).ToList() ?? new List<Services.Models.InjuryDetailModel>(),
+                MedicalCertificates = request.MedicalCertificates?.Select(c => new Services.Models.MedicalCertificateModel()
+                {
+                    AttachmentPath = c.AttachmentPath,
+                    HasAttachment = c.HasAttachment,
+                    InjuredPersonId = c.InjuredPersonId,
+                    InjuredPersonName  = c.InjuredPersonName,
+                    FromDate = c.FromDate,
+                    ToDate = c.ToDate,
+                    NumberOfDays = c.NumberOfDays
+                }).ToList() ?? new List<Services.Models.MedicalCertificateModel>(),
                 IncidentClassList = request.IncidentClassList ?? new List<string>(),
                 IncidentAgentList = request.IncidentAgentList ?? new List<string>(),
                 UnsafeConditionsList = request.UnsafeConditionsList ?? new List<string>(),
@@ -668,25 +728,24 @@ namespace WIRS.Mvc.Controllers
 
         private async Task LoadCreateViewModelDropdowns(IncidentCreateViewModel model)
         {
-            model.SbaOptions = await _masterDataService.GetSectors(); // Using Sectors as SBA
-            model.SbuOptions = new List<LookupItem>(); // Will be populated via AJAX
-            model.DivisionOptions = new List<LookupItem>(); // Will be populated via AJAX  
-            model.DepartmentOptions = new List<LookupItem>(); // Will be populated via AJAX
+            model.SbaOptions = await _masterDataService.GetSectors();
+            model.SbuOptions = new List<LookupItem>();
+            model.DivisionOptions = new List<LookupItem>();
+            model.DepartmentOptions = new List<LookupItem>();
             model.LocationOptions = await _masterDataService.GetLocations();
-            
-            // Static dropdown options
+
             model.YesNoOptions = new List<LookupItem>
             {
                 new LookupItem { Code = "1", Value = "Yes" },
                 new LookupItem { Code = "0", Value = "No" }
             };
-            
+
             model.OvertimeOptions = new List<LookupItem>
             {
                 new LookupItem { Code = "Y", Value = "Yes" },
                 new LookupItem { Code = "N", Value = "No" }
             };
-            
+
             model.JobRelatedOptions = new List<LookupItem>
             {
                 new LookupItem { Code = "Y", Value = "Yes" },
@@ -696,32 +755,32 @@ namespace WIRS.Mvc.Controllers
 
         private async Task LoadViewViewModelDropdowns(IncidentViewViewModel model)
         {
-            model.SbaOptions = await _masterDataService.GetSectors(); // Using Sectors as SBA
-            model.SbuOptions = new List<LookupItem>(); // Will be populated via AJAX
-            model.DivisionOptions = new List<LookupItem>(); // Will be populated via AJAX
-            model.DepartmentOptions = new List<LookupItem>(); // Will be populated via AJAX
+            model.SbaOptions = await _masterDataService.GetSectors();
+            model.SbuOptions = new List<LookupItem>();
+            model.DivisionOptions = new List<LookupItem>();
+            model.DepartmentOptions = new List<LookupItem>();
             model.LocationOptions = await _masterDataService.GetLocations();
         }
 
         private async Task LoadSearchViewModelDropdowns(IncidentSearchViewModel model)
         {
-            model.SbaOptions = await _masterDataService.GetSectors(); // Using Sectors as SBA
-            model.SbuOptions = new List<LookupItem>(); // Will be populated via AJAX
-            model.DivisionOptions = new List<LookupItem>(); // Will be populated via AJAX
+            model.SbaOptions = await _masterDataService.GetSectors();
+            model.SbuOptions = new List<LookupItem>();
+            model.DivisionOptions = new List<LookupItem>();
         }
 
         private void SetStagePermissions(IncidentViewViewModel model)
         {
             if (model.Incident?.StagePermissions?.Any() == true)
             {
-                var stageA = model.StagePermissions.FirstOrDefault(x => x.Stage == "A");
-                var stageB = model.StagePermissions.FirstOrDefault(x => x.Stage == "B");
-                var stageC = model.StagePermissions.FirstOrDefault(x => x.Stage == "C");
+                var stageA = model.StagePermissions.FirstOrDefault(x => x.Stage == "01");
+                var stageB = model.StagePermissions.FirstOrDefault(x => x.Stage == "02");
+                var stageC = model.StagePermissions.FirstOrDefault(x => x.Stage == "03");
 
                 model.CanViewPartA = stageA?.CanView ?? true;
                 model.CanViewPartB = stageB?.CanView ?? false;
                 model.CanViewPartC = stageC?.CanView ?? false;
-                
+
                 model.CanEditPartA = stageA?.CanEdit ?? false;
                 model.CanEditPartB = stageB?.CanEdit ?? false;
                 model.CanEditPartC = stageC?.CanEdit ?? false;
@@ -740,15 +799,15 @@ namespace WIRS.Mvc.Controllers
                 }
                 else
                 {
-                    model.CurrentStage = "A";
+                    model.CurrentStage = "01";
                     model.CurrentStageDescription = "Initial Report";
                 }
             }
         }
 
-        private WorkflowIncidentCreateModel MapViewModelToCreateModel(IncidentCreateViewModel model)
+        private IncidentCreateModel MapViewModelToCreateModel(IncidentCreateViewModel model)
         {
-            return new WorkflowIncidentCreateModel
+            return new IncidentCreateModel
             {
                 IncidentDateTime = model.IncidentDateTime,
                 IncidentTime = model.IncidentTime,
@@ -838,7 +897,7 @@ namespace WIRS.Mvc.Controllers
                         Status = row["status"]?.ToString() ?? "",
                         StatusDesc = row["status_desc"]?.ToString() ?? "",
                         SubmittedOn = row["submitted_on"]?.ToString() ?? "",
-                        CanView = true, 
+                        CanView = true,
                         CanEdit = row["can_edit"]?.ToString() == "1"
                     });
                 }
