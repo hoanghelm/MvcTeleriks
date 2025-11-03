@@ -119,5 +119,6 @@ namespace WIRS.Services.Models
         public string Nationality { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
         public string EmploymentType { get; set; } = string.Empty;
-    }
+		public string DateOfEmployment { get; set; } = string.Empty;
+	}
 }
