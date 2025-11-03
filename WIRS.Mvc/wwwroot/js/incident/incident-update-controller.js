@@ -3,9 +3,9 @@
         .module('incidentUpdateApp')
         .controller('IncidentUpdateController', IncidentUpdateController);
 
-    IncidentUpdateController.$inject = ['$window', '$location', 'IncidentUpdateService'];
+    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', 'IncidentUpdateService'];
 
-    function IncidentUpdateController($window, $location, IncidentUpdateService) {
+    function IncidentUpdateController($window, $location, $scope, $timeout, IncidentUpdateService) {
         var vm = this;
 
         vm.loading = true;
@@ -274,7 +274,10 @@
                 loadPartALookups(),
                 loadPartAWorkflowUsers()
             ]).then(function() {
-                mapIncidentToPartA();
+                // Use $timeout to ensure mapping happens in Angular digest cycle
+                $timeout(function() {
+                    mapIncidentToPartA();
+                }, 0);
             });
         }
 
@@ -343,8 +346,15 @@
 
             console.log('Mapping incident to Part A', vm.incident);
 
-            // Basic incident details
-            vm.partA.incidentType = vm.incident.incidentTypes || vm.incident.incidentType || '';
+            // Basic incident details - extract from incidentTypes array
+            if (vm.incident.incidentTypes && vm.incident.incidentTypes.length > 0) {
+                // Get the first incident type code (API returns {code: "...", value: "..."})
+                vm.partA.incidentType = vm.incident.incidentTypes[0].code || '';
+                console.log('Setting incident type to:', vm.partA.incidentType, 'from:', vm.incident.incidentTypes[0]);
+            } else {
+                vm.partA.incidentType = '';
+                console.log('No incident types found in incident data');
+            }
             vm.partA.incidentOther = vm.incident.incidentOther || '';
 
             // Parse dates and times
@@ -403,6 +413,11 @@
             vm.partA.ahodId = vm.incident.ahodId || '';
 
             console.log('Part A data after mapping:', vm.partA);
+
+            // Force Angular digest cycle to update Kendo UI controls
+            if ($scope.$root && $scope.$root.$$phase !== '$apply' && $scope.$root.$$phase !== '$digest') {
+                $scope.$applyAsync();
+            }
         }
 
         function loadPartBData() {

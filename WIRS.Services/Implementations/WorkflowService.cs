@@ -347,6 +347,15 @@ namespace WIRS.Services.Implementations
         private WorkflowIncidentDetailModel MapDataSetToDetailModel(DataSet dataSet)
         {
             var row = dataSet.Tables[0].Rows[0];
+            var incidentTypes = new List<IncidentTypeModel>();
+            foreach (DataRow typeRow in dataSet.Tables[1].Rows)
+            {
+                incidentTypes.Add(new IncidentTypeModel()
+                {
+                    Type = typeRow["lookup_code"]?.ToString(),
+                    Description = typeRow["lookup_value"]?.ToString()
+                });
+            }
             
             return new WorkflowIncidentDetailModel
             {
