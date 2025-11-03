@@ -418,6 +418,32 @@
             if ($scope.$root && $scope.$root.$$phase !== '$apply' && $scope.$root.$$phase !== '$digest') {
                 $scope.$applyAsync();
             }
+
+            // Additional delay to ensure Kendo widgets are fully initialized
+            $timeout(function() {
+                console.log('Attempting to set Kendo widget values...');
+
+                // Try to get Kendo widgets and set values manually
+                var incidentTypeWidget = $('#partA_incidentType').data('kendoDropDownList');
+                if (incidentTypeWidget) {
+                    console.log('Found incidentType widget, setting value:', vm.partA.incidentType);
+                    incidentTypeWidget.value(vm.partA.incidentType);
+                } else {
+                    console.log('incidentType widget not found');
+                }
+
+                var sectorWidget = $('#partA_sector').data('kendoDropDownList');
+                if (sectorWidget) {
+                    console.log('Found sector widget, setting value:', vm.partA.sectorCode);
+                    sectorWidget.value(vm.partA.sectorCode);
+                }
+
+                var lobWidget = $('#partA_lob').data('kendoDropDownList');
+                if (lobWidget) {
+                    console.log('Found LOB widget, setting value:', vm.partA.lobCode);
+                    lobWidget.value(vm.partA.lobCode);
+                }
+            }, 500);
         }
 
         function loadPartBData() {
