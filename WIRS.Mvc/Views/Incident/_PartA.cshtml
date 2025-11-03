@@ -143,7 +143,7 @@
         </fieldset>
 
         <!-- Particulars of Injured Person(s) -->
-        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50" ng-show="vm.partA.incidentType == '1' && vm.partA.injuredPersons.length > 0">
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50" ng-show="vm.partA.incidentType.code == '1' && vm.partA.injuredPersons.length > 0">
             <legend class="text-lg font-semibold text-gray-900 px-2">Particulars of Injured Person(s)</legend>
 
             <div class="overflow-x-auto">
@@ -201,18 +201,63 @@
                     </div>
                 </div>
 
-                <div class="form-group" ng-show="vm.partA.incidentType == '1'">
+            </div>
+
+            <!-- Fields that only show for Injury incidents (incidentType == '1') -->
+            <div ng-show="vm.partA.incidentType.code == '1'">
+                <div class="form-group mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Is this incident job related?
+                    </label>
+                    <div class="flex gap-4 mt-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.isJobRelated" value="Yes" class="form-radio" disabled />
+                            <span class="ml-2">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.isJobRelated" value="No" class="form-radio" disabled />
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
                     <label for="partA_hospitalClinic" class="block text-sm font-medium text-gray-700 mb-1">
-                        Hospital / Clinic Examined
+                        Hospital / Clinic where the injured person was examined or treated
+                    </label>
+                    <textarea kendo-text-area
+                              k-ng-model="vm.partA.hospitalClinicName"
+                              k-rows="2"
+                              id="partA_hospitalClinic"
+                              style="width: 100%;"
+                              k-enable="false"></textarea>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label for="partA_workingOvertime" class="block text-sm font-medium text-gray-700 mb-1">
+                        Was the injured person working overtime when the accident happened?
+                    </label>
+                    <textarea kendo-text-area
+                              k-ng-model="vm.partA.workingOvertime"
+                              k-rows="2"
+                              id="partA_workingOvertime"
+                              style="width: 100%;"
+                              k-enable="false"></textarea>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label for="partA_officialWorkingHours" class="block text-sm font-medium text-gray-700 mb-1">
+                        What is the official working hours of the injured person on the day of incident?
                     </label>
                     <input kendo-text-box
-                           k-ng-model="vm.partA.hospitalClinicName"
-                           id="partA_hospitalClinic"
+                           k-ng-model="vm.partA.officialWorkingHours"
+                           id="partA_officialWorkingHours"
                            style="width: 100%;"
                            k-enable="false" />
                 </div>
             </div>
 
+            <!-- Damage section for non-injury incidents -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                 <div class="form-group">
                     <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -229,22 +274,6 @@
                         </label>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Working Overtime?
-                    </label>
-                    <div class="flex gap-4 mt-2">
-                        <label class="inline-flex items-center">
-                            <input type="radio" ng-model="vm.partA.workingOvertime" value="Y" class="form-radio" disabled />
-                            <span class="ml-2">Yes</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" ng-model="vm.partA.workingOvertime" value="N" class="form-radio" disabled />
-                            <span class="ml-2">No</span>
-                        </label>
-                    </div>
-                </div>
             </div>
 
             <div class="form-group mt-4" ng-show="vm.partA.hasDamage == 'Y'">
@@ -257,35 +286,6 @@
                           id="partA_damageDescription"
                           style="width: 100%;"
                           k-enable="false"></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                <div class="form-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Is the incident job related?
-                    </label>
-                    <div class="flex gap-4 mt-2">
-                        <label class="inline-flex items-center">
-                            <input type="radio" ng-model="vm.partA.isJobRelated" value="Y" class="form-radio" disabled />
-                            <span class="ml-2">Yes</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" ng-model="vm.partA.isJobRelated" value="N" class="form-radio" disabled />
-                            <span class="ml-2">No</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="partA_officialWorkingHours" class="block text-sm font-medium text-gray-700 mb-1">
-                        Official Working Hours
-                    </label>
-                    <input kendo-text-box
-                           k-ng-model="vm.partA.officialWorkingHours"
-                           id="partA_officialWorkingHours"
-                           style="width: 100%;"
-                           k-enable="false" />
-                </div>
             </div>
         </fieldset>
 
