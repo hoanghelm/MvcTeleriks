@@ -45,7 +45,7 @@
 
         function getIncidentById(incidentId) {
             return $http.get('/Incident/GetIncidentById?id=' + incidentId)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.data.success) {
                         return response.data.incident;
                     }
@@ -56,7 +56,7 @@
 
         function getCurrentUser() {
             return $http.get('/User/GetCurrentUser')
-                .then(function(response) {
+                .then(function (response) {
                     if (response.data.success) {
                         return response.data.user;
                     }
@@ -72,26 +72,26 @@
         }
 
         function getSectors() {
-            return $http.get('/Maintenance/GetSectors')
+            return $http.get('/MasterData/GetSectors')
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getLOBs(sectorCode) {
-            return $http.get('/Maintenance/GetLOBsBySector?sectorCode=' + sectorCode)
+            return $http.get('/MasterData/GetLOBs?sectorCode=' + sectorCode)
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getDepartments(sectorCode, lobCode) {
-            var url = '/Maintenance/GetDepartments?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            var url = '/MasterData/GetDepartments?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
             return $http.get(url)
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getLocations(sectorCode, lobCode, departmentCode) {
-            var url = '/Maintenance/GetLocations?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            var url = '/MasterData/GetLocations?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
             if (departmentCode) url += '&departmentCode=' + departmentCode;
             return $http.get(url)
                 .then(handleSuccess)

@@ -385,7 +385,7 @@ namespace WIRS.Services.Implementations
                 RiskAssessmentReview = row["risk_assessment_review"]?.ToString() ?? "",
                 RiskAssessmentReviewDesc = row["risk_assessment_review_desc"]?.ToString() ?? "",
                 RiskAssessmentReviewComments = row["risk_assessment_review_comments"]?.ToString() ?? "",
-                WhatHappenedAndWhyComments = row["what_happened_and_why_comments"]?.ToString() ?? ""
+                WhatHappenedAndWhyComments = row["what_why"]?.ToString() ?? ""
             };
         }
 

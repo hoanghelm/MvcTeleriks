@@ -171,7 +171,7 @@ const DashboardViewModel = {
 
     viewIncident: function (incidentId) {
         if (incidentId) {
-            window.location.href = '/Incident/Details?id=' + encodeURIComponent(incidentId);
+            window.location.href = '/Incident/Update?id=' + encodeURIComponent(incidentId);
         }
     },
 

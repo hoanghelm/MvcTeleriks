@@ -74,169 +74,196 @@ namespace WIRS.Services.Implementations
 			}
 		}
 
-        public async Task<List<PartACopyToItem>> GetPartACopyToList(string sba_code, string sbu_code, string department_code, string location_code)
-        {
-            try
-            {
-                var result = new List<PartACopyToItem>();
-                var dataSet = await _userDataAccess.get_all_copyto_list_by_sbu(sba_code, sbu_code, department_code, location_code);
+		public async Task<List<PartACopyToItem>> GetPartACopyToList(string sba_code, string sbu_code, string department_code, string location_code)
+		{
+			try
+			{
+				var result = new List<PartACopyToItem>();
+				var dataSet = await _userDataAccess.get_all_copyto_list_by_sbu(sba_code, sbu_code, department_code, location_code);
 
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new PartACopyToItem
-                        {
-                            Id = row["empid"]?.ToString() ?? string.Empty,
-                            Name = row["empname"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in dataSet.Tables[0].Rows)
+					{
+						result.Add(new PartACopyToItem
+						{
+							Id = row["empid"]?.ToString() ?? string.Empty,
+							Name = row["empname"]?.ToString() ?? string.Empty
+						});
+					}
+				}
 
-                return result;
-            }
-            catch
-            {
-                return new List<PartACopyToItem>();
-            }
-        }
+				return result;
+			}
+			catch
+			{
+				return new List<PartACopyToItem>();
+			}
+		}
 
-        public async Task<List<UserItem>> GetWSHOs(string sba_code, string sbu_code, string department_code, string location_code)
-        {
-            try
-            {
-                var result = new List<UserItem>();
-                var dataSet = await _userDataAccess.get_wsho_by_sbu(sba_code, sbu_code, department_code, location_code);
+		public async Task<List<UserItem>> GetWSHOs(string sba_code, string sbu_code, string department_code, string location_code)
+		{
+			try
+			{
+				var result = new List<UserItem>();
+				var dataSet = await _userDataAccess.get_wsho_by_sbu(sba_code, sbu_code, department_code, location_code);
 
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new UserItem
-                        {
-                            Id = row["empid"]?.ToString() ?? string.Empty,
-                            Name = row["empname"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in dataSet.Tables[0].Rows)
+					{
+						result.Add(new UserItem
+						{
+							Id = row["empid"]?.ToString() ?? string.Empty,
+							Name = row["empname"]?.ToString() ?? string.Empty
+						});
+					}
+				}
 
-                return result;
-            }
-            catch
-            {
-                return new List<UserItem>();
-            }
-        }
+				return result;
+			}
+			catch
+			{
+				return new List<UserItem>();
+			}
+		}
 
-        public async Task<List<UserItem>> GetHODs(string sba_code, string sbu_code, string department_code, string location_code)
-        {
-            try
-            {
-                var result = new List<UserItem>();
-                var dataSet = await _userDataAccess.get_hod_by_sbu(sba_code, sbu_code, department_code, location_code);
+		public async Task<List<UserItem>> GetHODs(string sba_code, string sbu_code, string department_code, string location_code)
+		{
+			try
+			{
+				var result = new List<UserItem>();
+				var dataSet = await _userDataAccess.get_hod_by_sbu(sba_code, sbu_code, department_code, location_code);
 
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new UserItem
-                        {
-                            Id = row["empid"]?.ToString() ?? string.Empty,
-                            Name = row["empname"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in dataSet.Tables[0].Rows)
+					{
+						result.Add(new UserItem
+						{
+							Id = row["empid"]?.ToString() ?? string.Empty,
+							Name = row["empname"]?.ToString() ?? string.Empty
+						});
+					}
+				}
 
-                return result;
-            }
-            catch
-            {
-                return new List<UserItem>();
-            }
-        }
+				return result;
+			}
+			catch
+			{
+				return new List<UserItem>();
+			}
+		}
 
-        public async Task<List<UserItem>> GetAHODs(string sba_code, string sbu_code, string department_code, string location_code)
-        {
-            try
-            {
-                var result = new List<UserItem>();
-                var dataSet = await _userDataAccess.get_ahod_by_sbu(sba_code, sbu_code, department_code, location_code);
+		public async Task<List<UserItem>> GetAHODs(string sba_code, string sbu_code, string department_code, string location_code)
+		{
+			try
+			{
+				var result = new List<UserItem>();
+				var dataSet = await _userDataAccess.get_ahod_by_sbu(sba_code, sbu_code, department_code, location_code);
 
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new UserItem
-                        {
-                            Id = row["empid"]?.ToString() ?? string.Empty,
-                            Name = row["empname"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in dataSet.Tables[0].Rows)
+					{
+						result.Add(new UserItem
+						{
+							Id = row["empid"]?.ToString() ?? string.Empty,
+							Name = row["empname"]?.ToString() ?? string.Empty
+						});
+					}
+				}
 
-                return result;
-            }
-            catch
-            {
-                return new List<UserItem>();
-            }
-        }
+				return result;
+			}
+			catch
+			{
+				return new List<UserItem>();
+			}
+		}
 
-        public async Task<List<UserItem>> GetCWSHOs(string sba_code, string sbu_code, string department_code, string location_code)
-        {
-            try
-            {
-                var result = new List<UserItem>();
-                var dataSet = await _userDataAccess.get_c_wsho_by_sbu(sba_code, sbu_code, department_code, location_code);
+		public async Task<List<UserItem>> GetCWSHOs(string sba_code, string sbu_code, string department_code, string location_code)
+		{
+			try
+			{
+				var result = new List<UserItem>();
+				var dataSet = await _userDataAccess.get_c_wsho_by_sbu(sba_code, sbu_code, department_code, location_code);
 
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new UserItem
-                        {
-                            Id = row["empid"]?.ToString() ?? string.Empty,
-                            Name = row["empname"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in dataSet.Tables[0].Rows)
+					{
+						result.Add(new UserItem
+						{
+							Id = row["empid"]?.ToString() ?? string.Empty,
+							Name = row["empname"]?.ToString() ?? string.Empty
+						});
+					}
+				}
 
-                return result;
-            }
-            catch
-            {
-                return new List<UserItem>();
-            }
-        }
+				return result;
+			}
+			catch
+			{
+				return new List<UserItem>();
+			}
+		}
 
-        public async Task<List<UserItem>> GetHSBUs(string sba_code, string sbu_code, string department_code, string location_code)
-        {
-            try
-            {
-                var result = new List<UserItem>();
-                var dataSet = await _userDataAccess.get_h_hod_by_sbu(sba_code, sbu_code, department_code, location_code);
+		public async Task<List<UserItem>> GetHSBUs(string sba_code, string sbu_code, string department_code, string location_code)
+		{
+			try
+			{
+				var result = new List<UserItem>();
+				var dataSet = await _userDataAccess.get_h_hod_by_sbu(sba_code, sbu_code, department_code, location_code);
 
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new UserItem
-                        {
-                            Id = row["empid"]?.ToString() ?? string.Empty,
-                            Name = row["empname"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in dataSet.Tables[0].Rows)
+					{
+						result.Add(new UserItem
+						{
+							Id = row["empid"]?.ToString() ?? string.Empty,
+							Name = row["empname"]?.ToString() ?? string.Empty
+						});
+					}
+				}
 
-                return result;
-            }
-            catch
-            {
-                return new List<UserItem>();
-            }
-        }
+				return result;
+			}
+			catch
+			{
+				return new List<UserItem>();
+			}
+		}
 
-        public async Task<bool> CheckUserExists(string userId)
+		public async Task<List<UserItem>> GetAWSHOs(string sba_code, string sbu_code, string department_code, string location_code)
+		{
+			try
+			{
+				var result = new List<UserItem>();
+				var dataSet = await _userDataAccess.get_awsho_by_sbu(sba_code, sbu_code, department_code, location_code);
+
+				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in dataSet.Tables[0].Rows)
+					{
+						result.Add(new UserItem
+						{
+							Id = row["empid"]?.ToString() ?? string.Empty,
+							Name = row["empname"]?.ToString() ?? string.Empty
+						});
+					}
+				}
+
+				return result;
+			}
+			catch
+			{
+				return new List<UserItem>();
+			}
+		}
+
+		public async Task<bool> CheckUserExists(string userId)
 		{
 			try
 			{
@@ -253,7 +280,7 @@ namespace WIRS.Services.Implementations
 			try
 			{
 				var dataSet = await _userDataAccess.GetEmployeeInfoByEmployeeNo(userId);
-				
+
 				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
 				{
 					var row = dataSet.Tables[0].Rows[0];
@@ -348,8 +375,8 @@ namespace WIRS.Services.Implementations
 							Nationality = row["empnationality"]?.ToString() ?? string.Empty,
 							Gender = row["empgender"]?.ToString() ?? string.Empty,
 							EmploymentType = row["empemploymenttype"]?.ToString() ?? string.Empty,
-                            DateOfEmployment = row["empjoineddate"]?.ToString() ?? string.Empty,
-                        });
+							DateOfEmployment = row["empjoineddate"]?.ToString() ?? string.Empty,
+						});
 					}
 
 					result.TotalCount = result.Employees.Count;
@@ -374,15 +401,15 @@ namespace WIRS.Services.Implementations
 				{
 					foreach (DataRow row in dataSet.Tables[0].Rows)
 					{
-                        result.Users.Add(new UserListItem
-                        {
-                            UserId = row["user_id"]?.ToString() ?? string.Empty,
-                            UserName = row["user_name"]?.ToString() ?? string.Empty,
-                            UserRoleName = row["user_role_name"]?.ToString() ?? string.Empty,
-                            Email = row["email_address"]?.ToString() ?? string.Empty,
-                            AccountStatusName = row["statusdesc"]?.ToString() ?? string.Empty
-                        });
-                    }
+						result.Users.Add(new UserListItem
+						{
+							UserId = row["user_id"]?.ToString() ?? string.Empty,
+							UserName = row["user_name"]?.ToString() ?? string.Empty,
+							UserRoleName = row["user_role_name"]?.ToString() ?? string.Empty,
+							Email = row["email_address"]?.ToString() ?? string.Empty,
+							AccountStatusName = row["statusdesc"]?.ToString() ?? string.Empty
+						});
+					}
 
 					result.TotalCount = result.Users.Count;
 				}
@@ -395,70 +422,70 @@ namespace WIRS.Services.Implementations
 			}
 		}
 
-        public async Task<UserDetailsModel?> GetUserDetails(string userId)
-        {
-            try
-            {
-                UserCredentials user = new UserCredentials() { UserId = userId };
+		public async Task<UserDetailsModel?> GetUserDetails(string userId)
+		{
+			try
+			{
+				UserCredentials user = new UserCredentials() { UserId = userId };
 
-                var errorCode = await _userCredentialsDataAccess.GetUser(user);
+				var errorCode = await _userCredentialsDataAccess.GetUser(user);
 
-                if (!string.IsNullOrEmpty(errorCode))
-                {
-                    return null;
-                }
+				if (!string.IsNullOrEmpty(errorCode))
+				{
+					return null;
+				}
 
-                var userDetails = new UserDetailsModel
-                {
-                    UserId = user.UserId,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    UserRole = user.UserRole,
-                    AccountStatus = user.AccountStatus,
-                    Creator = user.Creator,
-                    Modifier = user.Modifiedby,
-                    CreationDate = user.CreationDate,
-                    ModificationDate = user.LastModifyDate
-                };
+				var userDetails = new UserDetailsModel
+				{
+					UserId = user.UserId,
+					UserName = user.UserName,
+					Email = user.Email,
+					UserRole = user.UserRole,
+					AccountStatus = user.AccountStatus,
+					Creator = user.Creator,
+					Modifier = user.Modifiedby,
+					CreationDate = user.CreationDate,
+					ModificationDate = user.LastModifyDate
+				};
 
-                if (!string.IsNullOrEmpty(user.InactiveDate))
-                {
-                    if (DateTime.TryParse(user.InactiveDate, out var inactiveDate))
-                    {
-                        userDetails.InactiveDate = inactiveDate;
-                        userDetails.InactiveDateString = inactiveDate.ToString("dd-MMM-yyyy");
-                    }
-                }
+				if (!string.IsNullOrEmpty(user.InactiveDate))
+				{
+					if (DateTime.TryParse(user.InactiveDate, out var inactiveDate))
+					{
+						userDetails.InactiveDate = inactiveDate;
+						userDetails.InactiveDateString = inactiveDate.ToString("dd-MMM-yyyy");
+					}
+				}
 
-                if (user.UserAccess != null && user.UserAccess.Rows.Count > 0)
-                {
-                    foreach (DataRow row in user.UserAccess.Rows)
-                    {
-                        userDetails.UserAccess.Add(new UserAccessDetails
-                        {
-                            UserRoleCode = row["ua_user_role_code"]?.ToString() ?? string.Empty,
-                            UserRoleName = row["user_role_name"]?.ToString() ?? string.Empty,
-                            SectorCode = row["sba_code"]?.ToString() ?? string.Empty,
-                            SectorValue = row["sba_value"]?.ToString() ?? string.Empty,
-                            LOBCode = row["sbu_code"]?.ToString() ?? string.Empty,
-                            LOBValue = row["sbu_value"]?.ToString() ?? string.Empty,
-                            DepartmentCode = row["department_code"]?.ToString() ?? string.Empty,
-                            DepartmentValue = row["department_value"]?.ToString() ?? string.Empty,
-                            LocationCode = row["location_code"]?.ToString() ?? string.Empty,
-                            LocationValue = row["location_value"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+				if (user.UserAccess != null && user.UserAccess.Rows.Count > 0)
+				{
+					foreach (DataRow row in user.UserAccess.Rows)
+					{
+						userDetails.UserAccess.Add(new UserAccessDetails
+						{
+							UserRoleCode = row["ua_user_role_code"]?.ToString() ?? string.Empty,
+							UserRoleName = row["user_role_name"]?.ToString() ?? string.Empty,
+							SectorCode = row["sba_code"]?.ToString() ?? string.Empty,
+							SectorValue = row["sba_value"]?.ToString() ?? string.Empty,
+							LOBCode = row["sbu_code"]?.ToString() ?? string.Empty,
+							LOBValue = row["sbu_value"]?.ToString() ?? string.Empty,
+							DepartmentCode = row["department_code"]?.ToString() ?? string.Empty,
+							DepartmentValue = row["department_value"]?.ToString() ?? string.Empty,
+							LocationCode = row["location_code"]?.ToString() ?? string.Empty,
+							LocationValue = row["location_value"]?.ToString() ?? string.Empty
+						});
+					}
+				}
 
-                return userDetails;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+				return userDetails;
+			}
+			catch
+			{
+				return null;
+			}
+		}
 
-        public async Task<string> UpdateUser(UserUpdateRequest request, string modifierUserId)
+		public async Task<string> UpdateUser(UserUpdateRequest request, string modifierUserId)
 		{
 			try
 			{
@@ -542,5 +569,5 @@ namespace WIRS.Services.Implementations
 				return ex.Message;
 			}
 		}
-    }
+	}
 }

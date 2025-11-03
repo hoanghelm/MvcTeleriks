@@ -7,26 +7,27 @@ using WIRS.Services.Models;
 
 namespace WIRS.Services.Interfaces
 {
-    public interface IUserService
-    {
-        Task<UserModel?> GetUserById(string userId);
-        Task<UserModel?> GetUserByEIP(string eipId);
-        Task<List<PartACopyToItem>> GetPartACopyToList(string sba_code, string sbu_code, string department_code, string location_code);
-        Task<List<UserItem>> GetWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
-        Task<List<UserItem>> GetHODs(string sba_code, string sbu_code, string department_code, string location_code);
-        Task<List<UserItem>> GetAHODs(string sba_code, string sbu_code, string department_code, string location_code);
-        Task<List<UserItem>> GetCWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
-        Task<List<UserItem>> GetHSBUs(string sba_code, string sbu_code, string department_code, string location_code);
+	public interface IUserService
+	{
+		Task<UserModel?> GetUserById(string userId);
+		Task<UserModel?> GetUserByEIP(string eipId);
+		Task<List<PartACopyToItem>> GetPartACopyToList(string sba_code, string sbu_code, string department_code, string location_code);
+		Task<List<UserItem>> GetWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
+		Task<List<UserItem>> GetHODs(string sba_code, string sbu_code, string department_code, string location_code);
+		Task<List<UserItem>> GetAHODs(string sba_code, string sbu_code, string department_code, string location_code);
+		Task<List<UserItem>> GetCWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
+		Task<List<UserItem>> GetHSBUs(string sba_code, string sbu_code, string department_code, string location_code);
+		Task<List<UserItem>> GetAWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
 
-        Task<bool> CheckUserExists(string userId);
-        Task<UserCreationModel?> ValidateUserExists(string userId);
-        Task<string> CreateUser(UserCreationRequest request, string creatorId);
-        Task<EmployeeSearchResult> SearchEmployees(string empId, string empName, int pageNo = 1, int pageSize = 10);
-        
-        Task<UserListResult> SearchUsers(string currentUserId, string sector, string lob, string userId, string userName, string userRole);
-        Task<UserDetailsModel?> GetUserDetails(string userId);
-        Task<string> UpdateUser(UserUpdateRequest request, string modifierUserId);
-        Task<string> InactiveUser(string userId, string modifierUserId);
-        Task<string> ResetPassword(string userId, string modifierUserId);
-    }
+		Task<bool> CheckUserExists(string userId);
+		Task<UserCreationModel?> ValidateUserExists(string userId);
+		Task<string> CreateUser(UserCreationRequest request, string creatorId);
+		Task<EmployeeSearchResult> SearchEmployees(string empId, string empName, int pageNo = 1, int pageSize = 10);
+
+		Task<UserListResult> SearchUsers(string currentUserId, string sector, string lob, string userId, string userName, string userRole);
+		Task<UserDetailsModel?> GetUserDetails(string userId);
+		Task<string> UpdateUser(UserUpdateRequest request, string modifierUserId);
+		Task<string> InactiveUser(string userId, string modifierUserId);
+		Task<string> ResetPassword(string userId, string modifierUserId);
+	}
 }
