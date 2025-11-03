@@ -67,6 +67,83 @@
             isSubmitting: false
         };
 
+        vm.partA = {
+            incidentType: '',
+            incidentOther: '',
+            incidentDate: null,
+            incidentTime: null,
+            sectorCode: '',
+            lobCode: '',
+            departmentCode: '',
+            locationCode: '',
+            exactLocation: '',
+            incidentDescription: '',
+            hasEyewitness: '',
+            hasDamage: '',
+            workingOvertime: '',
+            isJobRelated: '',
+            hospitalClinicName: '',
+            damageDescription: '',
+            officialWorkingHours: '',
+            injuredPersons: [],
+            eyewitnesses: [],
+            superiorName: '',
+            superiorEmpNo: '',
+            superiorDesignation: '',
+            submittedDate: null,
+            hodId: '',
+            wshoId: '',
+            ahodId: '',
+            incidentTypeOptions: {
+                dataTextField: 'value',
+                dataValueField: 'code',
+                dataSource: [],
+                optionLabel: '-- Select Incident Type --'
+            },
+            sectorOptions: {
+                dataTextField: 'value',
+                dataValueField: 'code',
+                dataSource: [],
+                optionLabel: '-- Select Sector --'
+            },
+            lobOptions: {
+                dataTextField: 'value',
+                dataValueField: 'code',
+                dataSource: [],
+                optionLabel: '-- Select LOB --'
+            },
+            departmentOptions: {
+                dataTextField: 'value',
+                dataValueField: 'code',
+                dataSource: [],
+                optionLabel: '-- Select Department --'
+            },
+            locationOptions: {
+                dataTextField: 'value',
+                dataValueField: 'code',
+                dataSource: [],
+                optionLabel: '-- Select Location --'
+            },
+            hodOptions: {
+                dataTextField: 'userName',
+                dataValueField: 'userId',
+                dataSource: [],
+                optionLabel: '-- Select HOD --'
+            },
+            wshoOptions: {
+                dataTextField: 'userName',
+                dataValueField: 'userId',
+                dataSource: [],
+                optionLabel: '-- Select WSHO --'
+            },
+            ahodOptions: {
+                dataTextField: 'userName',
+                dataValueField: 'userId',
+                dataSource: [],
+                optionLabel: '-- Select Alternate HOD --'
+            }
+        };
+
         vm.cwshoList = [];
         vm.hsbuList = [];
         vm.natureOfInjury = [];
@@ -125,6 +202,9 @@
                     return loadIncident(incidentId);
                 })
                 .then(function() {
+                    return loadPartAData();
+                })
+                .then(function() {
                     return loadPartBData();
                 })
                 .then(function() {
@@ -165,6 +245,139 @@
                     vm.incident = incident;
                     determinePartBMode();
                 });
+        }
+
+        function loadPartAData() {
+            // Part A is always visible (read-only)
+            return Promise.all([
+                loadPartALookups(),
+                loadPartAWorkflowUsers()
+            ]).then(function() {
+                mapIncidentToPartA();
+            });
+        }
+
+        function loadPartALookups() {
+            return Promise.all([
+                IncidentUpdateService.getIncidentTypes().then(function(data) {
+                    vm.partA.incidentTypeOptions.dataSource = data;
+                }),
+                IncidentUpdateService.getSectors().then(function(data) {
+                    vm.partA.sectorOptions.dataSource = data;
+                }),
+                IncidentUpdateService.getLOBs(vm.incident.sectorCode || vm.incident.sbaCode).then(function(data) {
+                    vm.partA.lobOptions.dataSource = data;
+                }).catch(function() {
+                    vm.partA.lobOptions.dataSource = [];
+                }),
+                IncidentUpdateService.getDepartments(
+                    vm.incident.sectorCode || vm.incident.sbaCode,
+                    vm.incident.lobCode || vm.incident.sbuCode
+                ).then(function(data) {
+                    vm.partA.departmentOptions.dataSource = data;
+                }).catch(function() {
+                    vm.partA.departmentOptions.dataSource = [];
+                }),
+                IncidentUpdateService.getLocations(
+                    vm.incident.sectorCode || vm.incident.sbaCode,
+                    vm.incident.lobCode || vm.incident.sbuCode,
+                    vm.incident.departmentCode || vm.incident.department
+                ).then(function(data) {
+                    vm.partA.locationOptions.dataSource = data;
+                }).catch(function() {
+                    vm.partA.locationOptions.dataSource = [];
+                })
+            ]);
+        }
+
+        function loadPartAWorkflowUsers() {
+            if (!vm.incident.sectorCode && !vm.incident.sbaCode) {
+                return Promise.resolve();
+            }
+
+            var sectorCode = vm.incident.sectorCode || vm.incident.sbaCode;
+            var lobCode = vm.incident.lobCode || vm.incident.sbuCode;
+
+            return Promise.all([
+                IncidentUpdateService.getHODs(sectorCode, lobCode).then(function(data) {
+                    vm.partA.hodOptions.dataSource = data;
+                }).catch(function() {
+                    vm.partA.hodOptions.dataSource = [];
+                }),
+                IncidentUpdateService.getWSHOs(sectorCode, lobCode).then(function(data) {
+                    vm.partA.wshoOptions.dataSource = data;
+                }).catch(function() {
+                    vm.partA.wshoOptions.dataSource = [];
+                }),
+                IncidentUpdateService.getAHODs(sectorCode, lobCode).then(function(data) {
+                    vm.partA.ahodOptions.dataSource = data;
+                }).catch(function() {
+                    vm.partA.ahodOptions.dataSource = [];
+                })
+            ]);
+        }
+
+        function mapIncidentToPartA() {
+            if (!vm.incident) return;
+
+            // Basic incident details
+            vm.partA.incidentType = vm.incident.incidentTypes || vm.incident.incidentType || '';
+            vm.partA.incidentOther = vm.incident.incidentOther || '';
+
+            // Parse dates and times
+            if (vm.incident.incidentDate) {
+                vm.partA.incidentDate = new Date(vm.incident.incidentDate);
+            }
+            if (vm.incident.incidentTime) {
+                var timeParts = vm.incident.incidentTime.split(':');
+                if (timeParts.length >= 2) {
+                    var timeDate = new Date();
+                    timeDate.setHours(parseInt(timeParts[0], 10));
+                    timeDate.setMinutes(parseInt(timeParts[1], 10));
+                    vm.partA.incidentTime = timeDate;
+                }
+            }
+
+            // Organization
+            vm.partA.sectorCode = vm.incident.sectorCode || vm.incident.sbaCode || '';
+            vm.partA.lobCode = vm.incident.lobCode || vm.incident.sbuCode || '';
+            vm.partA.departmentCode = vm.incident.departmentCode || vm.incident.department || '';
+            vm.partA.locationCode = vm.incident.locationCode || vm.incident.location || '';
+            vm.partA.exactLocation = vm.incident.exactLocation || '';
+
+            // Description
+            vm.partA.incidentDescription = vm.incident.incidentDesc || vm.incident.incidentDescription || '';
+            vm.partA.damageDescription = vm.incident.damageDescription || '';
+
+            // Boolean flags
+            vm.partA.hasEyewitness = vm.incident.hasEyewitness || vm.incident.anyEyewitness || 'N';
+            vm.partA.hasDamage = vm.incident.hasDamage || 'N';
+            vm.partA.workingOvertime = vm.incident.isWorkingOvertime || vm.incident.workingOvertime || 'N';
+            vm.partA.isJobRelated = vm.incident.isJobrelated || vm.incident.isJobRelated || 'N';
+
+            // Additional info
+            vm.partA.hospitalClinicName = vm.incident.examinedHospitalClinicName || vm.incident.hospitalClinicName || '';
+            vm.partA.officialWorkingHours = vm.incident.officialWorkingHrs || vm.incident.officialWorkingHours || '';
+
+            // Injured persons
+            vm.partA.injuredPersons = vm.incident.injuredPersons || [];
+
+            // Eyewitnesses
+            vm.partA.eyewitnesses = vm.incident.eyewitnesses || [];
+
+            // Submitter info
+            vm.partA.superiorName = vm.incident.superiorName || '';
+            vm.partA.superiorEmpNo = vm.incident.superiorEmpNo || '';
+            vm.partA.superiorDesignation = vm.incident.superiorDesignation || '';
+
+            if (vm.incident.createdDate || vm.incident.submittedDate) {
+                vm.partA.submittedDate = new Date(vm.incident.createdDate || vm.incident.submittedDate);
+            }
+
+            // Workflow
+            vm.partA.hodId = vm.incident.hodId || '';
+            vm.partA.wshoId = vm.incident.wshoId || '';
+            vm.partA.ahodId = vm.incident.ahodId || '';
         }
 
         function loadPartBData() {

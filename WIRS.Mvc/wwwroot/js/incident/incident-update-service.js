@@ -9,6 +9,13 @@
         var service = {
             getIncidentById: getIncidentById,
             getCurrentUser: getCurrentUser,
+            getIncidentTypes: getIncidentTypes,
+            getSectors: getSectors,
+            getLOBs: getLOBs,
+            getDepartments: getDepartments,
+            getLocations: getLocations,
+            getHODs: getHODs,
+            getAHODs: getAHODs,
             getInjuredCaseTypes: getInjuredCaseTypes,
             getWSHOs: getWSHOs,
             getAlternateWSHOs: getAlternateWSHOs,
@@ -55,6 +62,57 @@
                     }
                     return $q.reject(response.data.message || 'Failed to load user');
                 })
+                .catch(handleError);
+        }
+
+        function getIncidentTypes() {
+            return $http.get('/MasterData/GetLookupByType?type=IncidentType')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getSectors() {
+            return $http.get('/Maintenance/GetSectors')
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getLOBs(sectorCode) {
+            return $http.get('/Maintenance/GetLOBsBySector?sectorCode=' + sectorCode)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getDepartments(sectorCode, lobCode) {
+            var url = '/Maintenance/GetDepartments?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getLocations(sectorCode, lobCode, departmentCode) {
+            var url = '/Maintenance/GetLocations?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getHODs(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetHODs?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getAHODs(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetAHODs?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
                 .catch(handleError);
         }
 

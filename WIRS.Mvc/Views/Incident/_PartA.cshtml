@@ -1,155 +1,416 @@
-<div class="part-a-container">
-    <h3 class="text-xl font-semibold mb-4 text-gray-700">Part A - Incident Report Details</h3>
+@* Part A - Incident Report Details (Readonly Mode with Kendo UI Controls) *@
+
+<div class="part-a-container bg-white shadow-md rounded-lg p-6">
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part A - Incident Report Details</h3>
+        <p class="text-sm text-gray-600">Initial incident report information (Read-only)</p>
+    </div>
 
     <div class="space-y-6">
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-gray-700 mb-3">Incident Information</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Incident ID</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.incidentId }}</p>
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Incident Details</legend>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="partA_incidentType" class="block text-sm font-medium text-gray-700 mb-1">
+                        Incident Type
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partA.incidentTypeOptions"
+                            k-ng-model="vm.partA.incidentType"
+                            id="partA_incidentType"
+                            class="w-full"
+                            k-enable="false">
+                    </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Incident Date & Time</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.incidentDateTime }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Incident Type</label>
-                    <p class="mt-1 text-gray-900">{{ vm.getIncidentTypeText() }}</p>
+
+                <div class="form-group" ng-show="vm.partA.incidentOther">
+                    <label for="partA_incidentOther" class="block text-sm font-medium text-gray-700 mb-1">
+                        If 'Others', please specify
+                    </label>
+                    <input kendo-text-box
+                           k-ng-model="vm.partA.incidentOther"
+                           id="partA_incidentOther"
+                           style="width: 100%;"
+                           k-enable="false" />
                 </div>
             </div>
-        </div>
 
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-gray-700 mb-3">Organization Details</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Sector/SBA</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.sbaName }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="partA_incidentDate" class="block text-sm font-medium text-gray-700 mb-1">
+                        Date of Incident
+                    </label>
+                    <input kendo-date-picker
+                           k-ng-model="vm.partA.incidentDate"
+                           k-format="'dd-MMM-yyyy'"
+                           id="partA_incidentDate"
+                           class="w-full"
+                           k-enable="false" />
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">LOB/SBU</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.sbuName }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Department</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.departmentName }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Location</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.locationName }}</p>
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-600">Exact Location</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.exactLocation }}</p>
+
+                <div class="form-group">
+                    <label for="partA_incidentTime" class="block text-sm font-medium text-gray-700 mb-1">
+                        Time (24-hr)
+                    </label>
+                    <input kendo-time-picker
+                           k-ng-model="vm.partA.incidentTime"
+                           k-format="'HH:mm'"
+                           id="partA_incidentTime"
+                           class="w-full"
+                           k-enable="false" />
                 </div>
             </div>
-        </div>
 
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-gray-700 mb-3">Incident Description</h4>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Description of Incident</label>
-                    <p class="mt-1 text-gray-900 whitespace-pre-wrap">{{ vm.incident.incidentDesc }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="partA_sector" class="block text-sm font-medium text-gray-700 mb-1">
+                        Sector
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partA.sectorOptions"
+                            k-ng-model="vm.partA.sectorCode"
+                            id="partA_sector"
+                            class="w-full"
+                            k-enable="false">
+                    </select>
                 </div>
-                <div ng-show="vm.incident.damageDescription">
-                    <label class="block text-sm font-medium text-gray-600">Description of Damage</label>
-                    <p class="mt-1 text-gray-900 whitespace-pre-wrap">{{ vm.incident.damageDescription }}</p>
+
+                <div class="form-group">
+                    <label for="partA_lob" class="block text-sm font-medium text-gray-700 mb-1">
+                        LOB
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partA.lobOptions"
+                            k-ng-model="vm.partA.lobCode"
+                            id="partA_lob"
+                            class="w-full"
+                            k-enable="false">
+                    </select>
                 </div>
             </div>
-        </div>
 
-        <div class="bg-gray-50 p-4 rounded-lg" ng-show="vm.incident.injuredPersons && vm.incident.injuredPersons.length > 0">
-            <h4 class="font-semibold text-gray-700 mb-3">Injured Persons</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label for="partA_department" class="block text-sm font-medium text-gray-700 mb-1">
+                        Department
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partA.departmentOptions"
+                            k-ng-model="vm.partA.departmentCode"
+                            id="partA_department"
+                            class="w-full"
+                            k-enable="false">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="partA_location" class="block text-sm font-medium text-gray-700 mb-1">
+                        Location of Incident
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partA.locationOptions"
+                            k-ng-model="vm.partA.locationCode"
+                            id="partA_location"
+                            class="w-full"
+                            k-enable="false">
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <label for="partA_exactLocation" class="block text-sm font-medium text-gray-700 mb-1">
+                    Exact Location
+                </label>
+                <input kendo-text-box
+                       k-ng-model="vm.partA.exactLocation"
+                       id="partA_exactLocation"
+                       style="width: 100%;"
+                       k-enable="false" />
+            </div>
+
+            <div class="form-group mt-4">
+                <label for="partA_incidentDescription" class="block text-sm font-medium text-gray-700 mb-1">
+                    Near-miss / Incident Description
+                </label>
+                <textarea kendo-text-area
+                          k-ng-model="vm.partA.incidentDescription"
+                          k-rows="4"
+                          id="partA_incidentDescription"
+                          style="width: 100%;"
+                          k-enable="false"></textarea>
+            </div>
+        </fieldset>
+
+        <!-- Particulars of Injured Person(s) -->
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50" ng-show="vm.partA.incidentType == '1' && vm.partA.injuredPersons.length > 0">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Particulars of Injured Person(s)</legend>
+
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Contact No</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Age</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Type</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Type</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Contact No</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Company</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Age</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Race</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Nationality</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Gender</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr ng-repeat="person in vm.incident.injuredPersons">
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.name }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.employeeNo }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.designation }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.contactNo }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.age }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.type === 'E' ? 'Employee' : 'Non-Employee' }}</td>
+                        <tr ng-repeat="person in vm.partA.injuredPersons">
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.type === 'E' ? 'Employee' : 'Contractor/Public' }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.name }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.employeeNo }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.contactNo }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.company }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.age }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.race }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.nationality }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.gender }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ person.designation }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </fieldset>
 
-        <div class="bg-gray-50 p-4 rounded-lg" ng-show="vm.incident.eyewitnesses && vm.incident.eyewitnesses.length > 0">
-            <h4 class="font-semibold text-gray-700 mb-3">Eye Witnesses</h4>
+        <!-- Additional Information -->
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Additional Information</legend>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Any Eye Witness?
+                    </label>
+                    <div class="flex gap-4 mt-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.hasEyewitness" value="Y" class="form-radio" disabled />
+                            <span class="ml-2">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.hasEyewitness" value="N" class="form-radio" disabled />
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="vm.partA.incidentType == '1'">
+                    <label for="partA_hospitalClinic" class="block text-sm font-medium text-gray-700 mb-1">
+                        Hospital / Clinic Examined
+                    </label>
+                    <input kendo-text-box
+                           k-ng-model="vm.partA.hospitalClinicName"
+                           id="partA_hospitalClinic"
+                           style="width: 100%;"
+                           k-enable="false" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Damage to property / equipment?
+                    </label>
+                    <div class="flex gap-4 mt-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.hasDamage" value="Y" class="form-radio" disabled />
+                            <span class="ml-2">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.hasDamage" value="N" class="form-radio" disabled />
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Working Overtime?
+                    </label>
+                    <div class="flex gap-4 mt-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.workingOvertime" value="Y" class="form-radio" disabled />
+                            <span class="ml-2">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.workingOvertime" value="N" class="form-radio" disabled />
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-4" ng-show="vm.partA.hasDamage == 'Y'">
+                <label for="partA_damageDescription" class="block text-sm font-medium text-gray-700 mb-1">
+                    Description of Damage
+                </label>
+                <textarea kendo-text-area
+                          k-ng-model="vm.partA.damageDescription"
+                          k-rows="3"
+                          id="partA_damageDescription"
+                          style="width: 100%;"
+                          k-enable="false"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Is the incident job related?
+                    </label>
+                    <div class="flex gap-4 mt-2">
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.isJobRelated" value="Y" class="form-radio" disabled />
+                            <span class="ml-2">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" ng-model="vm.partA.isJobRelated" value="N" class="form-radio" disabled />
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="partA_officialWorkingHours" class="block text-sm font-medium text-gray-700 mb-1">
+                        Official Working Hours
+                    </label>
+                    <input kendo-text-box
+                           k-ng-model="vm.partA.officialWorkingHours"
+                           id="partA_officialWorkingHours"
+                           style="width: 100%;"
+                           k-enable="false" />
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Eye Witnesses -->
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50" ng-show="vm.partA.hasEyewitness == 'Y' && vm.partA.eyewitnesses.length > 0">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Eye Witnesses</legend>
+
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Contact No</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Contact No</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr ng-repeat="witness in vm.incident.eyewitnesses">
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ witness.name }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ witness.employeeNo }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ witness.designation }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-900">{{ witness.contactNo }}</td>
+                        <tr ng-repeat="witness in vm.partA.eyewitnesses">
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ witness.name }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ witness.employeeNo }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ witness.designation }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ witness.contactNo }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </fieldset>
 
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-gray-700 mb-3">Additional Information</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Job Related</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.isJobrelated === 'Y' ? 'Yes' : 'No' }}</p>
+        <!-- Particulars of Person Submitting -->
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Particulars of Person Submitting</legend>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="partA_superiorName" class="block text-sm font-medium text-gray-700 mb-1">
+                        Name
+                    </label>
+                    <input kendo-text-box
+                           k-ng-model="vm.partA.superiorName"
+                           id="partA_superiorName"
+                           style="width: 100%;"
+                           k-enable="false" />
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Working Overtime</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.isWorkingOvertime === 'Y' ? 'Yes' : 'No' }}</p>
+
+                <div class="form-group">
+                    <label for="partA_superiorEmpNo" class="block text-sm font-medium text-gray-700 mb-1">
+                        Employee Number
+                    </label>
+                    <input kendo-text-box
+                           k-ng-model="vm.partA.superiorEmpNo"
+                           id="partA_superiorEmpNo"
+                           style="width: 100%;"
+                           k-enable="false" />
                 </div>
-                <div ng-show="vm.incident.officialWorkingHrs">
-                    <label class="block text-sm font-medium text-gray-600">Official Working Hours</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.officialWorkingHrs }}</p>
+
+                <div class="form-group">
+                    <label for="partA_superiorDesignation" class="block text-sm font-medium text-gray-700 mb-1">
+                        Designation
+                    </label>
+                    <input kendo-text-box
+                           k-ng-model="vm.partA.superiorDesignation"
+                           id="partA_superiorDesignation"
+                           style="width: 100%;"
+                           k-enable="false" />
                 </div>
-                <div ng-show="vm.incident.examinedHospitalClinicName">
-                    <label class="block text-sm font-medium text-gray-600">Hospital/Clinic Name</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.examinedHospitalClinicName }}</p>
+
+                <div class="form-group">
+                    <label for="partA_submittedDate" class="block text-sm font-medium text-gray-700 mb-1">
+                        Date Submitted
+                    </label>
+                    <input kendo-date-picker
+                           k-ng-model="vm.partA.submittedDate"
+                           k-format="'dd-MMM-yyyy'"
+                           id="partA_submittedDate"
+                           class="w-full"
+                           k-enable="false" />
                 </div>
             </div>
-        </div>
+        </fieldset>
 
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="font-semibold text-gray-700 mb-3">Reported By</h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Name</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.superiorName }}</p>
+        <!-- Workflow Assignment -->
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Workflow Assignment</legend>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-group">
+                    <label for="partA_hod" class="block text-sm font-medium text-gray-700 mb-1">
+                        HOD
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partA.hodOptions"
+                            k-ng-model="vm.partA.hodId"
+                            id="partA_hod"
+                            class="w-full"
+                            k-enable="false">
+                    </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Employee No</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.superiorEmpNo }}</p>
+
+                <div class="form-group">
+                    <label for="partA_wsho" class="block text-sm font-medium text-gray-700 mb-1">
+                        WSHO
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partA.wshoOptions"
+                            k-ng-model="vm.partA.wshoId"
+                            id="partA_wsho"
+                            class="w-full"
+                            k-enable="false">
+                    </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Designation</label>
-                    <p class="mt-1 text-gray-900">{{ vm.incident.superiorDesignation }}</p>
+
+                <div class="form-group">
+                    <label for="partA_ahod" class="block text-sm font-medium text-gray-700 mb-1">
+                        Alternate HOD
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partA.ahodOptions"
+                            k-ng-model="vm.partA.ahodId"
+                            id="partA_ahod"
+                            class="w-full"
+                            k-enable="false">
+                    </select>
                 </div>
             </div>
-        </div>
+        </fieldset>
     </div>
 </div>

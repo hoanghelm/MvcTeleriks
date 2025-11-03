@@ -812,9 +812,17 @@ Close incident with full summary. Implementation not started.
 4. Specific `API_PARTx_IMPLEMENTATION_SUMMARY.md` - For implemented API details
 
 **Important Notes**:
+- **STATUS FORMAT CORRECTION**: Backend uses numeric format '01', '02', '03', etc. (NOT 'A', 'B', 'C')
+  - Status '01' = Part A submitted, awaiting HOD review (Part B)
+  - Status '02' = Part B submitted, awaiting WSHO investigation (Part C)
+  - Status '03' = Part C submitted, awaiting HOD comment (Part D)
+  - Status '04' = Part D submitted, awaiting HSBU approval (Part E)
+  - Status '05' through '08' for Parts F-H
+- **Part A Update Page**: Now uses Kendo UI controls in readonly mode (reuses Create page structure with k-enable="false")
 - Part C is now 95% complete with all UI, API endpoints, and client-side logic implemented
 - Part C required ~1,880 lines of code and is the most complex part
-- Service layer implementation is the main remaining task for Parts B and C
+- Part D is 95% complete (~650 lines), simpler than Part B
+- Service layer implementation is the main remaining task for Parts B, C, and D
 - All patterns are established and documented
 
 All the context, field mappings, business logic, and patterns are documented. No need to re-analyze old code!
