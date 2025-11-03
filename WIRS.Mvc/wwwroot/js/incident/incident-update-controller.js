@@ -244,6 +244,8 @@
             return IncidentUpdateService.getIncidentById(incidentId)
                 .then(function(incident) {
                     console.log('Loaded incident data:', incident);
+                    console.log('IncidentTypes array:', incident.incidentTypes);
+                    console.log('IncidentTypes length:', incident.incidentTypes ? incident.incidentTypes.length : 'undefined');
                     vm.incident = incident;
                     return loadStatusName();
                 })
@@ -348,8 +350,9 @@
 
             // Basic incident details - extract from incidentTypes array
             if (vm.incident.incidentTypes && vm.incident.incidentTypes.length > 0) {
-                // Get the first incident type code (API returns {code: "...", value: "..."})
-                vm.partA.incidentType = vm.incident.incidentTypes[0].code || '';
+                // Get the first incident type code
+                // API returns {type: "...", description: "..."} OR {code: "...", value: "..."}
+                vm.partA.incidentType = vm.incident.incidentTypes[0].type || vm.incident.incidentTypes[0].code || '';
                 console.log('Setting incident type to:', vm.partA.incidentType, 'from:', vm.incident.incidentTypes[0]);
             } else {
                 vm.partA.incidentType = '';
