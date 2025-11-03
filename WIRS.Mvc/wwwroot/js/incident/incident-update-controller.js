@@ -422,28 +422,66 @@
             // Additional delay to ensure Kendo widgets are fully initialized
             $timeout(function() {
                 console.log('Attempting to set Kendo widget values...');
+                console.log('vm.partA at widget set time:', vm.partA);
 
                 // Try to get Kendo widgets and set values manually
                 var incidentTypeWidget = $('#partA_incidentType').data('kendoDropDownList');
                 if (incidentTypeWidget) {
-                    console.log('Found incidentType widget, setting value:', vm.partA.incidentType);
+                    console.log('Found incidentType widget');
+                    console.log('  - Current value:', incidentTypeWidget.value());
+                    console.log('  - DataSource items:', incidentTypeWidget.dataSource.data().length);
+                    console.log('  - Setting value to:', vm.partA.incidentType);
+
+                    // Set dataSource and value
+                    if (vm.partA.incidentTypeOptions.dataSource.length > 0) {
+                        incidentTypeWidget.setDataSource(new kendo.data.DataSource({
+                            data: vm.partA.incidentTypeOptions.dataSource
+                        }));
+                    }
                     incidentTypeWidget.value(vm.partA.incidentType);
+                    incidentTypeWidget.trigger('change');
+                    console.log('  - Value after set:', incidentTypeWidget.value());
                 } else {
-                    console.log('incidentType widget not found');
+                    console.log('incidentType widget not found - checking element exists:', $('#partA_incidentType').length > 0);
                 }
 
                 var sectorWidget = $('#partA_sector').data('kendoDropDownList');
                 if (sectorWidget) {
                     console.log('Found sector widget, setting value:', vm.partA.sectorCode);
+                    if (vm.partA.sectorOptions.dataSource.length > 0) {
+                        sectorWidget.setDataSource(new kendo.data.DataSource({
+                            data: vm.partA.sectorOptions.dataSource
+                        }));
+                    }
                     sectorWidget.value(vm.partA.sectorCode);
+                    sectorWidget.trigger('change');
                 }
 
                 var lobWidget = $('#partA_lob').data('kendoDropDownList');
                 if (lobWidget) {
                     console.log('Found LOB widget, setting value:', vm.partA.lobCode);
+                    if (vm.partA.lobOptions.dataSource.length > 0) {
+                        lobWidget.setDataSource(new kendo.data.DataSource({
+                            data: vm.partA.lobOptions.dataSource
+                        }));
+                    }
                     lobWidget.value(vm.partA.lobCode);
+                    lobWidget.trigger('change');
                 }
-            }, 500);
+
+                // Date and time pickers
+                var dateWidget = $('#partA_incidentDate').data('kendoDatePicker');
+                if (dateWidget && vm.partA.incidentDate) {
+                    console.log('Found date widget, setting value:', vm.partA.incidentDate);
+                    dateWidget.value(vm.partA.incidentDate);
+                }
+
+                var timeWidget = $('#partA_incidentTime').data('kendoTimePicker');
+                if (timeWidget && vm.partA.incidentTime) {
+                    console.log('Found time widget, setting value:', vm.partA.incidentTime);
+                    timeWidget.value(vm.partA.incidentTime);
+                }
+            }, 1000);
         }
 
         function loadPartBData() {
