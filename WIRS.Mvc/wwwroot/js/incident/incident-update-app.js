@@ -1,3 +1,3 @@
 (function () {
-    angular.module('incidentUpdateApp', []);
+    angular.module('incidentUpdateApp', ['kendo.directives']);
 })();

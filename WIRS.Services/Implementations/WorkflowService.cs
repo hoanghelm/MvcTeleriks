@@ -348,6 +348,9 @@ namespace WIRS.Services.Implementations
         {
             var row = dataSet.Tables[0].Rows[0];
             var incidentTypes = new List<IncidentTypeModel>();
+            var injuredPerson = new List<InjuredPersonModel>();
+            var eyewitnesses = new List<EyewitnessModel>();
+
             foreach (DataRow typeRow in dataSet.Tables[1].Rows)
             {
                 incidentTypes.Add(new IncidentTypeModel()
@@ -356,7 +359,40 @@ namespace WIRS.Services.Implementations
                     Description = typeRow["lookup_value"]?.ToString()
                 });
             }
-            
+
+            foreach (DataRow injuredRow in dataSet.Tables[2].Rows)
+            {
+                injuredPerson.Add(new InjuredPersonModel()
+                {
+                    EmpNo = injuredRow["injured_emp_no"]?.ToString() ?? string.Empty,
+                    Name = injuredRow["injured_name"]?.ToString() ?? string.Empty,
+                    NricFinNo = injuredRow["injured_nric_fin_no"]?.ToString() ?? string.Empty,
+                    Company = injuredRow["injured_company"]?.ToString() ?? string.Empty,
+                    ContactNo = injuredRow["injured_contact_no"]?.ToString() ?? string.Empty,
+                    Age = injuredRow["injured_age"]?.ToString() ?? string.Empty,
+                    Race = injuredRow["injured_race"]?.ToString() ?? string.Empty,
+                    RaceOther = injuredRow["injured_race_oth"]?.ToString() ?? string.Empty,
+                    Gender = injuredRow["injured_gender"]?.ToString() ?? string.Empty,
+                    Nationality = injuredRow["injured_nationality"]?.ToString() ?? string.Empty,
+                    Designation = injuredRow["injured_designation"]?.ToString() ?? string.Empty,
+                    EmploymentType = injuredRow["injured_employment_type"]?.ToString() ?? string.Empty,
+                    EmploymentTypeOther = injuredRow["injured_employment_type_oth"]?.ToString() ?? string.Empty,
+                    EmploymentDate = injuredRow["injured_employment_date"]?.ToString() ?? string.Empty,
+                    Remarks = injuredRow["Remarks"]?.ToString() ?? string.Empty
+                });
+            }
+
+            foreach (DataRow eyeRow in dataSet.Tables[3].Rows)
+            {
+                eyewitnesses.Add(new EyewitnessModel()
+                {
+                    EmpNo = eyeRow["empid"]?.ToString() ?? string.Empty,
+                    Name = eyeRow["empname"]?.ToString() ?? string.Empty,
+                    ContactNo = eyeRow["empcontactno"]?.ToString() ?? string.Empty,
+                    Designation = eyeRow["empdesignation"]?.ToString() ?? string.Empty
+                });
+            }
+
             return new WorkflowIncidentDetailModel
             {
                 IncidentId = row["incident_id"]?.ToString() ?? "",
@@ -395,7 +431,9 @@ namespace WIRS.Services.Implementations
                 RiskAssessmentReviewDesc = row["risk_assessment_review_desc"]?.ToString() ?? "",
                 RiskAssessmentReviewComments = row["risk_assessment_review_comments"]?.ToString() ?? "",
                 WhatHappenedAndWhyComments = row["what_why"]?.ToString() ?? "",
-                IncidentTypes = incidentTypes
+                IncidentTypes = incidentTypes,
+                InjuredPersons = injuredPerson,
+                Eyewitnesses = eyewitnesses,
             };
         }
 

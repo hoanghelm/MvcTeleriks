@@ -352,8 +352,14 @@
             if (vm.incident.incidentTypes && vm.incident.incidentTypes.length > 0) {
                 // Get the first incident type code
                 // API returns {type: "...", description: "..."} OR {code: "...", value: "..."}
-                vm.partA.incidentType = vm.incident.incidentTypes[0].type || vm.incident.incidentTypes[0].code || '';
-                console.log('Setting incident type to:', vm.partA.incidentType, 'from:', vm.incident.incidentTypes[0]);
+                var incType = vm.incident.incidentTypes[0];
+                vm.partA.incidentType = incType.type || incType.code || '';
+                console.log('Setting incident type to:', vm.partA.incidentType, 'from:', incType);
+            } else if (vm.incident.incidentType) {
+                // Fallback: if incidentType is directly on incident object
+                var incType = vm.incident.incidentType;
+                vm.partA.incidentType = (typeof incType === 'object' && incType.code) ? incType.code : incType;
+                console.log('Setting incident type from incident.incidentType:', vm.partA.incidentType);
             } else {
                 vm.partA.incidentType = '';
                 console.log('No incident types found in incident data');
@@ -374,11 +380,19 @@
                 }
             }
 
-            // Organization
-            vm.partA.sectorCode = vm.incident.sectorCode || vm.incident.sbaCode || '';
-            vm.partA.lobCode = vm.incident.lobCode || vm.incident.sbuCode || '';
-            vm.partA.departmentCode = vm.incident.departmentCode || vm.incident.department || '';
-            vm.partA.locationCode = vm.incident.locationCode || vm.incident.location || '';
+            // Organization - extract code if it's an object
+            var sectorCode = vm.incident.sectorCode || vm.incident.sbaCode || '';
+            vm.partA.sectorCode = (typeof sectorCode === 'object' && sectorCode.code) ? sectorCode.code : sectorCode;
+
+            var lobCode = vm.incident.lobCode || vm.incident.sbuCode || '';
+            vm.partA.lobCode = (typeof lobCode === 'object' && lobCode.code) ? lobCode.code : lobCode;
+
+            var departmentCode = vm.incident.departmentCode || vm.incident.department || '';
+            vm.partA.departmentCode = (typeof departmentCode === 'object' && departmentCode.code) ? departmentCode.code : departmentCode;
+
+            var locationCode = vm.incident.locationCode || vm.incident.location || '';
+            vm.partA.locationCode = (typeof locationCode === 'object' && locationCode.code) ? locationCode.code : locationCode;
+
             vm.partA.exactLocation = vm.incident.exactLocation || '';
 
             // Description
