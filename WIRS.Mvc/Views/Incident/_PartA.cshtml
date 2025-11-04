@@ -365,13 +365,10 @@
                            k-enable="false" />
                 </div>
             </div>
-        </fieldset>
 
-        <!-- Workflow Submission History -->
-        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
-            <legend class="text-lg font-semibold text-gray-900 px-2">Workflow Submission History</legend>
-
-            <div ng-show="vm.getWorkflowsByAction('01').length > 0">
+            <!-- Workflow Submission History (inside Particulars section) -->
+            <div class="mt-6" ng-show="vm.getWorkflowsByAction('01').length > 0">
+                <h4 class="text-md font-semibold text-gray-800 mb-3">Workflow Submission History</h4>
                 <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                     <thead class="bg-gray-100">
                         <tr>
@@ -383,10 +380,10 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr ng-repeat="workflow in vm.getWorkflowsByAction('01')">
                             <td class="px-4 py-3 text-sm text-gray-900">
-                                <div ng-bind-html="workflow.toDesignation || 'N/A'"></div>
+                                <div ng-bind-html="workflow.toName || 'N/A'"></div>
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-900">
-                                <div ng-bind-html="workflow.fromDesignation || 'N/A'"></div>
+                                <div ng-bind-html="workflow.toDesignation || 'N/A'"></div>
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-900">
                                 {{workflow.date | date:'dd-MMM-yyyy HH:mm' || 'N/A'}}
@@ -394,10 +391,6 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div ng-show="vm.getWorkflowsByAction('01').length === 0" class="text-center py-4 text-gray-500">
-                No workflow history available for this part
             </div>
         </fieldset>
     </div>
