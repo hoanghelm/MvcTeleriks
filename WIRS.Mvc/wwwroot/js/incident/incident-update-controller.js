@@ -3,9 +3,9 @@
         .module('incidentUpdateApp')
         .controller('IncidentUpdateController', IncidentUpdateController);
 
-    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', 'IncidentUpdateService'];
+    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', 'IncidentUpdateService'];
 
-    function IncidentUpdateController($window, $location, $scope, $timeout, IncidentUpdateService) {
+    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, IncidentUpdateService) {
         var vm = this;
 
         vm.loading = true;
@@ -170,6 +170,7 @@
         vm.getInjuredCaseTypeText = getInjuredCaseTypeText;
         vm.getHsbuName = getHsbuName;
         vm.getCurrentDate = getCurrentDate;
+        vm.getWorkflowsByAction = getWorkflowsByAction;
         vm.submitPartB = submitPartB;
         vm.submitPartD = submitPartD;
         vm.openEmployeeSearch = openEmployeeSearch;
@@ -1304,6 +1305,23 @@
             if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
                 $window.location.href = '/Home/Index';
             }
+        }
+
+        // Get workflows filtered by action code
+        function getWorkflowsByAction(actionCode) {
+            if (!vm.incident || !vm.incident.workflows) {
+                return [];
+            }
+            return vm.incident.workflows.filter(function(workflow) {
+                // Trust HTML content for ng-bind-html
+                if (workflow.toDesignation && typeof workflow.toDesignation === 'string') {
+                    workflow.toDesignation = $sce.trustAsHtml(workflow.toDesignation);
+                }
+                if (workflow.fromDesignation && typeof workflow.fromDesignation === 'string') {
+                    workflow.fromDesignation = $sce.trustAsHtml(workflow.fromDesignation);
+                }
+                return workflow.actionCode === actionCode;
+            });
         }
     }
 })();
