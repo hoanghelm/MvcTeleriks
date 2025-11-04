@@ -199,25 +199,25 @@
             }
 
             loadCurrentUser()
-                .then(function() {
+                .then(function () {
                     return loadIncident(incidentId);
                 })
-                .then(function() {
+                .then(function () {
                     return loadPartAData();
                 })
-                .then(function() {
+                .then(function () {
                     return loadPartBData();
                 })
-                .then(function() {
+                .then(function () {
                     return loadPartCData();
                 })
-                .then(function() {
+                .then(function () {
                     return loadPartDData();
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     vm.error = error || 'Failed to load incident data';
                 })
-                .finally(function() {
+                .finally(function () {
                     vm.loading = false;
                 });
         }
@@ -230,7 +230,7 @@
 
         function loadCurrentUser() {
             return IncidentUpdateService.getCurrentUser()
-                .then(function(user) {
+                .then(function (user) {
                     vm.currentUser = {
                         userId: user.userId,
                         name: user.userName || user.displayName || 'User',
@@ -242,14 +242,14 @@
 
         function loadIncident(incidentId) {
             return IncidentUpdateService.getIncidentById(incidentId)
-                .then(function(incident) {
+                .then(function (incident) {
                     console.log('Loaded incident data:', incident);
                     console.log('IncidentTypes array:', incident.incidentTypes);
                     console.log('IncidentTypes length:', incident.incidentTypes ? incident.incidentTypes.length : 'undefined');
                     vm.incident = incident;
                     return loadStatusName();
                 })
-                .then(function() {
+                .then(function () {
                     determinePartBMode();
                 });
         }
@@ -260,24 +260,24 @@
             }
 
             return IncidentUpdateService.getStatusName(vm.incident.status)
-                .then(function(statusName) {
+                .then(function (statusName) {
                     vm.incident.statusName = statusName;
                     console.log('Status name loaded:', statusName);
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     console.error('Error loading status name:', error);
                     vm.incident.statusName = vm.incident.status;
                 });
         }
 
         function loadPartAData() {
-            // Part A is always visible (read-only)
+
             return Promise.all([
                 loadPartALookups(),
                 loadPartAWorkflowUsers()
-            ]).then(function() {
-                // Use $timeout to ensure mapping happens in Angular digest cycle
-                $timeout(function() {
+            ]).then(function () {
+
+                $timeout(function () {
                     mapIncidentToPartA();
                 }, 0);
             });
@@ -285,32 +285,32 @@
 
         function loadPartALookups() {
             return Promise.all([
-                IncidentUpdateService.getIncidentTypes().then(function(data) {
+                IncidentUpdateService.getIncidentTypes().then(function (data) {
                     vm.partA.incidentTypeOptions.dataSource = data;
                 }),
-                IncidentUpdateService.getSectors().then(function(data) {
+                IncidentUpdateService.getSectors().then(function (data) {
                     vm.partA.sectorOptions.dataSource = data;
                 }),
-                IncidentUpdateService.getLOBs(vm.incident.sectorCode || vm.incident.sbaCode).then(function(data) {
+                IncidentUpdateService.getLOBs(vm.incident.sectorCode || vm.incident.sbaCode).then(function (data) {
                     vm.partA.lobOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.lobOptions.dataSource = [];
                 }),
                 IncidentUpdateService.getDepartments(
                     vm.incident.sectorCode || vm.incident.sbaCode,
                     vm.incident.lobCode || vm.incident.sbuCode
-                ).then(function(data) {
+                ).then(function (data) {
                     vm.partA.departmentOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.departmentOptions.dataSource = [];
                 }),
                 IncidentUpdateService.getLocations(
                     vm.incident.sectorCode || vm.incident.sbaCode,
                     vm.incident.lobCode || vm.incident.sbuCode,
                     vm.incident.departmentCode || vm.incident.department
-                ).then(function(data) {
+                ).then(function (data) {
                     vm.partA.locationOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.locationOptions.dataSource = [];
                 })
             ]);
@@ -325,19 +325,19 @@
             var lobCode = vm.incident.lobCode || vm.incident.sbuCode;
 
             return Promise.all([
-                IncidentUpdateService.getHODs(sectorCode, lobCode).then(function(data) {
+                IncidentUpdateService.getHODs(sectorCode, lobCode).then(function (data) {
                     vm.partA.hodOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.hodOptions.dataSource = [];
                 }),
-                IncidentUpdateService.getWSHOs(sectorCode, lobCode).then(function(data) {
+                IncidentUpdateService.getWSHOs(sectorCode, lobCode).then(function (data) {
                     vm.partA.wshoOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.wshoOptions.dataSource = [];
                 }),
-                IncidentUpdateService.getAHODs(sectorCode, lobCode).then(function(data) {
+                IncidentUpdateService.getAHODs(sectorCode, lobCode).then(function (data) {
                     vm.partA.ahodOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.ahodOptions.dataSource = [];
                 })
             ]);
@@ -348,15 +348,11 @@
 
             console.log('Mapping incident to Part A', vm.incident);
 
-            // Basic incident details - extract from incidentTypes array
             if (vm.incident.incidentTypes && vm.incident.incidentTypes.length > 0) {
-                // Get the first incident type code
-                // API returns {type: "...", description: "..."} OR {code: "...", value: "..."}
                 var incType = vm.incident.incidentTypes[0];
                 vm.partA.incidentType = incType.type || incType.code || '';
                 console.log('Setting incident type to:', vm.partA.incidentType, 'from:', incType);
             } else if (vm.incident.incidentType) {
-                // Fallback: if incidentType is directly on incident object
                 var incType = vm.incident.incidentType;
                 vm.partA.incidentType = (typeof incType === 'object' && incType.code) ? incType.code : incType;
                 console.log('Setting incident type from incident.incidentType:', vm.partA.incidentType);
@@ -366,21 +362,16 @@
             }
             vm.partA.incidentOther = vm.incident.incidentOther || '';
 
-            // Parse dates and times
             if (vm.incident.incidentDate) {
                 vm.partA.incidentDate = new Date(vm.incident.incidentDate);
             }
             if (vm.incident.incidentTime) {
-                var timeParts = vm.incident.incidentTime.split(':');
-                if (timeParts.length >= 2) {
-                    var timeDate = new Date();
-                    timeDate.setHours(parseInt(timeParts[0], 10));
-                    timeDate.setMinutes(parseInt(timeParts[1], 10));
-                    vm.partA.incidentTime = timeDate;
-                }
+                var timeDate = new Date();
+                timeDate.setHours(parseInt(vm.incident.incidentTime.substr(0, 2), 10));
+                timeDate.setMinutes(parseInt(vm.incident.incidentTime.substr(2), 10));
+                vm.partA.incidentTime = timeDate;
             }
 
-            // Organization - extract code if it's an object
             var sectorCode = vm.incident.sectorCode || vm.incident.sbaCode || '';
             vm.partA.sectorCode = (typeof sectorCode === 'object' && sectorCode.code) ? sectorCode.code : sectorCode;
 
@@ -395,27 +386,21 @@
 
             vm.partA.exactLocation = vm.incident.exactLocation || '';
 
-            // Description
             vm.partA.incidentDescription = vm.incident.incidentDesc || vm.incident.incidentDescription || '';
             vm.partA.damageDescription = vm.incident.damageDescription || '';
 
-            // Boolean flags
             vm.partA.hasEyewitness = vm.incident.hasEyewitness || vm.incident.anyEyewitness || 'N';
             vm.partA.hasDamage = vm.incident.hasDamage || 'N';
             vm.partA.workingOvertime = vm.incident.isWorkingOvertime || vm.incident.workingOvertime || 'N';
             vm.partA.isJobRelated = vm.incident.isJobrelated || vm.incident.isJobRelated || 'N';
 
-            // Additional info
             vm.partA.hospitalClinicName = vm.incident.examinedHospitalClinicName || vm.incident.hospitalClinicName || '';
             vm.partA.officialWorkingHours = vm.incident.officialWorkingHrs || vm.incident.officialWorkingHours || '';
 
-            // Injured persons
             vm.partA.injuredPersons = vm.incident.injuredPersons || [];
 
-            // Eyewitnesses
             vm.partA.eyewitnesses = vm.incident.eyewitnesses || [];
 
-            // Submitter info
             vm.partA.superiorName = vm.incident.superiorName || '';
             vm.partA.superiorEmpNo = vm.incident.superiorEmpNo || '';
             vm.partA.superiorDesignation = vm.incident.superiorDesignation || '';
@@ -424,24 +409,20 @@
                 vm.partA.submittedDate = new Date(vm.incident.createdDate || vm.incident.submittedDate);
             }
 
-            // Workflow
             vm.partA.hodId = vm.incident.hodId || '';
             vm.partA.wshoId = vm.incident.wshoId || '';
             vm.partA.ahodId = vm.incident.ahodId || '';
 
             console.log('Part A data after mapping:', vm.partA);
 
-            // Force Angular digest cycle to update Kendo UI controls
             if ($scope.$root && $scope.$root.$$phase !== '$apply' && $scope.$root.$$phase !== '$digest') {
                 $scope.$applyAsync();
             }
 
-            // Additional delay to ensure Kendo widgets are fully initialized
-            $timeout(function() {
+            $timeout(function () {
                 console.log('Attempting to set Kendo widget values...');
                 console.log('vm.partA at widget set time:', vm.partA);
 
-                // Try to get Kendo widgets and set values manually
                 var incidentTypeWidget = $('#partA_incidentType').data('kendoDropDownList');
                 if (incidentTypeWidget) {
                     console.log('Found incidentType widget');
@@ -449,7 +430,6 @@
                     console.log('  - DataSource items:', incidentTypeWidget.dataSource.data().length);
                     console.log('  - Setting value to:', vm.partA.incidentType);
 
-                    // Set dataSource and value
                     if (vm.partA.incidentTypeOptions.dataSource.length > 0) {
                         incidentTypeWidget.setDataSource(new kendo.data.DataSource({
                             data: vm.partA.incidentTypeOptions.dataSource
@@ -486,7 +466,30 @@
                     lobWidget.trigger('change');
                 }
 
-                // Date and time pickers
+                var deptWidget = $('#partA_department').data('kendoDropDownList');
+                if (deptWidget) {
+                    console.log('Found Dept widget, setting value:', vm.partA.departmentCode);
+                    if (vm.partA.departmentOptions.dataSource.length > 0) {
+                        deptWidget.setDataSource(new kendo.data.DataSource({
+                            data: vm.partA.departmentOptions.dataSource
+                        }));
+                    }
+                    deptWidget.value(vm.partA.departmentCode);
+                    deptWidget.trigger('change');
+                }
+
+                var locationWidget = $('#partA_location').data('kendoDropDownList');
+                if (locationWidget) {
+                    console.log('Found location widget, setting value:', vm.partA.locationCode);
+                    if (vm.partA.locationOptions.dataSource.length > 0) {
+                        locationWidget.setDataSource(new kendo.data.DataSource({
+                            data: vm.partA.locationOptions.dataSource
+                        }));
+                    }
+                    locationWidget.value(vm.partA.locationCode);
+                    locationWidget.trigger('change');
+                }
+
                 var dateWidget = $('#partA_incidentDate').data('kendoDatePicker');
                 if (dateWidget && vm.partA.incidentDate) {
                     console.log('Found date widget, setting value:', vm.partA.incidentDate);
@@ -516,13 +519,13 @@
 
         function loadInjuredCaseTypes() {
             return IncidentUpdateService.getInjuredCaseTypes()
-                .then(function(data) {
+                .then(function (data) {
                     vm.injuredCaseTypes = data;
                     if (vm.injuredCaseTypes.length > 0 && !vm.partB.injuredCaseType) {
                         vm.partB.injuredCaseType = vm.injuredCaseTypes[0].code;
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     console.error('Failed to load injured case types:', error);
                 });
         }
@@ -538,10 +541,10 @@
                 vm.incident.department,
                 vm.incident.location
             )
-                .then(function(data) {
+                .then(function (data) {
                     vm.wshoList = data;
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     console.error('Failed to load WSHOs:', error);
                 });
         }
@@ -557,10 +560,10 @@
                 vm.incident.department,
                 vm.incident.location
             )
-                .then(function(data) {
+                .then(function (data) {
                     vm.alternateWshoList = data;
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     console.error('Failed to load alternate WSHOs:', error);
                 });
         }
@@ -576,8 +579,8 @@
                 vm.incident.department,
                 vm.incident.location
             )
-                .then(function(data) {
-                    vm.emailToList = data.map(function(person) {
+                .then(function (data) {
+                    vm.emailToList = data.map(function (person) {
                         return {
                             id: person.id,
                             name: person.name,
@@ -586,7 +589,7 @@
                         };
                     });
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     console.error('Failed to load email to list:', error);
                 });
         }
@@ -602,7 +605,7 @@
 
         function loadPartBReadOnlyData() {
             if (vm.incident.workflows && vm.incident.workflows.length > 0) {
-                var partBWorkflow = vm.incident.workflows.find(function(w) {
+                var partBWorkflow = vm.incident.workflows.find(function (w) {
                     return w.status === '02' && w.role === 'HOD';
                 });
 
@@ -667,7 +670,7 @@
                 return 'N/A';
             }
 
-            var caseType = vm.injuredCaseTypes.find(function(ct) {
+            var caseType = vm.injuredCaseTypes.find(function (ct) {
                 return ct.code === vm.partB.injuredCaseType;
             });
 
@@ -699,8 +702,8 @@
             vm.partB.submitting = true;
 
             var selectedEmailTo = vm.emailToList
-                .filter(function(person) { return person.selected; })
-                .map(function(person) { return person.id; });
+                .filter(function (person) { return person.selected; })
+                .map(function (person) { return person.id; });
 
             var submitData = {
                 incidentId: vm.incident.incidentId,
@@ -713,7 +716,7 @@
             };
 
             IncidentUpdateService.submitPartB(submitData)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.success) {
                         alert('Part B submitted successfully!');
                         $window.location.href = '/Home/Index';
@@ -721,10 +724,10 @@
                         vm.partB.validationMessage = response.message || 'Failed to submit Part B';
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     vm.partB.validationMessage = error.message || 'An error occurred while submitting Part B';
                 })
-                .finally(function() {
+                .finally(function () {
                     vm.partB.submitting = false;
                 });
         }
@@ -756,39 +759,39 @@
 
         function loadPartCLookups() {
             var promises = [
-                IncidentUpdateService.getNatureOfInjury().then(function(data) {
-                    vm.natureOfInjury = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getNatureOfInjury().then(function (data) {
+                    vm.natureOfInjury = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getHeadNeckTorso().then(function(data) {
-                    vm.headNeckTorso = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getHeadNeckTorso().then(function (data) {
+                    vm.headNeckTorso = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getUpperLimbs().then(function(data) {
-                    vm.upperLimbs = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getUpperLimbs().then(function (data) {
+                    vm.upperLimbs = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getLowerLimbs().then(function(data) {
-                    vm.lowerLimbs = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getLowerLimbs().then(function (data) {
+                    vm.lowerLimbs = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getIncidentClass().then(function(data) {
-                    vm.incidentClass = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getIncidentClass().then(function (data) {
+                    vm.incidentClass = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getIncidentAgent().then(function(data) {
-                    vm.incidentAgent = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getIncidentAgent().then(function (data) {
+                    vm.incidentAgent = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getUnsafeConditions().then(function(data) {
-                    vm.unsafeConditions = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getUnsafeConditions().then(function (data) {
+                    vm.unsafeConditions = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getUnsafeActs().then(function(data) {
-                    vm.unsafeActs = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getUnsafeActs().then(function (data) {
+                    vm.unsafeActs = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getContributingFactors().then(function(data) {
-                    vm.contributingFactors = data.map(function(item) { return { code: item.code, value: item.value, selected: false }; });
+                IncidentUpdateService.getContributingFactors().then(function (data) {
+                    vm.contributingFactors = data.map(function (item) { return { code: item.code, value: item.value, selected: false }; });
                 }),
-                IncidentUpdateService.getNegligentOptions().then(function(data) {
+                IncidentUpdateService.getNegligentOptions().then(function (data) {
                     vm.negligentOptions = data;
                 })
             ];
 
-            return Promise.all(promises).catch(function(error) {
+            return Promise.all(promises).catch(function (error) {
                 console.error('Failed to load Part C lookups:', error);
             });
         }
@@ -804,10 +807,10 @@
                 vm.incident.department,
                 vm.incident.location
             )
-                .then(function(data) {
+                .then(function (data) {
                     vm.cwshoList = data;
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     console.error('Failed to load CWSHOs:', error);
                 });
         }
@@ -822,7 +825,7 @@
 
         function loadPartCReadOnlyData() {
             if (vm.incident.workflows && vm.incident.workflows.length > 0) {
-                var partCWorkflow = vm.incident.workflows.find(function(w) {
+                var partCWorkflow = vm.incident.workflows.find(function (w) {
                     return w.status === '03' && w.role === 'WSHO';
                 });
 
@@ -893,14 +896,14 @@
                 return;
             }
 
-            var selectedNature = vm.natureOfInjury.filter(function(n) { return n.selected; }).map(function(n) { return n.value; }).join(', ');
-            var selectedHead = vm.headNeckTorso.filter(function(h) { return h.selected; }).map(function(h) { return h.value; }).join(', ');
-            var selectedUpper = vm.upperLimbs.filter(function(u) { return u.selected; }).map(function(u) { return u.value; }).join(', ');
-            var selectedLower = vm.lowerLimbs.filter(function(l) { return l.selected; }).map(function(l) { return l.value; }).join(', ');
+            var selectedNature = vm.natureOfInjury.filter(function (n) { return n.selected; }).map(function (n) { return n.value; }).join(', ');
+            var selectedHead = vm.headNeckTorso.filter(function (h) { return h.selected; }).map(function (h) { return h.value; }).join(', ');
+            var selectedUpper = vm.upperLimbs.filter(function (u) { return u.selected; }).map(function (u) { return u.value; }).join(', ');
+            var selectedLower = vm.lowerLimbs.filter(function (l) { return l.selected; }).map(function (l) { return l.value; }).join(', ');
 
-            var bodyParts = [selectedHead, selectedUpper, selectedLower].filter(function(p) { return p; }).join('; ');
+            var bodyParts = [selectedHead, selectedUpper, selectedLower].filter(function (p) { return p; }).join('; ');
 
-            var injuredPerson = vm.incident.injuredPersons.find(function(p) { return p.employeeNo === vm.partC.injuryDetail.injuredPersonId; });
+            var injuredPerson = vm.incident.injuredPersons.find(function (p) { return p.employeeNo === vm.partC.injuryDetail.injuredPersonId; });
 
             vm.partC.injuryDetails.push({
                 injuredPersonId: vm.partC.injuryDetail.injuredPersonId,
@@ -908,17 +911,17 @@
                 natureOfInjury: selectedNature,
                 bodyParts: bodyParts,
                 description: vm.partC.injuryDetail.description || '',
-                natureOfInjuryList: vm.natureOfInjury.filter(function(n) { return n.selected; }).map(function(n) { return n.code; }),
-                headNeckTorsoList: vm.headNeckTorso.filter(function(h) { return h.selected; }).map(function(h) { return h.code; }),
-                upperLimbsList: vm.upperLimbs.filter(function(u) { return u.selected; }).map(function(u) { return u.code; }),
-                lowerLimbsList: vm.lowerLimbs.filter(function(l) { return l.selected; }).map(function(l) { return l.code; })
+                natureOfInjuryList: vm.natureOfInjury.filter(function (n) { return n.selected; }).map(function (n) { return n.code; }),
+                headNeckTorsoList: vm.headNeckTorso.filter(function (h) { return h.selected; }).map(function (h) { return h.code; }),
+                upperLimbsList: vm.upperLimbs.filter(function (u) { return u.selected; }).map(function (u) { return u.code; }),
+                lowerLimbsList: vm.lowerLimbs.filter(function (l) { return l.selected; }).map(function (l) { return l.code; })
             });
 
             vm.partC.injuryDetail = {};
-            vm.natureOfInjury.forEach(function(n) { n.selected = false; });
-            vm.headNeckTorso.forEach(function(h) { h.selected = false; });
-            vm.upperLimbs.forEach(function(u) { u.selected = false; });
-            vm.lowerLimbs.forEach(function(l) { l.selected = false; });
+            vm.natureOfInjury.forEach(function (n) { n.selected = false; });
+            vm.headNeckTorso.forEach(function (h) { h.selected = false; });
+            vm.upperLimbs.forEach(function (u) { u.selected = false; });
+            vm.lowerLimbs.forEach(function (l) { l.selected = false; });
         }
 
         function removeInjuryDetail(index) {
@@ -936,7 +939,7 @@
                 return;
             }
 
-            var injuredPerson = vm.incident.injuredPersons.find(function(p) { return p.employeeNo === vm.partC.medicalCert.injuredPersonId; });
+            var injuredPerson = vm.incident.injuredPersons.find(function (p) { return p.employeeNo === vm.partC.medicalCert.injuredPersonId; });
 
             vm.partC.medicalCertificates.push({
                 injuredPersonId: vm.partC.medicalCert.injuredPersonId,
@@ -961,17 +964,17 @@
             var partCData = buildPartCData();
 
             IncidentUpdateService.savePartC(partCData)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.success) {
                         alert('Part C saved successfully!');
                     } else {
                         vm.partC.validationMessage = response.message || 'Failed to save Part C';
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     vm.partC.validationMessage = error.message || 'An error occurred while saving Part C';
                 })
-                .finally(function() {
+                .finally(function () {
                     vm.partC.saving = false;
                 });
         }
@@ -988,7 +991,7 @@
             var partCData = buildPartCData();
 
             IncidentUpdateService.submitPartC(partCData)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.success) {
                         alert('Part C submitted successfully to HOD!');
                         $window.location.href = '/Home/Index';
@@ -996,10 +999,10 @@
                         vm.partC.validationMessage = response.message || 'Failed to submit Part C';
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     vm.partC.validationMessage = error.message || 'An error occurred while submitting Part C';
                 })
-                .finally(function() {
+                .finally(function () {
                     vm.partC.submitting = false;
                 });
         }
@@ -1031,7 +1034,7 @@
             };
 
             IncidentUpdateService.closePartC(closeData)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.success) {
                         alert('Incident closed successfully!');
                         $window.location.href = '/Home/Index';
@@ -1039,10 +1042,10 @@
                         vm.partC.validationMessage = response.message || 'Failed to close incident';
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     vm.partC.validationMessage = error.message || 'An error occurred while closing incident';
                 })
-                .finally(function() {
+                .finally(function () {
                     vm.partC.closing = false;
                 });
         }
@@ -1068,14 +1071,14 @@
                 return false;
             }
 
-            var hasIncidentClass = vm.incidentClass.some(function(c) { return c.selected; });
+            var hasIncidentClass = vm.incidentClass.some(function (c) { return c.selected; });
             if (!hasIncidentClass) {
                 vm.partC.validationMessage = 'At least one incident classification is required';
                 return false;
             }
 
-            var hasUnsafeCondition = vm.unsafeConditions.some(function(c) { return c.selected; });
-            var hasUnsafeAct = vm.unsafeActs.some(function(a) { return a.selected; });
+            var hasUnsafeCondition = vm.unsafeConditions.some(function (c) { return c.selected; });
+            var hasUnsafeAct = vm.unsafeActs.some(function (a) { return a.selected; });
             if (!hasUnsafeCondition && !hasUnsafeAct) {
                 vm.partC.validationMessage = 'At least one unsafe condition OR unsafe act is required';
                 return false;
@@ -1095,7 +1098,7 @@
                 recommendedActions: vm.partC.recommendedActions,
                 additionalComments: vm.partC.additionalComments || '',
                 personsInterviewed: vm.partC.personsInterviewed,
-                injuryDetails: vm.partC.injuryDetails.map(function(injury) {
+                injuryDetails: vm.partC.injuryDetails.map(function (injury) {
                     return {
                         injuredPersonId: injury.injuredPersonId,
                         injuredPersonName: injury.injuredPersonName,
@@ -1107,15 +1110,13 @@
                     };
                 }),
                 medicalCertificates: vm.partC.medicalCertificates,
-                incidentClassList: vm.incidentClass.filter(function(c) { return c.selected; }).map(function(c) { return c.code; }),
-                incidentAgentList: vm.incidentAgent.filter(function(a) { return a.selected; }).map(function(a) { return a.code; }),
-                unsafeConditionsList: vm.unsafeConditions.filter(function(c) { return c.selected; }).map(function(c) { return c.code; }),
-                unsafeActsList: vm.unsafeActs.filter(function(a) { return a.selected; }).map(function(a) { return a.code; }),
-                contributingFactorsList: vm.contributingFactors.filter(function(f) { return f.selected; }).map(function(f) { return f.code; })
+                incidentClassList: vm.incidentClass.filter(function (c) { return c.selected; }).map(function (c) { return c.code; }),
+                incidentAgentList: vm.incidentAgent.filter(function (a) { return a.selected; }).map(function (a) { return a.code; }),
+                unsafeConditionsList: vm.unsafeConditions.filter(function (c) { return c.selected; }).map(function (c) { return c.code; }),
+                unsafeActsList: vm.unsafeActs.filter(function (a) { return a.selected; }).map(function (a) { return a.code; }),
+                contributingFactorsList: vm.contributingFactors.filter(function (f) { return f.selected; }).map(function (f) { return f.code; })
             };
         }
-
-        // ========== Part D Functions ==========
 
         function canViewPartD() {
             return vm.incident && vm.incident.status && parseInt(vm.incident.status) >= 3;
@@ -1125,7 +1126,6 @@
             if (!vm.incident || vm.incident.status !== '03') return false;
             if (!vm.currentUser || !vm.currentUser.userId) return false;
 
-            // HOD or Alternate HOD can edit Part D
             if (vm.incident.hodId === vm.currentUser.userId) return true;
             if (vm.incident.ahodId === vm.currentUser.userId) return true;
 
@@ -1155,7 +1155,7 @@
         }
 
         function loadPartDReadOnlyData() {
-            // Load read-only data from incident
+
             vm.partD.comments = vm.incident.partDComments || '';
             vm.partD.hsbuId = vm.incident.hsbuId || '';
             vm.partD.submitterName = vm.incident.partDSubmitterName || '';
@@ -1163,7 +1163,6 @@
             vm.partD.submitterDesignation = vm.incident.partDSubmitterDesignation || '';
             vm.partD.submittedDate = vm.incident.partDSubmittedDate || '';
 
-            // Load HSBU list and email to list for display purposes
             return Promise.all([
                 loadHSBUs(),
                 loadPartDEmailToList()
@@ -1180,15 +1179,15 @@
                 vm.incident.lobCode,
                 vm.incident.departmentCode || '',
                 vm.incident.locationCode || ''
-            ).then(function(data) {
-                vm.hsbuList = data.map(function(item) {
+            ).then(function (data) {
+                vm.hsbuList = data.map(function (item) {
                     return {
                         userId: item.userId || item.employeeNo,
                         userName: item.userName || item.name,
                         designation: item.designation || ''
                     };
                 });
-            }).catch(function(error) {
+            }).catch(function (error) {
                 console.error('Error loading HSBUs:', error);
                 vm.hsbuList = [];
             });
@@ -1204,16 +1203,16 @@
                 vm.incident.lobCode,
                 vm.incident.departmentCode || '',
                 vm.incident.locationCode || ''
-            ).then(function(data) {
-                vm.partD.emailToList = data.map(function(item) {
+            ).then(function (data) {
+                vm.partD.emailToList = data.map(function (item) {
                     return {
                         userId: item.userId || item.employeeNo,
                         userName: item.userName || item.name,
                         designation: item.designation || '',
-                        selected: true  // Default all selected
+                        selected: true
                     };
                 });
-            }).catch(function(error) {
+            }).catch(function (error) {
                 console.error('Error loading email to list:', error);
                 vm.partD.emailToList = [];
             });
@@ -1223,15 +1222,14 @@
             if (!hsbuId || !vm.hsbuList || vm.hsbuList.length === 0) {
                 return 'N/A';
             }
-            var hsbu = vm.hsbuList.find(function(h) {
+            var hsbu = vm.hsbuList.find(function (h) {
                 return h.userId === hsbuId;
             });
             return hsbu ? hsbu.userName + ' (' + hsbu.userId + ')' : 'N/A';
         }
 
         function openEmployeeSearchForPartD() {
-            // TODO: Implement employee search modal
-            // For now, just show an alert
+
             alert('Employee search functionality will be implemented');
         }
 
@@ -1243,7 +1241,6 @@
             vm.partD.validationMessage = '';
             vm.partD.successMessage = '';
 
-            // Validation
             if (!vm.partD.comments || vm.partD.comments.trim() === '') {
                 vm.partD.validationMessage = 'Comments are required (ERR-137)';
                 return;
@@ -1261,15 +1258,15 @@
             vm.partD.isSubmitting = true;
 
             var selectedEmailTo = vm.partD.emailToList
-                .filter(function(person) { return person.selected; })
-                .map(function(person) { return person.userId; });
+                .filter(function (person) { return person.selected; })
+                .map(function (person) { return person.userId; });
 
             var submitData = {
                 incidentId: vm.incident.incidentId,
                 comments: vm.partD.comments,
                 hsbuId: vm.partD.hsbuId,
                 emailToList: selectedEmailTo,
-                additionalCopyToList: vm.partD.additionalCopyToList.map(function(person) {
+                additionalCopyToList: vm.partD.additionalCopyToList.map(function (person) {
                     return {
                         employeeNo: person.employeeId,
                         name: person.name,
@@ -1279,20 +1276,20 @@
             };
 
             IncidentUpdateService.submitPartD(submitData)
-                .then(function(response) {
+                .then(function (response) {
                     if (response.success) {
                         vm.partD.successMessage = response.message || 'Part D submitted successfully to HSBU';
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $window.location.href = '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partD.validationMessage = response.message || 'Failed to submit Part D';
                     }
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     vm.partD.validationMessage = error.message || 'An error occurred while submitting Part D';
                 })
-                .finally(function() {
+                .finally(function () {
                     vm.partD.isSubmitting = false;
                 });
         }

@@ -96,11 +96,12 @@ namespace WIRS.Services.Implementations
             {
                 var workflowIncident = new WorkflowIncident { incident_id = incidentId };
                 var dataSet = await _workflowIncidentDataAccess.get_incident_by_id(workflowIncident);
+                var workflows = await this.GetIncidentWorkflowsAsync(incidentId);
                 
                 if (dataSet?.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
                     return null;
 
-                var incident = MapDataSetToDetailModel(dataSet);
+                var incident = MapDataSetToDetailModel(dataSet, workflows);
                 
                 incident.CanEdit = await CanUserEditIncidentAsync(incidentId, userId);
                 incident.CanWorkflow = await CanUserWorkflowIncidentAsync(incidentId, userId);
@@ -344,12 +345,14 @@ namespace WIRS.Services.Implementations
             };
         }
 
-        private WorkflowIncidentDetailModel MapDataSetToDetailModel(DataSet dataSet)
+        private WorkflowIncidentDetailModel MapDataSetToDetailModel(DataSet dataSet, DataSet workflowDs)
         {
             var row = dataSet.Tables[0].Rows[0];
             var incidentTypes = new List<IncidentTypeModel>();
             var injuredPerson = new List<InjuredPersonModel>();
             var eyewitnesses = new List<EyewitnessModel>();
+            var workflows = new List<IncidentWorkflowModel>();
+
 
             foreach (DataRow typeRow in dataSet.Tables[1].Rows)
             {
@@ -393,6 +396,26 @@ namespace WIRS.Services.Implementations
                 });
             }
 
+            if (workflowDs != null && workflowDs.Tables.Count > 0)
+            {
+                foreach (DataRow item in workflowDs.Tables[0].Rows)
+                {
+                    workflows.Add(new IncidentWorkflowModel()
+                    {
+                        ActionCode = item["_actions_code"]?.ToString() ?? string.Empty,
+                        ActionRole = item["_actions_role"]?.ToString() ?? string.Empty,
+                        From = item["from"]?.ToString() ?? string.Empty,
+                        FromName = item["from_name"]?.ToString() ?? string.Empty,
+                        FromDesignation = item["from_designation"]?.ToString() ?? string.Empty,
+                        To = item["_to"]?.ToString() ?? string.Empty,
+                        ToName = item["to_name"]?.ToString() ?? string.Empty,
+                        ToDesignation = item["to_designation"]?.ToString() ?? string.Empty,
+                        Date = item["Date"]?.ToString() ?? string.Empty,
+                        Remarks = item["remarks"]?.ToString() ?? string.Empty,
+                    });
+                }
+            }
+
             return new WorkflowIncidentDetailModel
             {
                 IncidentId = row["incident_id"]?.ToString() ?? "",
@@ -434,6 +457,7 @@ namespace WIRS.Services.Implementations
                 IncidentTypes = incidentTypes,
                 InjuredPersons = injuredPerson,
                 Eyewitnesses = eyewitnesses,
+                Workflows = workflows
             };
         }
 
@@ -466,34 +490,34 @@ namespace WIRS.Services.Implementations
             DataSet ds = new DataSet("NewDataSet");
             DataTable dt = new DataTable("Table1");
 
-            dt.Columns.Add("injured_name", typeof(string));
-            dt.Columns.Add("injured_emp_no", typeof(string));
-            dt.Columns.Add("injured_nric_fin_no", typeof(string));
-            dt.Columns.Add("injured_race", typeof(string));
-            dt.Columns.Add("injured_gender", typeof(string));
-            dt.Columns.Add("injured_contact_no", typeof(string));
-            dt.Columns.Add("injured_age_text", typeof(string));
-            dt.Columns.Add("injured_nationality", typeof(string));
-            dt.Columns.Add("injured_employment_type", typeof(string));
-            dt.Columns.Add("injured_employment_date_text", typeof(string));
-            dt.Columns.Add("injured_designation", typeof(string));
-            dt.Columns.Add("injured_company", typeof(string));
+            dt.Columns.Add("InjuredPerson_name", typeof(string));
+            dt.Columns.Add("InjuredPerson_EmpNo", typeof(string));
+            dt.Columns.Add("InjuredPerson_NRIC", typeof(string));
+            dt.Columns.Add("InjuredPerson_Race", typeof(string));
+            dt.Columns.Add("InjuredPerson_Gender", typeof(string));
+            dt.Columns.Add("InjuredPerson_ContactNo", typeof(string));
+            dt.Columns.Add("InjuredPerson_Age", typeof(string));
+            dt.Columns.Add("InjuredPerson_Nationality", typeof(string));
+            dt.Columns.Add("InjuredPerson_EmploymentType", typeof(string));
+            dt.Columns.Add("InjuredPerson_DateofEmployment", typeof(string));
+            dt.Columns.Add("InjuredPerson_Designation", typeof(string));
+            dt.Columns.Add("Injured_Company", typeof(string));
 
             foreach (var person in injuredPersons)
             {
                 DataRow row = dt.NewRow();
-                row["injured_name"] = person.Name ?? "";
-                row["injured_emp_no"] = person.EmpNo ?? "";
-                row["injured_nric_fin_no"] = person.NricFinNo ?? "";
-                row["injured_race"] = person.Race ?? "";
-                row["injured_gender"] = person.Gender ?? "";
-                row["injured_contact_no"] = person.ContactNo ?? "";
-                row["injured_age_text"] = person.Age ?? "";
-                row["injured_nationality"] = person.Nationality ?? "";
-                row["injured_employment_type"] = person.EmploymentType ?? "";
-                row["injured_employment_date_text"] = person.EmploymentDate ?? "";
-                row["injured_designation"] = person.Designation ?? "";
-                row["injured_company"] = person.Company ?? "";
+                row["InjuredPerson_name"] = person.Name ?? "";
+                row["InjuredPerson_EmpNo"] = person.EmpNo ?? "";
+                row["InjuredPerson_NRIC"] = person.NricFinNo ?? "";
+                row["InjuredPerson_Race"] = person.Race ?? "";
+                row["InjuredPerson_Gender"] = person.Gender ?? "";
+                row["InjuredPerson_ContactNo"] = person.ContactNo ?? "";
+                row["InjuredPerson_Age"] = person.Age ?? "";
+                row["InjuredPerson_Nationality"] = person.Nationality ?? "";
+                row["InjuredPerson_EmploymentType"] = person.EmploymentType ?? "";
+                row["InjuredPerson_DateofEmployment"] = person.EmploymentDate ?? "";
+                row["InjuredPerson_Designation"] = person.Designation ?? "";
+                row["Injured_Company"] = person.Company ?? "";
                 dt.Rows.Add(row);
             }
 

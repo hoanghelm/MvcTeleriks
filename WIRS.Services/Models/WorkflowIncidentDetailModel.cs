@@ -76,14 +76,16 @@ namespace WIRS.Services.Models
 
     public class IncidentWorkflowModel
     {
-        public string WorkflowId { get; set; } = string.Empty;
-        public string IncidentId { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
-        public string UserId { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
-        public string Comments { get; set; } = string.Empty;
-        public string ActionDate { get; set; } = string.Empty;
-        public string ActionType { get; set; } = string.Empty;
+        public string From { get; set; } = string.Empty;
+        public string FromName { get; set; } = string.Empty;
+        public string ActionCode { get; set; } = string.Empty;
+        public string ActionRole { get; set; } = string.Empty;
+        public string To { get; set; } = string.Empty;
+        public string ToName { get; set; } = string.Empty;
+        public string Date { get; set; } = string.Empty;
+        public string Remarks { get; set; } = string.Empty;
+        public string FromDesignation { get; set; } = string.Empty;
+        public string ToDesignation { get; set; } = string.Empty;
     }
 
     public class IncidentAttachmentModel
