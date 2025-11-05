@@ -22,6 +22,7 @@
             getAlternateWSHOs: getAlternateWSHOs,
             getPartBCopyToList: getPartBCopyToList,
             submitPartB: submitPartB,
+            closePartB: closePartB,
             searchEmployee: searchEmployee,
             getCWSHOs: getCWSHOs,
             getNatureOfInjury: getNatureOfInjury,
@@ -169,6 +170,12 @@
 
         function submitPartB(partBData) {
             return $http.post('/Incident/SubmitPartB', partBData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function closePartB(partBData) {
+            return $http.post('/Incident/ClosePartB', partBData)
                 .then(handleSuccess)
                 .catch(handleError);
         }

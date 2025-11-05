@@ -14,7 +14,7 @@
             canViewPartB: canViewPartB,
             canEditPartB: canEditPartB,
             submitPartB: submitPartB,
-            rejectPartB: rejectPartB,
+            closePartB: closePartB,
             openEmployeeSearch: openEmployeeSearch,
             addPartBCopyTo: addPartBCopyTo,
             removeCopyToPerson: removeCopyToPerson,
@@ -315,10 +315,58 @@
             vm.partB.copyToPerson = {};
         }
 
-        function rejectPartB(vm) {
-            if (confirm('Are you sure you want to reject this incident report?')) {
-                $window.location.href = '/Home/Index';
+        function closePartB(vm) {
+            if (!confirm('Are you sure you want to reject this incident report?')) {
+                return;
             }
+
+            vm.partB.validationMessage = '';
+
+            // Validate Review and Comment
+            if (!vm.partB.reviewComment || !vm.partB.reviewComment.trim()) {
+                vm.partB.validationMessage = 'Review and Comment is required (ERR-134)';
+                return;
+            }
+
+            // Validate WSHO selection
+            if (!vm.partB.wshoId) {
+                vm.partB.validationMessage = 'WSHO selection is required (ERR-135)';
+                return;
+            }
+
+            vm.partB.submitting = true;
+
+            var selectedEmailTo = vm.emailToList
+                .filter(function (person) { return person.selected; })
+                .map(function (person) { return person.id; });
+
+            var closeData = {
+                incidentId: vm.incident.incidentId,
+                injuredCaseType: vm.partB.injuredCaseType,
+                reviewComment: vm.partB.reviewComment,
+                wshoId: vm.partB.wshoId,
+                alternateWshoId: vm.partB.alternateWshoId || '',
+                emailToList: selectedEmailTo,
+                additionalCopyToList: vm.partB.additionalCopyToList.map(function (person) {
+                    return person.employeeNo;
+                })
+            };
+
+            IncidentUpdateService.closePartB(closeData)
+                .then(function (response) {
+                    if (response.success) {
+                        alert('Part B rejected successfully. Incident report has been closed.');
+                        $window.location.href = '/Home/Index';
+                    } else {
+                        vm.partB.validationMessage = response.message || 'Failed to close Part B';
+                    }
+                })
+                .catch(function (error) {
+                    vm.partB.validationMessage = error.message || 'An error occurred while closing Part B';
+                })
+                .finally(function () {
+                    vm.partB.submitting = false;
+                });
         }
 
         function getInjuredCaseTypeText(vm) {

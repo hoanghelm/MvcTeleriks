@@ -44,7 +44,7 @@
         vm.canViewPartB = function () { return PartBService.canViewPartB(vm); };
         vm.canEditPartB = function () { return PartBService.canEditPartB(vm); };
         vm.submitPartB = function () { PartBService.submitPartB(vm); };
-        vm.rejectPartB = function () { PartBService.rejectPartB(vm); };
+        vm.closePartB = function () { PartBService.closePartB(vm); };
         vm.searchPartBCopyTo = function () { PartBService.openEmployeeSearch(vm, 'copyTo'); };
         vm.addPartBCopyTo = function () { PartBService.addPartBCopyTo(vm); };
         vm.openEmployeeSearch = function (context) { PartBService.openEmployeeSearch(vm, context); };
@@ -248,7 +248,7 @@
         vm.canViewPartB = function () { return PartBService.canViewPartB(vm); };
         vm.canEditPartB = function () { return PartBService.canEditPartB(vm); };
         vm.submitPartB = function () { PartBService.submitPartB(vm); };
-        vm.rejectPartB = function () { PartBService.rejectPartB(vm); };
+        vm.closePartB = function () { PartBService.closePartB(vm); };
         vm.searchPartBCopyTo = function () { PartBService.openEmployeeSearch(vm, 'copyTo'); };
         vm.addPartBCopyTo = function () { PartBService.addPartBCopyTo(vm); };
         vm.openEmployeeSearch = function (context) { PartBService.openEmployeeSearch(vm, context); };

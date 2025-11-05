@@ -463,6 +463,68 @@ namespace WIRS.Mvc.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> ClosePartB([FromBody] PartBSubmitRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.ReviewComment))
+                {
+                    return Json(new { success = false, message = "Review and Comment is required", errorCode = "ERR-134" });
+                }
+
+                if (string.IsNullOrEmpty(request.WshoId))
+                {
+                    return Json(new { success = false, message = "WSHO selection is required", errorCode = "ERR-135" });
+                }
+
+                var partBModel = new PartBSubmitModel
+                {
+                    IncidentId = request.IncidentId,
+                    InjuredCaseType = request.InjuredCaseType,
+                    ReviewComment = request.ReviewComment,
+                    WshoId = request.WshoId,
+                    AlternateWshoId = request.AlternateWshoId ?? string.Empty,
+                    EmailToList = request.EmailToList ?? new List<string>(),
+                    AdditionalCopyToList = request.AdditionalCopyToList?.Select(c => new Services.Models.CopyToPersonModel()
+                    {
+                        Name = c.Name,
+                        EmployeeNo = c.EmployeeNo,
+                        Designation = c.Designation
+                    }).ToList() ?? new List<Services.Models.CopyToPersonModel>(),
+                    SubmitterName = currentUser.UserName,
+                    SubmitterEmpId = currentUser.UserId,
+                    SubmitterDesignation = string.Empty
+                };
+
+                var result = await _workflowService.ClosePartBAsync(partBModel, currentUser.UserId);
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part B closed successfully. Incident report has been rejected.", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while closing Part B", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> SavePartC([FromBody] PartCSaveRequest request)
         {
             try
