@@ -50,16 +50,40 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Type of Injured Case</label>
                     <div class="space-y-2">
-                        <div ng-repeat="caseType in vm.injuredCaseTypes" class="flex items-center">
+                        <div class="flex items-center">
                             <input type="radio"
-                                   id="caseType{{ $index }}"
+                                   id="caseType1"
                                    name="injuredCaseType"
                                    ng-model="vm.partB.injuredCaseType"
-                                   ng-value="caseType.code"
+                                   value="1"
                                    ng-disabled="vm.partB.isReadOnly"
                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <label for="caseType{{ $index }}" class="ml-2 block text-sm text-gray-700">
-                                {{ caseType.value }}
+                            <label for="caseType1" class="ml-2 block text-sm text-gray-700">
+                                Hospitalisation >=24 hours or MC > 3 days
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio"
+                                   id="caseType2"
+                                   name="injuredCaseType"
+                                   ng-model="vm.partB.injuredCaseType"
+                                   value="2"
+                                   ng-disabled="vm.partB.isReadOnly"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="caseType2" class="ml-2 block text-sm text-gray-700">
+                                Fatality
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio"
+                                   id="caseType3"
+                                   name="injuredCaseType"
+                                   ng-model="vm.partB.injuredCaseType"
+                                   value="3"
+                                   ng-disabled="vm.partB.isReadOnly"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="caseType3" class="ml-2 block text-sm text-gray-700">
+                                Data not available
                             </label>
                         </div>
                     </div>
