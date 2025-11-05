@@ -5,44 +5,42 @@
     </div>
 
     <form name="partBForm" ng-submit="vm.submitPartB()" novalidate>
-            <div class="space-y-6">
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-3">Incident Case Type Classification</h4>
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 required">Injured Case Type</label>
-                        <div class="space-y-2">
-                            <div ng-repeat="caseType in vm.injuredCaseTypes" class="flex items-center">
-                                <input type="radio"
-                                       id="caseType{{ $index }}"
-                                       name="injuredCaseType"
-                                       ng-model="vm.partB.injuredCaseType"
-                                       ng-value="caseType.code"
-                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                <label for="caseType{{ $index }}" class="ml-2 block text-sm text-gray-700">
-                                    {{ caseType.value }}
-                                </label>
-                            </div>
-                        </div>
+        <div class="space-y-6">
+            <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                <legend class="text-lg font-semibold text-gray-900 px-2">Review and Comment</legend>
+                <div>
+                    <label for="partB_reviewComment" class="block text-sm font-medium text-gray-700 mb-1 required">Review and Comment</label>
+                    <textarea kendo-text-area
+                              k-ng-model="vm.partB.reviewComment"
+                              k-rows="5"
+                              id="partB_reviewComment"
+                              name="reviewComment"
+                              style="width: 100%;"
+                              k-enable="!vm.partB.isReadOnly"
+                              required></textarea>
+                    <span class="text-red-600 text-sm" ng-show="partBForm.reviewComment.$touched && partBForm.reviewComment.$invalid">
+                        Review and Comment is required (ERR-134)
+                    </span>
+                </div>
+            </fieldset>
+
+            <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                <legend class="text-lg font-semibold text-gray-900 px-2">Type of Injured Case</legend>
+                <div class="space-y-2">
+                    <div ng-repeat="caseType in vm.injuredCaseTypes" class="flex items-center">
+                        <input type="radio"
+                               id="caseType{{ $index }}"
+                               name="injuredCaseType"
+                               ng-model="vm.partB.injuredCaseType"
+                               ng-value="caseType.code"
+                               ng-disabled="vm.partB.isReadOnly"
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <label for="caseType{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                            {{ caseType.value }}
+                        </label>
                     </div>
                 </div>
-
-                <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
-                    <legend class="text-lg font-semibold text-gray-900 px-2">HOD Review and Comments</legend>
-                    <div>
-                        <label for="partB_reviewComment" class="block text-sm font-medium text-gray-700 mb-1 required">Review and Comment</label>
-                        <textarea kendo-text-area
-                                  k-ng-model="vm.partB.reviewComment"
-                                  k-rows="5"
-                                  id="partB_reviewComment"
-                                  name="reviewComment"
-                                  style="width: 100%;"
-                                  k-enable="!vm.partB.isReadOnly"
-                                  required></textarea>
-                        <span class="text-red-600 text-sm" ng-show="partBForm.reviewComment.$touched && partBForm.reviewComment.$invalid">
-                            Review and Comment is required (ERR-134)
-                        </span>
-                    </div>
-                </fieldset>
+            </fieldset>
 
                 <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
                     <legend class="text-lg font-semibold text-gray-900 px-2">Workflow Assignment</legend>
@@ -75,13 +73,14 @@
                     </div>
                 </fieldset>
 
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-3">CC/Email To List</h4>
+                <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                    <legend class="text-lg font-semibold text-gray-900 px-2">Copy To</legend>
                     <div class="space-y-2">
                         <div ng-repeat="person in vm.emailToList" class="flex items-center">
                             <input type="checkbox"
                                    id="emailTo{{ $index }}"
                                    ng-model="person.selected"
+                                   ng-disabled="vm.partB.isReadOnly"
                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                             <label for="emailTo{{ $index }}" class="ml-2 block text-sm text-gray-700">
                                 {{ person.name }} ({{ person.designation }})
@@ -91,7 +90,7 @@
 
                     <div class="mt-4">
                         <h5 class="text-sm font-medium text-gray-700 mb-2">Additional Copy To</h5>
-                        <div class="mb-2">
+                        <div class="mb-2" ng-show="!vm.partB.isReadOnly">
                             <button type="button"
                                     ng-click="vm.openEmployeeSearch('partB')"
                                     class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -99,13 +98,13 @@
                             </button>
                         </div>
                         <div ng-show="vm.partB.additionalCopyToList.length > 0" class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                                 <thead class="bg-gray-100">
                                     <tr>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
                                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                                        <th ng-show="!vm.partB.isReadOnly" class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -113,7 +112,7 @@
                                         <td class="px-4 py-2 text-sm text-gray-900">{{ person.employeeNo }}</td>
                                         <td class="px-4 py-2 text-sm text-gray-900">{{ person.name }}</td>
                                         <td class="px-4 py-2 text-sm text-gray-900">{{ person.designation }}</td>
-                                        <td class="px-4 py-2 text-sm">
+                                        <td ng-show="!vm.partB.isReadOnly" class="px-4 py-2 text-sm">
                                             <button type="button"
                                                     ng-click="vm.removeCopyToPerson($index)"
                                                     class="text-red-600 hover:text-red-800">
@@ -125,29 +124,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
-
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-3">Submitter Information</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Name</label>
-                            <p class="mt-1 text-gray-900">{{ vm.currentUser.name }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Employee ID</label>
-                            <p class="mt-1 text-gray-900">{{ vm.currentUser.userId }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Designation</label>
-                            <p class="mt-1 text-gray-900">{{ vm.currentUser.designation }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Date of Submission</label>
-                            <p class="mt-1 text-gray-900">{{ vm.getCurrentDate() }}</p>
-                        </div>
-                    </div>
-                </div>
+                </fieldset>
 
                 <div ng-show="vm.partB.validationMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                     {{ vm.partB.validationMessage }}
