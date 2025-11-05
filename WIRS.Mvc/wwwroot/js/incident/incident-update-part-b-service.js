@@ -194,7 +194,22 @@
         }
 
         function canViewPartB(vm) {
-            return vm.incident.status && parseInt(vm.incident.status) >= 1;
+            if (!vm.incident.status || parseInt(vm.incident.status) < 1) {
+                return false;
+            }
+
+            if (vm.isWorkflowClosed && vm.isWorkflowClosed()) {
+                var highestCode = vm.getHighestCompletedActionCode();
+                var hasPartBAction = vm.incident.workflows && vm.incident.workflows.some(function (w) {
+                    return w.actionCode === '02';
+                });
+
+                if (!hasPartBAction && parseInt(highestCode) < 2) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         function canEditPartB(vm) {

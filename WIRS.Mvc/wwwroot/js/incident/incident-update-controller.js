@@ -26,6 +26,8 @@
         vm.getIncidentTypeText = getIncidentTypeText;
         vm.getCurrentDate = getCurrentDate;
         vm.getWorkflowsByAction = getWorkflowsByAction;
+        vm.isWorkflowClosed = isWorkflowClosed;
+        vm.getHighestCompletedActionCode = getHighestCompletedActionCode;
         vm.cancel = cancel;
 
         vm.onIncidentTypeChange = function () { PartAService.onIncidentTypeChange(vm); };
@@ -200,6 +202,45 @@
 
                 return workflow.actionCode === actionCode;
             });
+        }
+
+        function isWorkflowClosed() {
+            if (!vm.incident || !vm.incident.workflows) {
+                return false;
+            }
+            return vm.incident.workflows.some(function (workflow) {
+                return workflow.actionCode === '08';
+            });
+        }
+
+        function getHighestCompletedActionCode() {
+            if (!vm.incident || !vm.incident.workflows) {
+                return '00';
+            }
+
+            var hasClosure = vm.incident.workflows.some(function (w) { return w.actionCode === '08'; });
+
+            if (!hasClosure) {
+                var actionCodes = vm.incident.workflows
+                    .map(function (w) { return w.actionCode; })
+                    .filter(function (code) { return code && code !== '08'; });
+
+                if (actionCodes.length === 0) return '00';
+
+                return actionCodes.reduce(function (max, code) {
+                    return (parseInt(code) || 0) > (parseInt(max) || 0) ? code : max;
+                }, '00');
+            }
+
+            var completedCodes = vm.incident.workflows
+                .map(function (w) { return w.actionCode; })
+                .filter(function (code) { return code && code !== '08'; });
+
+            if (completedCodes.length === 0) return '00';
+
+            return completedCodes.reduce(function (max, code) {
+                return (parseInt(code) || 0) > (parseInt(max) || 0) ? code : max;
+            }, '00');
         }
     }
 })();(function () {
@@ -230,6 +271,8 @@
         vm.getIncidentTypeText = getIncidentTypeText;
         vm.getCurrentDate = getCurrentDate;
         vm.getWorkflowsByAction = getWorkflowsByAction;
+        vm.isWorkflowClosed = isWorkflowClosed;
+        vm.getHighestCompletedActionCode = getHighestCompletedActionCode;
         vm.cancel = cancel;
 
         vm.onIncidentTypeChange = function () { PartAService.onIncidentTypeChange(vm); };
@@ -404,6 +447,45 @@
 
                 return workflow.actionCode === actionCode;
             });
+        }
+
+        function isWorkflowClosed() {
+            if (!vm.incident || !vm.incident.workflows) {
+                return false;
+            }
+            return vm.incident.workflows.some(function (workflow) {
+                return workflow.actionCode === '08';
+            });
+        }
+
+        function getHighestCompletedActionCode() {
+            if (!vm.incident || !vm.incident.workflows) {
+                return '00';
+            }
+
+            var hasClosure = vm.incident.workflows.some(function (w) { return w.actionCode === '08'; });
+
+            if (!hasClosure) {
+                var actionCodes = vm.incident.workflows
+                    .map(function (w) { return w.actionCode; })
+                    .filter(function (code) { return code && code !== '08'; });
+
+                if (actionCodes.length === 0) return '00';
+
+                return actionCodes.reduce(function (max, code) {
+                    return (parseInt(code) || 0) > (parseInt(max) || 0) ? code : max;
+                }, '00');
+            }
+
+            var completedCodes = vm.incident.workflows
+                .map(function (w) { return w.actionCode; })
+                .filter(function (code) { return code && code !== '08'; });
+
+            if (completedCodes.length === 0) return '00';
+
+            return completedCodes.reduce(function (max, code) {
+                return (parseInt(code) || 0) > (parseInt(max) || 0) ? code : max;
+            }, '00');
         }
     }
 })();
