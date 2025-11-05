@@ -1,10 +1,13 @@
-<div class="part-b-container">
-    <h3 class="text-xl font-semibold mb-4 text-gray-700">Part B - HOD Review</h3>
+<div class="part-b-container bg-white shadow-md rounded-lg p-6">
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part B - HOD Review</h3>
+        <p class="text-sm text-gray-600">Review incident report and assign to WSHO for investigation</p>
+    </div>
 
     <div ng-show="vm.partB.isReadOnly">
         <div class="space-y-6">
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="font-semibold text-gray-700 mb-3">Review Information</h4>
+            <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                <legend class="text-lg font-semibold text-gray-900 px-2">Review Information</legend>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-600">Injured Case Type</label>
@@ -15,10 +18,10 @@
                     <label class="block text-sm font-medium text-gray-600">HOD Review and Comment</label>
                     <p class="mt-1 text-gray-900 whitespace-pre-wrap bg-white p-3 rounded border">{{ vm.partB.reviewComment }}</p>
                 </div>
-            </div>
+            </fieldset>
 
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="font-semibold text-gray-700 mb-3">Reviewed By</h4>
+            <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                <legend class="text-lg font-semibold text-gray-900 px-2">Reviewed By</legend>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-600">Name</label>
@@ -37,7 +40,7 @@
                         <p class="mt-1 text-gray-900">{{ vm.partB.submissionDate }}</p>
                     </div>
                 </div>
-            </div>
+            </fieldset>
 
             <div class="mt-6" ng-show="vm.getWorkflowsByAction('02').length > 0">
                 <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
@@ -66,7 +69,7 @@
         </div>
     </div>
 
-    <div ng-show="!vm.partB.isReadOnly && vm.canEditPartB()">
+    <div ng-show="!vm.partB.isReadOnly">
         <form name="partBForm" ng-submit="vm.submitPartB()" novalidate>
             <div class="space-y-6">
                 <div class="bg-gray-50 p-4 rounded-lg">
@@ -89,51 +92,54 @@
                     </div>
                 </div>
 
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-3">HOD Review and Comments</h4>
+                <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                    <legend class="text-lg font-semibold text-gray-900 px-2">HOD Review and Comments</legend>
                     <div>
-                        <label for="reviewComment" class="block text-sm font-medium text-gray-700 required">Review and Comment</label>
-                        <textarea id="reviewComment"
+                        <label for="partB_reviewComment" class="block text-sm font-medium text-gray-700 mb-1 required">Review and Comment</label>
+                        <textarea kendo-text-area
+                                  k-ng-model="vm.partB.reviewComment"
+                                  k-rows="5"
+                                  id="partB_reviewComment"
                                   name="reviewComment"
-                                  ng-model="vm.partB.reviewComment"
-                                  rows="5"
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                  style="width: 100%;"
+                                  k-enable="!vm.partB.isReadOnly"
                                   required></textarea>
                         <span class="text-red-600 text-sm" ng-show="partBForm.reviewComment.$touched && partBForm.reviewComment.$invalid">
                             Review and Comment is required (ERR-134)
                         </span>
                     </div>
-                </div>
+                </fieldset>
 
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold text-gray-700 mb-3">Workflow Assignment</h4>
+                <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                    <legend class="text-lg font-semibold text-gray-900 px-2">Workflow Assignment</legend>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="wsho" class="block text-sm font-medium text-gray-700 required">WSHO</label>
-                            <select id="wsho"
+                        <div class="form-group">
+                            <label for="partB_wsho" class="block text-sm font-medium text-gray-700 mb-1 required">WSHO</label>
+                            <select kendo-drop-down-list
+                                    k-options="vm.partB.wshoOptions"
+                                    k-ng-model="vm.partB.wshoId"
+                                    id="partB_wsho"
                                     name="wsho"
-                                    ng-model="vm.partB.wshoId"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    class="w-full"
+                                    k-enable="!vm.partB.isReadOnly"
                                     required>
-                                <option value="">-- Select WSHO --</option>
-                                <option ng-repeat="wsho in vm.wshoList" value="{{ wsho.id }}">{{ wsho.name }}</option>
                             </select>
                             <span class="text-red-600 text-sm" ng-show="partBForm.wsho.$touched && partBForm.wsho.$invalid">
                                 WSHO selection is required (ERR-135)
                             </span>
                         </div>
-                        <div>
-                            <label for="alternateWsho" class="block text-sm font-medium text-gray-700">Alternate WSHO</label>
-                            <select id="alternateWsho"
-                                    name="alternateWsho"
-                                    ng-model="vm.partB.alternateWshoId"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">-- Select Alternate WSHO --</option>
-                                <option ng-repeat="awsho in vm.alternateWshoList" value="{{ awsho.id }}">{{ awsho.name }}</option>
+                        <div class="form-group">
+                            <label for="partB_alternateWsho" class="block text-sm font-medium text-gray-700 mb-1">Alternate WSHO</label>
+                            <select kendo-drop-down-list
+                                    k-options="vm.partB.alternateWshoOptions"
+                                    k-ng-model="vm.partB.alternateWshoId"
+                                    id="partB_alternateWsho"
+                                    class="w-full"
+                                    k-enable="!vm.partB.isReadOnly">
                             </select>
                         </div>
                     </div>
-                </div>
+                </fieldset>
 
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <h4 class="font-semibold text-gray-700 mb-3">CC/Email To List</h4>
@@ -213,7 +219,29 @@
                     {{ vm.partB.validationMessage }}
                 </div>
 
-                <div class="flex justify-end space-x-4">
+                <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                    <legend class="text-lg font-semibold text-gray-900 px-2">Submitter Information</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Name</label>
+                            <p class="mt-1 text-gray-900">{{ vm.currentUser.userName }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Employee ID</label>
+                            <p class="mt-1 text-gray-900">{{ vm.currentUser.userId }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Designation</label>
+                            <p class="mt-1 text-gray-900">{{ vm.currentUser.designation }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Date of Submission</label>
+                            <p class="mt-1 text-gray-900">{{ vm.getCurrentDate() }}</p>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
                     <button type="button"
                             ng-click="vm.cancel()"
                             class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -228,9 +256,5 @@
                 </div>
             </div>
         </form>
-    </div>
-
-    <div ng-show="!vm.canEditPartB() && !vm.partB.isReadOnly" class="bg-yellow-50 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-        You do not have permission to edit Part B. Only the assigned HOD can review and submit this section.
     </div>
 </div>

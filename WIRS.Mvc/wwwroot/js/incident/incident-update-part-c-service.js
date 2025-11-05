@@ -5,9 +5,9 @@
         .module('incidentUpdateApp')
         .factory('PartCService', PartCService);
 
-    PartCService.$inject = ['$window', 'IncidentUpdateService'];
+    PartCService.$inject = ['$window', '$timeout', 'IncidentUpdateService'];
 
-    function PartCService($window, IncidentUpdateService) {
+    function PartCService($window, $timeout, IncidentUpdateService) {
         var service = {
             initializePartC: initializePartC,
             loadPartCData: loadPartCData,
@@ -48,7 +48,20 @@
                 saving: false,
                 submitting: false,
                 closing: false,
-                showCloseOptions: false
+                showCloseOptions: false,
+                injuredPersonOptions: {
+                    dataTextField: 'name',
+                    dataValueField: 'employeeNo',
+                    dataSource: [],
+                    optionLabel: '-- Select Injured Person --',
+                    template: '#= name # (#= employeeNo #)'
+                },
+                cwshoOptions: {
+                    dataTextField: 'userName',
+                    dataValueField: 'userId',
+                    dataSource: [],
+                    optionLabel: '-- Select Corporate WSHO --'
+                }
             };
 
             vm.cwshoList = [];
@@ -75,10 +88,20 @@
                 return loadPartCReadOnlyData(vm);
             }
 
+            if (vm.incident.injuredPersons && vm.incident.injuredPersons.length > 0) {
+                vm.partC.injuredPersonOptions.dataSource = vm.incident.injuredPersons;
+            }
+
             return Promise.all([
                 loadPartCLookups(vm),
                 loadCWSHOs(vm)
-            ]);
+            ]).then(function () {
+                if (!vm.partC.isReadOnly) {
+                    $timeout(function () {
+                        refreshKendoDropDowns(vm);
+                    }, 0);
+                }
+            });
         }
 
         function loadPartCLookups(vm) {
@@ -133,10 +156,30 @@
             )
                 .then(function (data) {
                     vm.cwshoList = data;
+                    vm.partC.cwshoOptions.dataSource = data;
                 })
                 .catch(function (error) {
-                    console.error('Failed to load CWSHOs:', error);
+                    vm.partC.cwshoOptions.dataSource = [];
                 });
+        }
+
+        function refreshKendoDropDowns(vm) {
+            function refreshDropDown(elementId, dataSource, value) {
+                var widget = $('#' + elementId).data('kendoDropDownList');
+                if (widget && value) {
+                    if (dataSource && dataSource.length > 0) {
+                        widget.setDataSource(new kendo.data.DataSource({
+                            data: dataSource
+                        }));
+                    }
+                    widget.value(value);
+                    widget.trigger('change');
+                }
+            }
+
+            refreshDropDown('partC_injuredPerson', vm.partC.injuredPersonOptions.dataSource, vm.partC.injuryDetail.injuredPersonId);
+            refreshDropDown('partC_mcInjuredPerson', vm.partC.injuredPersonOptions.dataSource, vm.partC.medicalCert.injuredPersonId);
+            refreshDropDown('partC_cwsho', vm.partC.cwshoOptions.dataSource, vm.partC.cwshoId);
         }
 
         function determinePartCMode(vm) {

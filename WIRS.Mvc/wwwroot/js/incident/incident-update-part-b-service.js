@@ -5,9 +5,9 @@
         .module('incidentUpdateApp')
         .factory('PartBService', PartBService);
 
-    PartBService.$inject = ['$window', 'IncidentUpdateService'];
+    PartBService.$inject = ['$window', '$timeout', 'IncidentUpdateService'];
 
-    function PartBService($window, IncidentUpdateService) {
+    function PartBService($window, $timeout, IncidentUpdateService) {
         var service = {
             initializePartB: initializePartB,
             loadPartBData: loadPartBData,
@@ -30,7 +30,19 @@
                 alternateWshoId: '',
                 additionalCopyToList: [],
                 validationMessage: '',
-                submitting: false
+                submitting: false,
+                wshoOptions: {
+                    dataTextField: 'userName',
+                    dataValueField: 'userId',
+                    dataSource: [],
+                    optionLabel: '-- Select WSHO --'
+                },
+                alternateWshoOptions: {
+                    dataTextField: 'userName',
+                    dataValueField: 'userId',
+                    dataSource: [],
+                    optionLabel: '-- Select Alternate WSHO --'
+                }
             };
 
             vm.injuredCaseTypes = [];
@@ -51,6 +63,11 @@
                 loadEmailToList(vm)
             ]).then(function () {
                 determinePartBMode(vm);
+                if (!vm.partB.isReadOnly) {
+                    $timeout(function () {
+                        refreshKendoDropDowns(vm);
+                    }, 0);
+                }
             });
         }
 
@@ -80,9 +97,10 @@
             )
                 .then(function (data) {
                     vm.wshoList = data;
+                    vm.partB.wshoOptions.dataSource = data;
                 })
                 .catch(function (error) {
-                    console.error('Failed to load WSHOs:', error);
+                    vm.partB.wshoOptions.dataSource = [];
                 });
         }
 
@@ -99,10 +117,29 @@
             )
                 .then(function (data) {
                     vm.alternateWshoList = data;
+                    vm.partB.alternateWshoOptions.dataSource = data;
                 })
                 .catch(function (error) {
-                    console.error('Failed to load alternate WSHOs:', error);
+                    vm.partB.alternateWshoOptions.dataSource = [];
                 });
+        }
+
+        function refreshKendoDropDowns(vm) {
+            function refreshDropDown(elementId, dataSource, value) {
+                var widget = $('#' + elementId).data('kendoDropDownList');
+                if (widget && value) {
+                    if (dataSource && dataSource.length > 0) {
+                        widget.setDataSource(new kendo.data.DataSource({
+                            data: dataSource
+                        }));
+                    }
+                    widget.value(value);
+                    widget.trigger('change');
+                }
+            }
+
+            refreshDropDown('partB_wsho', vm.partB.wshoOptions.dataSource, vm.partB.wshoId);
+            refreshDropDown('partB_alternateWsho', vm.partB.alternateWshoOptions.dataSource, vm.partB.alternateWshoId);
         }
 
         function loadEmailToList(vm) {

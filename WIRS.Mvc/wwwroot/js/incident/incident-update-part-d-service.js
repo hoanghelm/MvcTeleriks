@@ -5,9 +5,9 @@
         .module('incidentUpdateApp')
         .factory('PartDService', PartDService);
 
-    PartDService.$inject = ['$window', 'IncidentUpdateService'];
+    PartDService.$inject = ['$window', '$timeout', 'IncidentUpdateService'];
 
-    function PartDService($window, IncidentUpdateService) {
+    function PartDService($window, $timeout, IncidentUpdateService) {
         var service = {
             initializePartD: initializePartD,
             loadPartDData: loadPartDData,
@@ -36,7 +36,13 @@
                 currentDate: '',
                 validationMessage: '',
                 successMessage: '',
-                isSubmitting: false
+                isSubmitting: false,
+                hsbuOptions: {
+                    dataTextField: 'userName',
+                    dataValueField: 'userId',
+                    dataSource: [],
+                    optionLabel: '-- Select HSBU --'
+                }
             };
 
             vm.hsbuList = [];
@@ -57,7 +63,13 @@
             return Promise.all([
                 loadHSBUs(vm),
                 loadPartDEmailToList(vm)
-            ]);
+            ]).then(function () {
+                if (!vm.partD.isReadOnly) {
+                    $timeout(function () {
+                        refreshKendoDropDowns(vm);
+                    }, 0);
+                }
+            });
         }
 
         function determinePartDMode(vm) {
@@ -96,10 +108,28 @@
                         designation: item.designation || ''
                     };
                 });
+                vm.partD.hsbuOptions.dataSource = vm.hsbuList;
             }).catch(function (error) {
-                console.error('Error loading HSBUs:', error);
                 vm.hsbuList = [];
+                vm.partD.hsbuOptions.dataSource = [];
             });
+        }
+
+        function refreshKendoDropDowns(vm) {
+            function refreshDropDown(elementId, dataSource, value) {
+                var widget = $('#' + elementId).data('kendoDropDownList');
+                if (widget && value) {
+                    if (dataSource && dataSource.length > 0) {
+                        widget.setDataSource(new kendo.data.DataSource({
+                            data: dataSource
+                        }));
+                    }
+                    widget.value(value);
+                    widget.trigger('change');
+                }
+            }
+
+            refreshDropDown('partD_hsbu', vm.partD.hsbuOptions.dataSource, vm.partD.hsbuId);
         }
 
         function loadPartDEmailToList(vm) {

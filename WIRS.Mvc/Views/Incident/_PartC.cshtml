@@ -211,14 +211,14 @@
                     </h2>
                     <div id="collapseC3" class="accordion-collapse collapse" data-bs-parent="#partCAccordion">
                         <div class="accordion-body">
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700">Select Injured Person</label>
-                                <select ng-model="vm.partC.injuryDetail.injuredPersonId"
-                                        class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                    <option value="">-- Select Injured Person --</option>
-                                    <option ng-repeat="person in vm.incident.injuredPersons" value="{{ person.employeeNo }}">
-                                        {{ person.name }} ({{ person.employeeNo }})
-                                    </option>
+                            <div class="mb-4 form-group">
+                                <label for="partC_injuredPerson" class="block text-sm font-medium text-gray-700 mb-1">Select Injured Person</label>
+                                <select kendo-drop-down-list
+                                        k-options="vm.partC.injuredPersonOptions"
+                                        k-ng-model="vm.partC.injuryDetail.injuredPersonId"
+                                        id="partC_injuredPerson"
+                                        class="md:w-1/2"
+                                        k-enable="!vm.partC.isReadOnly">
                                 </select>
                             </div>
 
@@ -339,14 +339,14 @@
                     <div id="collapseC4" class="accordion-collapse collapse" data-bs-parent="#partCAccordion">
                         <div class="accordion-body">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Select Injured Person</label>
-                                    <select ng-model="vm.partC.medicalCert.injuredPersonId"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                        <option value="">-- Select Injured Person --</option>
-                                        <option ng-repeat="person in vm.incident.injuredPersons" value="{{ person.employeeNo }}">
-                                            {{ person.name }} ({{ person.employeeNo }})
-                                        </option>
+                                <div class="form-group">
+                                    <label for="partC_mcInjuredPerson" class="block text-sm font-medium text-gray-700 mb-1">Select Injured Person</label>
+                                    <select kendo-drop-down-list
+                                            k-options="vm.partC.injuredPersonOptions"
+                                            k-ng-model="vm.partC.medicalCert.injuredPersonId"
+                                            id="partC_mcInjuredPerson"
+                                            class="w-full"
+                                            k-enable="!vm.partC.isReadOnly">
                                     </select>
                                 </div>
                                 <div>
@@ -653,12 +653,14 @@
                                     </div>
                                 </div>
 
-                                <div ng-show="vm.partC.showCloseOptions">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Forward To (for closure)</label>
-                                    <select ng-model="vm.partC.cwshoId"
-                                            class="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                        <option value="">-- Select Corporate WSHO --</option>
-                                        <option ng-repeat="cwsho in vm.cwshoList" value="{{ cwsho.id }}">{{ cwsho.name }}</option>
+                                <div ng-show="vm.partC.showCloseOptions" class="form-group">
+                                    <label for="partC_cwsho" class="block text-sm font-medium text-gray-700 mb-1 required">Forward To (for closure)</label>
+                                    <select kendo-drop-down-list
+                                            k-options="vm.partC.cwshoOptions"
+                                            k-ng-model="vm.partC.cwshoId"
+                                            id="partC_cwsho"
+                                            class="md:w-1/2"
+                                            k-enable="!vm.partC.isReadOnly">
                                     </select>
                                 </div>
                             </div>
