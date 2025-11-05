@@ -19,7 +19,7 @@
                     </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" ng-show="!vm.partB.isReadOnly">
                     <div class="form-group">
                         <label for="partB_wsho" class="block text-sm font-medium text-gray-700 mb-1 required">Name of WSHO</label>
                         <select kendo-drop-down-list
@@ -150,18 +150,17 @@
 
                         <div class="form-group mb-4">
                             <label for="partB_copyToDesignation" class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-                            <input type="text"
-                                   ng-model="vm.partB.copyToPerson.designation"
-                                   id="partB_copyToDesignation"
-                                   class="form-control w-full px-3 py-2 border border-gray-300 rounded" />
-                        </div>
-
-                        <div class="mb-4">
+                            <div class="flex gap-2">
+                                <input type="text"
+                                       ng-model="vm.partB.copyToPerson.designation"
+                                       id="partB_copyToDesignation"
+                                       class="form-control w-full px-3 py-2 border border-gray-300 rounded" />
                             <button type="button"
                                     ng-click="vm.addPartBCopyTo()"
                                     class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                 Add
                             </button>
+                            </div>
                         </div>
                     </div>
 

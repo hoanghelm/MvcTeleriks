@@ -153,6 +153,12 @@
         function determinePartBMode(vm) {
             if (vm.incident.status === '01') {
                 vm.partB.isReadOnly = false;
+                // In edit mode, reset to use current user data
+                vm.partB.reviewComment = '';
+                vm.partB.submitterName = '';
+                vm.partB.submitterEmpId = '';
+                vm.partB.submitterDesignation = '';
+                vm.partB.submissionDate = '';
             } else if (parseInt(vm.incident.status) > 1) {
                 vm.partB.isReadOnly = true;
                 loadPartBReadOnlyData(vm);
@@ -160,18 +166,28 @@
         }
 
         function loadPartBReadOnlyData(vm) {
+            // Get workflows with actionCode "02" (Part B)
+            var partBWorkflows = [];
             if (vm.incident.workflows && vm.incident.workflows.length > 0) {
-                var partBWorkflow = vm.incident.workflows.find(function (w) {
-                    return w.status === '02' && w.role === 'HOD';
+                partBWorkflows = vm.incident.workflows.filter(function (w) {
+                    return w.actionCode === '02';
+                });
+            }
+
+            // Sort by date descending and get the latest one
+            if (partBWorkflows.length > 0) {
+                partBWorkflows.sort(function (a, b) {
+                    var dateA = new Date(a.date || 0);
+                    var dateB = new Date(b.date || 0);
+                    return dateB - dateA; // Descending order
                 });
 
-                if (partBWorkflow) {
-                    vm.partB.reviewComment = partBWorkflow.comments || '';
-                    vm.partB.submitterName = partBWorkflow.submitterName || '';
-                    vm.partB.submitterEmpId = partBWorkflow.submitterEmpId || '';
-                    vm.partB.submitterDesignation = partBWorkflow.submitterDesignation || '';
-                    vm.partB.submissionDate = partBWorkflow.submissionDate || '';
-                }
+                var latestWorkflow = partBWorkflows[0];
+                vm.partB.reviewComment = latestWorkflow.remarks || '';
+                vm.partB.submitterName = latestWorkflow.fromName || '';
+                vm.partB.submitterEmpId = latestWorkflow.from || '';
+                vm.partB.submitterDesignation = latestWorkflow.fromDesignation || '';
+                vm.partB.submissionDate = latestWorkflow.date || '';
             }
 
             vm.partB.injuredCaseType = vm.incident.injuredCaseType || '';
