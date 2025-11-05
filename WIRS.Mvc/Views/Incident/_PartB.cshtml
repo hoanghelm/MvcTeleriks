@@ -85,10 +85,10 @@
                             <div class="form-group">
                                 <label for="partB_copyToName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
                                 <div class="flex gap-2">
-                                    <input kendo-text-box
-                                           k-ng-model="vm.partB.copyToPerson.name"
+                                    <input type="text"
+                                           ng-model="vm.partB.copyToPerson.name"
                                            id="partB_copyToName"
-                                           style="width: 100%;" />
+                                           class="form-control w-full px-3 py-2 border border-gray-300 rounded" />
                                     <button type="button"
                                             ng-click="vm.searchPartBCopyTo()"
                                             class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
@@ -99,19 +99,19 @@
 
                             <div class="form-group">
                                 <label for="partB_copyToEmpNo" class="block text-sm font-medium text-gray-700 mb-1">Employee Number</label>
-                                <input kendo-text-box
-                                       k-ng-model="vm.partB.copyToPerson.employeeNo"
+                                <input type="text"
+                                       ng-model="vm.partB.copyToPerson.employeeNo"
                                        id="partB_copyToEmpNo"
-                                       style="width: 100%;" />
+                                       class="form-control w-full px-3 py-2 border border-gray-300 rounded" />
                             </div>
                         </div>
 
                         <div class="form-group mb-4">
                             <label for="partB_copyToDesignation" class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-                            <input kendo-text-box
-                                   k-ng-model="vm.partB.copyToPerson.designation"
+                            <input type="text"
+                                   ng-model="vm.partB.copyToPerson.designation"
                                    id="partB_copyToDesignation"
-                                   style="width: 100%;" />
+                                   class="form-control w-full px-3 py-2 border border-gray-300 rounded" />
                         </div>
 
                         <div class="mb-4">
@@ -177,14 +177,14 @@
 
                 <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partB.isReadOnly">
                     <button type="button"
-                            ng-click="vm.cancel()"
+                            ng-click="vm.rejectPartB()"
                             class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        Cancel
+                        Reject
                     </button>
                     <button type="submit"
                             ng-disabled="partBForm.$invalid || vm.partB.submitting"
                             class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span ng-show="!vm.partB.submitting">Submit Review</span>
+                        <span ng-show="!vm.partB.submitting">Approve & submit to WSHO</span>
                         <span ng-show="vm.partB.submitting">Submitting...</span>
                     </button>
                 </div>
