@@ -19,24 +19,6 @@
                     </span>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Type of Injured Case</label>
-                    <div class="space-y-2">
-                        <div ng-repeat="caseType in vm.injuredCaseTypes" class="flex items-center">
-                            <input type="radio"
-                                   id="caseType{{ $index }}"
-                                   name="injuredCaseType"
-                                   ng-model="vm.partB.injuredCaseType"
-                                   ng-value="caseType.code"
-                                   ng-disabled="vm.partB.isReadOnly"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <label for="caseType{{ $index }}" class="ml-2 block text-sm text-gray-700">
-                                {{ caseType.value }}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label for="partB_wsho" class="block text-sm font-medium text-gray-700 mb-1 required">Name of WSHO</label>
@@ -66,13 +48,49 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Type of Injured Case</label>
+                    <div class="space-y-2">
+                        <div ng-repeat="caseType in vm.injuredCaseTypes" class="flex items-center">
+                            <input type="radio"
+                                   id="caseType{{ $index }}"
+                                   name="injuredCaseType"
+                                   ng-model="vm.partB.injuredCaseType"
+                                   ng-value="caseType.code"
+                                   ng-disabled="vm.partB.isReadOnly"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="caseType{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                {{ caseType.value }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Name</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partB.submitterName || vm.currentUser.userName }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Employee Number</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partB.submitterEmpId || vm.currentUser.userId }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Designation</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partB.submitterDesignation || vm.currentUser.designation }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600">Date of Submission</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partB.submissionDate || vm.getCurrentDate() }}</p>
+                    </div>
+                </div>
+
+                <div ng-show="!vm.partB.isReadOnly">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Copy To</label>
                     <div class="space-y-2 mb-3">
                         <div ng-repeat="person in vm.emailToList" class="flex items-center">
                             <input type="checkbox"
                                    id="emailTo{{ $index }}"
                                    ng-model="person.selected"
-                                   ng-disabled="vm.partB.isReadOnly"
                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                             <label for="emailTo{{ $index }}" class="ml-2 block text-sm text-gray-700">
                                 {{ person.name }} ({{ person.designation }})
@@ -80,7 +98,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-3" ng-show="!vm.partB.isReadOnly">
+                    <div class="mt-3">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div class="form-group">
                                 <label for="partB_copyToName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
@@ -152,25 +170,6 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Name</label>
-                        <p class="mt-1 text-gray-900">{{ vm.currentUser.userName }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Employee Number</label>
-                        <p class="mt-1 text-gray-900">{{ vm.currentUser.userId }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Designation</label>
-                        <p class="mt-1 text-gray-900">{{ vm.currentUser.designation }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600">Date of Submission</label>
-                        <p class="mt-1 text-gray-900">{{ vm.getCurrentDate() }}</p>
-                    </div>
-                </div>
-
                 <div ng-show="vm.partB.validationMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                     {{ vm.partB.validationMessage }}
                 </div>
@@ -190,7 +189,6 @@
                 </div>
 
                 <div class="mt-6" ng-show="vm.getWorkflowsByAction('02').length > 0">
-                    <h4 class="text-lg font-semibold text-gray-700 mb-3">Workflow History</h4>
                     <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                         <thead class="bg-gray-100">
                             <tr>
