@@ -44,6 +44,9 @@
         vm.canViewPartB = function () { return PartBService.canViewPartB(vm); };
         vm.canEditPartB = function () { return PartBService.canEditPartB(vm); };
         vm.submitPartB = function () { PartBService.submitPartB(vm); };
+        vm.rejectPartB = function () { PartBService.rejectPartB(vm); };
+        vm.searchPartBCopyTo = function () { PartBService.openEmployeeSearch(vm, 'copyTo'); };
+        vm.addPartBCopyTo = function () { PartBService.addPartBCopyTo(vm); };
         vm.openEmployeeSearch = function (context) { PartBService.openEmployeeSearch(vm, context); };
         vm.removeCopyToPerson = function (index) { PartBService.removeCopyToPerson(vm, index); };
         vm.getInjuredCaseTypeText = function () { return PartBService.getInjuredCaseTypeText(vm); };
@@ -245,6 +248,9 @@
         vm.canViewPartB = function () { return PartBService.canViewPartB(vm); };
         vm.canEditPartB = function () { return PartBService.canEditPartB(vm); };
         vm.submitPartB = function () { PartBService.submitPartB(vm); };
+        vm.rejectPartB = function () { PartBService.rejectPartB(vm); };
+        vm.searchPartBCopyTo = function () { PartBService.openEmployeeSearch(vm, 'copyTo'); };
+        vm.addPartBCopyTo = function () { PartBService.addPartBCopyTo(vm); };
         vm.openEmployeeSearch = function (context) { PartBService.openEmployeeSearch(vm, context); };
         vm.removeCopyToPerson = function (index) { PartBService.removeCopyToPerson(vm, index); };
         vm.getInjuredCaseTypeText = function () { return PartBService.getInjuredCaseTypeText(vm); };

@@ -14,7 +14,9 @@
             canViewPartB: canViewPartB,
             canEditPartB: canEditPartB,
             submitPartB: submitPartB,
+            rejectPartB: rejectPartB,
             openEmployeeSearch: openEmployeeSearch,
+            addPartBCopyTo: addPartBCopyTo,
             removeCopyToPerson: removeCopyToPerson,
             getInjuredCaseTypeText: getInjuredCaseTypeText
         };
@@ -29,6 +31,7 @@
                 wshoId: '',
                 alternateWshoId: '',
                 additionalCopyToList: [],
+                copyToPerson: {},
                 validationMessage: '',
                 submitting: false,
                 wshoOptions: {
@@ -266,11 +269,60 @@
         }
 
         function openEmployeeSearch(vm, context) {
-            console.log('Employee search not yet implemented');
+            if (typeof window.openEmployeeSearch === 'function') {
+                window.openEmployeeSearch('partB', function(employee) {
+                    if (context === 'copyTo') {
+                        vm.partB.copyToPerson = {
+                            name: employee.name,
+                            employeeNo: employee.empId,
+                            designation: employee.designation
+                        };
+                        vm.$apply();
+                    }
+                });
+            }
         }
 
         function removeCopyToPerson(vm, index) {
             vm.partB.additionalCopyToList.splice(index, 1);
+        }
+
+        function addPartBCopyTo(vm) {
+            if (!vm.partB.copyToPerson) {
+                vm.partB.copyToPerson = {};
+            }
+
+            if (!vm.partB.copyToPerson.name || !vm.partB.copyToPerson.employeeNo) {
+                alert('Please enter name and employee number');
+                return;
+            }
+
+            if (!vm.partB.additionalCopyToList) {
+                vm.partB.additionalCopyToList = [];
+            }
+
+            var exists = vm.partB.additionalCopyToList.some(function(p) {
+                return p.employeeNo === vm.partB.copyToPerson.employeeNo;
+            });
+
+            if (exists) {
+                alert('This person has already been added');
+                return;
+            }
+
+            vm.partB.additionalCopyToList.push({
+                name: vm.partB.copyToPerson.name,
+                employeeNo: vm.partB.copyToPerson.employeeNo,
+                designation: vm.partB.copyToPerson.designation || ''
+            });
+
+            vm.partB.copyToPerson = {};
+        }
+
+        function rejectPartB(vm) {
+            if (confirm('Are you sure you want to reject this incident report?')) {
+                $window.location.href = '/Home/Index';
+            }
         }
 
         function getInjuredCaseTypeText(vm) {
