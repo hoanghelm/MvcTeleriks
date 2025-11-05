@@ -35,16 +35,18 @@
                 validationMessage: '',
                 submitting: false,
                 wshoOptions: {
-                    dataTextField: 'userName',
-                    dataValueField: 'userId',
-                    dataSource: [],
-                    optionLabel: '-- Select WSHO --'
+                    dataTextField: 'name',
+                    dataValueField: 'id',
+                    dataSource: new kendo.data.DataSource({ data: [] }),
+                    optionLabel: '-- Select WSHO --',
+                    valuePrimitive: true
                 },
                 alternateWshoOptions: {
-                    dataTextField: 'userName',
-                    dataValueField: 'userId',
-                    dataSource: [],
-                    optionLabel: '-- Select Alternate WSHO --'
+                    dataTextField: 'name',
+                    dataValueField: 'id',
+                    dataSource: new kendo.data.DataSource({ data: [] }),
+                    optionLabel: '-- Select Alternate WSHO --',
+                    valuePrimitive: true
                 }
             };
 
@@ -66,11 +68,6 @@
                 loadEmailToList(vm)
             ]).then(function () {
                 determinePartBMode(vm);
-                if (!vm.partB.isReadOnly) {
-                    $timeout(function () {
-                        refreshKendoDropDowns(vm);
-                    }, 0);
-                }
             });
         }
 
@@ -100,10 +97,10 @@
             )
                 .then(function (data) {
                     vm.wshoList = data;
-                    vm.partB.wshoOptions.dataSource = data;
+                    vm.partB.wshoOptions.dataSource.data(data);
                 })
                 .catch(function (error) {
-                    vm.partB.wshoOptions.dataSource = [];
+                    vm.partB.wshoOptions.dataSource.data([]);
                 });
         }
 
@@ -120,29 +117,11 @@
             )
                 .then(function (data) {
                     vm.alternateWshoList = data;
-                    vm.partB.alternateWshoOptions.dataSource = data;
+                    vm.partB.alternateWshoOptions.dataSource.data(data);
                 })
                 .catch(function (error) {
-                    vm.partB.alternateWshoOptions.dataSource = [];
+                    vm.partB.alternateWshoOptions.dataSource.data([]);
                 });
-        }
-
-        function refreshKendoDropDowns(vm) {
-            function refreshDropDown(elementId, dataSource, value) {
-                var widget = $('#' + elementId).data('kendoDropDownList');
-                if (widget && value) {
-                    if (dataSource && dataSource.length > 0) {
-                        widget.setDataSource(new kendo.data.DataSource({
-                            data: dataSource
-                        }));
-                    }
-                    widget.value(value);
-                    widget.trigger('change');
-                }
-            }
-
-            refreshDropDown('partB_wsho', vm.partB.wshoOptions.dataSource, vm.partB.wshoId);
-            refreshDropDown('partB_alternateWsho', vm.partB.alternateWshoOptions.dataSource, vm.partB.alternateWshoId);
         }
 
         function loadEmailToList(vm) {
