@@ -154,6 +154,7 @@
                                         <div ng-repeat="nature in vm.natureOfInjury" class="flex items-center">
                                             <input type="checkbox"
                                                    ng-model="nature.selected"
+                                                   ng-disabled="vm.partC.isReadOnly"
                                                    id="nature{{ $index }}"
                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                             <label for="nature{{ $index }}" class="ml-2 block text-sm text-gray-700">

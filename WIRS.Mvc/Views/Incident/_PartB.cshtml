@@ -80,15 +80,52 @@
                         </div>
                     </div>
 
-                    <div class="mt-3">
-                        <div class="mb-2" ng-show="!vm.partB.isReadOnly">
-                            <button type="button"
-                                    ng-click="vm.openEmployeeSearch('partB')"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                Add Person
+                    <div class="mt-3" ng-show="!vm.partB.isReadOnly">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div class="form-group">
+                                <label for="partB_copyToName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                <div class="flex gap-2">
+                                    <input kendo-text-box
+                                           k-ng-model="vm.partB.copyToPerson.name"
+                                           id="partB_copyToName"
+                                           style="width: 100%;" />
+                                    <button kendo-button
+                                            class="k-primary"
+                                            type="button"
+                                            ng-click="vm.searchPartBCopyTo()">
+                                        ...
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="partB_copyToEmpNo" class="block text-sm font-medium text-gray-700 mb-1">Employee Number</label>
+                                <input kendo-text-box
+                                       k-ng-model="vm.partB.copyToPerson.employeeNo"
+                                       id="partB_copyToEmpNo"
+                                       style="width: 100%;" />
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="partB_copyToDesignation" class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                            <input kendo-text-box
+                                   k-ng-model="vm.partB.copyToPerson.designation"
+                                   id="partB_copyToDesignation"
+                                   style="width: 100%;" />
+                        </div>
+
+                        <div class="mb-4">
+                            <button kendo-button
+                                    class="k-primary"
+                                    type="button"
+                                    ng-click="vm.addPartBCopyTo()">
+                                Add
                             </button>
                         </div>
-                        <div ng-show="vm.partB.additionalCopyToList.length > 0" class="overflow-x-auto">
+                    </div>
+
+                    <div ng-show="vm.partB.additionalCopyToList.length > 0" class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                                 <thead class="bg-gray-100">
                                     <tr>
