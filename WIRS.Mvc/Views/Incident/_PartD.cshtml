@@ -14,8 +14,7 @@
         {{ vm.partD.successMessage }}
     </div>
 
-    <!-- Edit Mode (Status = 03) -->
-    <form name="partDForm" ng-submit="vm.submitPartD()" novalidate ng-show="!vm.partD.isReadOnly">
+    <form name="partDForm" ng-submit="vm.submitPartD()" novalidate>
         <div class="space-y-6">
             <!-- Section 1: HOD Comments -->
             <div class="bg-gray-50 p-4 rounded-lg">
@@ -168,7 +167,7 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partD.isReadOnly">
                 <button type="button"
                         ng-click="vm.cancelPartD()"
                         class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
@@ -183,109 +182,37 @@
                     </span>
                 </button>
             </div>
+
+            <!-- Workflow History -->
+            <div class="mt-6" ng-show="vm.getWorkflowsByAction('04').length > 0">
+                <h4 class="text-lg font-semibold text-gray-700 mb-3">Workflow History</h4>
+                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">To</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date of Submission</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr ng-repeat="workflow in vm.getWorkflowsByAction('04')">
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                <div ng-bind-html="workflow.toName || 'N/A'"></div>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                <div ng-bind-html="workflow.toDesignation || 'N/A'"></div>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                {{workflow.date | date:'dd-MMM-yyyy HH:mm' || 'N/A'}}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                <div>{{ workflow.remarks }}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </form>
-
-    <!-- Read-Only Mode (Status > 03) -->
-    <div ng-show="vm.partD.isReadOnly" class="space-y-6">
-        <!-- Section 1: HOD Comments (Read-only) -->
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="text-lg font-semibold text-gray-700 mb-4">1. HOD Comments</h4>
-            <div class="bg-white p-4 rounded border border-gray-300">
-                <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ vm.partD.comments || 'No comments provided' }}</p>
-            </div>
-        </div>
-
-        <!-- Section 2: Forward To (Read-only) -->
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="text-lg font-semibold text-gray-700 mb-4">2. Forwarded To</h4>
-            <div class="bg-white p-4 rounded border border-gray-300">
-                <p class="text-sm text-gray-700">
-                    <strong>HSBU:</strong> {{ vm.getHsbuName(vm.partD.hsbuId) }}
-                </p>
-            </div>
-        </div>
-
-        <!-- Section 3: CC/Email To (Read-only) -->
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="text-lg font-semibold text-gray-700 mb-4">3. CC/Email To</h4>
-
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Standard Recipients</label>
-                <div class="bg-white p-4 rounded border border-gray-300">
-                    <ul class="list-disc list-inside space-y-1">
-                        <li ng-repeat="person in vm.partD.emailToList | filter: {selected: true}" class="text-sm text-gray-700">
-                            {{ person.userName }} ({{ person.userId }}) - {{ person.designation }}
-                        </li>
-                        <li ng-show="(vm.partD.emailToList | filter: {selected: true}).length === 0" class="text-sm text-gray-500 italic list-none">
-                            No standard recipients selected
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div ng-show="vm.partD.additionalCopyToList.length > 0">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Recipients</label>
-                <div class="bg-white p-4 rounded border border-gray-300">
-                    <ul class="list-disc list-inside space-y-1">
-                        <li ng-repeat="person in vm.partD.additionalCopyToList" class="text-sm text-gray-700">
-                            {{ person.name }} ({{ person.employeeId }}) - {{ person.designation }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 4: Submitter Information (Read-only) -->
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <h4 class="text-lg font-semibold text-gray-700 mb-4">4. Submitted By</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded border border-gray-300">
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Name:</p>
-                    <p class="text-sm text-gray-900">{{ vm.partD.submitterName || 'N/A' }}</p>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Employee ID:</p>
-                    <p class="text-sm text-gray-900">{{ vm.partD.submitterEmpId || 'N/A' }}</p>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Designation:</p>
-                    <p class="text-sm text-gray-900">{{ vm.partD.submitterDesignation || 'N/A' }}</p>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Date:</p>
-                    <p class="text-sm text-gray-900">{{ vm.partD.submittedDate || 'N/A' }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-6" ng-show="vm.getWorkflowsByAction('04').length > 0">
-            <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">To</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date of Submission</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Remarks</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    <tr ng-repeat="workflow in vm.getWorkflowsByAction('04')">
-                        <td class="px-4 py-3 text-sm text-gray-900">
-                            <div ng-bind-html="workflow.toName || 'N/A'"></div>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-900">
-                            <div ng-bind-html="workflow.toDesignation || 'N/A'"></div>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-900">
-                            {{workflow.date | date:'dd-MMM-yyyy HH:mm' || 'N/A'}}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-900">
-                            <div>{{ workflow.remarks }}</div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
