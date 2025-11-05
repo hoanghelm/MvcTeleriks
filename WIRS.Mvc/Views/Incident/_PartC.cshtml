@@ -14,7 +14,7 @@
                             <span class="font-semibold">C-1: Eye Witnesses</span>
                         </button>
                     </h2>
-                    <div id="collapseC1" class="accordion-collapse collapse show" data-bs-parent="#partCAccordion">
+                    <div id="collapseC1" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <p class="text-sm text-gray-600 mb-3">Eye witnesses from Part A are listed below. You may add additional witnesses if needed.</p>
 
@@ -53,7 +53,7 @@
                             <span class="font-semibold">C-2: Persons Interviewed</span>
                         </button>
                     </h2>
-                    <div id="collapseC2" class="accordion-collapse collapse show" data-bs-parent="#partCAccordion">
+                    <div id="collapseC2" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
@@ -134,7 +134,7 @@
                             <span class="font-semibold">C-3: Injury Details</span>
                         </button>
                     </h2>
-                    <div id="collapseC3" class="accordion-collapse collapse show" data-bs-parent="#partCAccordion">
+                    <div id="collapseC3" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <div class="mb-4 form-group">
                                 <label for="partC_injuredPerson" class="block text-sm font-medium text-gray-700 mb-1">Select Injured Person</label>
@@ -262,7 +262,7 @@
                             <span class="font-semibold">C-4: Medical Certificates/Leaves</span>
                         </button>
                     </h2>
-                    <div id="collapseC4" class="accordion-collapse collapse show" data-bs-parent="#partCAccordion">
+                    <div id="collapseC4" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div class="form-group">
@@ -351,7 +351,7 @@
                             <span class="font-semibold">C-5: Incident Classification and Cause Analysis</span>
                         </button>
                     </h2>
-                    <div id="collapseC5" class="accordion-collapse collapse show" data-bs-parent="#partCAccordion">
+                    <div id="collapseC5" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -440,7 +440,7 @@
                             <span class="font-semibold">C-6: Root Cause Analysis</span>
                         </button>
                     </h2>
-                    <div id="collapseC6" class="accordion-collapse collapse show" data-bs-parent="#partCAccordion">
+                    <div id="collapseC6" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <div class="space-y-6">
                                 <div>
@@ -546,7 +546,7 @@
                             <span class="font-semibold">C-7: Additional Comments and Submission</span>
                         </button>
                     </h2>
-                    <div id="collapseC7" class="accordion-collapse collapse show" data-bs-parent="#partCAccordion">
+                    <div id="collapseC7" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <div class="space-y-6">
                                 <div>
@@ -667,20 +667,45 @@
     color: red;
 }
 
-.accordion-body input,
-.accordion-body select,
-.accordion-body textarea,
-.accordion-body .form-control,
-.accordion-body [kendo-drop-down-list],
-.accordion-body [kendo-text-area] {
+.part-c-container .accordion-body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.part-c-container .accordion-body * {
+    visibility: visible !important;
+}
+
+.part-c-container .accordion-body input,
+.part-c-container .accordion-body select,
+.part-c-container .accordion-body textarea,
+.part-c-container .accordion-body .form-control,
+.part-c-container .accordion-body label,
+.part-c-container .accordion-body div,
+.part-c-container .accordion-body p,
+.part-c-container .accordion-body span {
+    background-color: #ffffff !important;
+    opacity: 1 !important;
+    color: #000000 !important;
+}
+
+.part-c-container .accordion-body input[type="checkbox"],
+.part-c-container .accordion-body input[type="radio"] {
     background-color: #ffffff !important;
     opacity: 1 !important;
 }
 
-.accordion-body input:disabled,
-.accordion-body select:disabled,
-.accordion-body textarea:disabled {
+.part-c-container .accordion-body input:disabled,
+.part-c-container .accordion-body select:disabled,
+.part-c-container .accordion-body textarea:disabled {
     background-color: #f3f4f6 !important;
+    opacity: 0.6 !important;
+}
+
+.part-c-container .k-widget,
+.part-c-container .k-dropdown,
+.part-c-container .k-dropdown-wrap {
+    background-color: #ffffff !important;
     opacity: 1 !important;
 }
 </style>
