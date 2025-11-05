@@ -272,12 +272,13 @@
             if (typeof window.openEmployeeSearch === 'function') {
                 window.openEmployeeSearch('partB', function(employee) {
                     if (context === 'copyTo') {
-                        vm.partB.copyToPerson = {
-                            name: employee.name,
-                            employeeNo: employee.empId,
-                            designation: employee.designation
-                        };
-                        vm.$apply();
+                        $timeout(function() {
+                            vm.partB.copyToPerson = {
+                                name: employee.name,
+                                employeeNo: employee.empId,
+                                designation: employee.designation
+                            };
+                        });
                     }
                 });
             }
