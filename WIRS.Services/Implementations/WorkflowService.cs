@@ -674,6 +674,80 @@ namespace WIRS.Services.Implementations
             }
         }
 
+        public async Task<string> ClosePartBAsync(PartBSubmitModel model, string userId)
+        {
+            var incident = new WorkflowIncident { incident_id = model.IncidentId };
+            var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
+
+            if (dataset == null || dataset.Tables.Count == 0)
+            {
+                throw new Exception("The incident not found");
+            }
+
+            incident.status = "08";
+
+
+            DataSet workflow = new DataSet("NewDataSet");
+            DataTable dt = new DataTable("incidents_workflows");
+
+            dt.Columns.Add("incident_id", typeof(string));
+            dt.Columns.Add("actions_code", typeof(string));
+            dt.Columns.Add("actions_role", typeof(string));
+            dt.Columns.Add("from", typeof(string));
+            dt.Columns.Add("to", typeof(string));
+            dt.Columns.Add("remarks", typeof(string));
+            dt.Columns.Add("Date", typeof(string));
+            dt.Columns.Add("attachment", typeof(string));
+
+            List<(User, string)> assignedUsers = new List<(User, string)>();
+            string userAction = "CLOSE";
+            assignedUsers.Add((new User() { UserId = userId, UserRole = userAction }, model.ReviewComment));
+
+            if (model.EmailToList != null && model.EmailToList.Count > 0)
+            {
+                foreach (var emailTo in model.EmailToList)
+                {
+                    assignedUsers.Add((new User() { UserId = emailTo, UserRole = userAction }, string.Empty));
+                }
+            }
+
+            if (model.AdditionalCopyToList != null && model.AdditionalCopyToList.Count > 0)
+            {
+                foreach (var copyTo in model.AdditionalCopyToList)
+                {
+                    assignedUsers.Add((new User() { UserId = copyTo.EmployeeNo, UserRole = userAction }, string.Empty));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(model.WshoId))
+            {
+                assignedUsers.Add((new User() { UserId = model.WshoId, UserRole = userAction }, string.Empty));
+            }
+
+            if (!string.IsNullOrEmpty(model.AlternateWshoId))
+            {
+                assignedUsers.Add((new User() { UserId = model.AlternateWshoId, UserRole = userAction }, string.Empty));
+            }
+
+            foreach (var assignedUser in assignedUsers)
+            {
+                DataRow row = dt.NewRow();
+                row["incident_id"] = incident.incident_id;
+                row["actions_code"] = incident.status;
+                row["actions_role"] = assignedUser.Item1.UserRole;
+                row["from"] = userId;
+                row["to"] = assignedUser.Item1.UserId;
+                row["remarks"] = assignedUser.Item2;
+                row["Date"] = "";
+                row["attachment"] = "";
+                dt.Rows.Add(row);
+            }
+
+            workflow.Tables.Add(dt);
+
+            return await _workflowIncidentDataAccess.insert_incidents_workflows(incident.incident_id, workflow.GetXml());
+        }
+
         public Task<string> SavePartCAsync(PartCSubmitModel model, string userId)
         {
             throw new NotImplementedException();

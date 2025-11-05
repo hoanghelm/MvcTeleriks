@@ -12,6 +12,7 @@ namespace WIRS.Services.Interfaces
         Task<bool> CanUserWorkflowIncidentAsync(string incidentId, string userId);
         Task<string> UpdateIncidentAsync(WorkflowIncidentUpdateModel model, string userId);
         Task<string> SubmitPartBAsync(PartBSubmitModel model, string userId);
+        Task<string> ClosePartBAsync(PartBSubmitModel model, string userId);
         Task<string> SavePartCAsync(PartCSubmitModel model, string userId);
         Task<string> SubmitPartCAsync(PartCSubmitModel model, string userId);
         Task<string> ClosePartCAsync(PartCCloseModel model, string userId);
