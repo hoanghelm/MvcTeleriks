@@ -27,7 +27,6 @@
 
         return service;
 
-        // Initialize Part A data structure
         function initializePartA(vm) {
             vm.injuredPerson = {};
             vm.eyeWitness = {};
@@ -112,7 +111,6 @@
                 }
             };
 
-            // Grid options
             vm.injuredGridOptions = {
                 columns: [
                     { field: 'name', title: 'Name', width: 200 },
@@ -129,7 +127,7 @@
                     {
                         command: {
                             text: 'Delete',
-                            click: function(e) {
+                            click: function (e) {
                                 deleteInjuredPerson(vm, e);
                             }
                         },
@@ -152,7 +150,7 @@
                     {
                         command: {
                             text: 'Delete',
-                            click: function(e) {
+                            click: function (e) {
                                 deleteEyeWitness(vm, e);
                             }
                         },
@@ -167,48 +165,50 @@
             };
         }
 
-        // Load Part A data
         function loadPartAData(vm) {
             return Promise.all([
                 loadPartALookups(vm),
                 loadPartAWorkflowUsers(vm)
-            ]).then(function() {
-                $timeout(function() {
-                    mapIncidentToPartA(vm);
+            ]).then(function () {
+
+                mapIncidentToPartA(vm);
+
+                $timeout(function () {
+                    refreshKendoDropDowns(vm);
                 }, 0);
             });
         }
 
         function loadPartALookups(vm) {
             return Promise.all([
-                IncidentUpdateService.getIncidentTypes().then(function(data) {
+                IncidentUpdateService.getIncidentTypes().then(function (data) {
                     console.log('Incident types loaded:', data);
                     vm.partA.incidentTypeOptions.dataSource = data;
                 }),
-                IncidentUpdateService.getSectors().then(function(data) {
+                IncidentUpdateService.getSectors().then(function (data) {
                     console.log('Sectors loaded:', data);
                     vm.partA.sectorOptions.dataSource = data;
                 }),
-                IncidentUpdateService.getLOBs(vm.incident.sectorCode || vm.incident.sbaCode).then(function(data) {
+                IncidentUpdateService.getLOBs(vm.incident.sectorCode || vm.incident.sbaCode).then(function (data) {
                     vm.partA.lobOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.lobOptions.dataSource = [];
                 }),
                 IncidentUpdateService.getDepartments(
                     vm.incident.sectorCode || vm.incident.sbaCode,
                     vm.incident.lobCode || vm.incident.sbuCode
-                ).then(function(data) {
+                ).then(function (data) {
                     vm.partA.departmentOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.departmentOptions.dataSource = [];
                 }),
                 IncidentUpdateService.getLocations(
                     vm.incident.sectorCode || vm.incident.sbaCode,
                     vm.incident.lobCode || vm.incident.sbuCode,
                     vm.incident.departmentCode || vm.incident.department
-                ).then(function(data) {
+                ).then(function (data) {
                     vm.partA.locationOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.locationOptions.dataSource = [];
                 })
             ]);
@@ -221,9 +221,9 @@
                     vm.incident.lobCode || vm.incident.sbuCode,
                     vm.incident.departmentCode || vm.incident.department,
                     vm.incident.locationCode || vm.incident.location
-                ).then(function(data) {
+                ).then(function (data) {
                     vm.partA.hodOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.hodOptions.dataSource = [];
                 }),
                 IncidentUpdateService.getAHODs(
@@ -231,9 +231,9 @@
                     vm.incident.lobCode || vm.incident.sbuCode,
                     vm.incident.departmentCode || vm.incident.department,
                     vm.incident.locationCode || vm.incident.location
-                ).then(function(data) {
+                ).then(function (data) {
                     vm.partA.ahodOptions.dataSource = data;
-                }).catch(function() {
+                }).catch(function () {
                     vm.partA.ahodOptions.dataSource = [];
                 })
             ]);
@@ -244,7 +244,6 @@
 
             console.log('Mapping incident to Part A', vm.incident);
 
-            // Basic incident details - extract from incidentTypes array
             if (vm.incident.incidentTypes && vm.incident.incidentTypes.length > 0) {
                 var incType = vm.incident.incidentTypes[0];
                 vm.partA.incidentType = incType.type || incType.code || '';
@@ -259,7 +258,6 @@
             }
             vm.partA.incidentOther = vm.incident.incidentOther || '';
 
-            // Parse dates and times
             if (vm.incident.incidentDate) {
                 vm.partA.incidentDate = new Date(vm.incident.incidentDate);
             }
@@ -273,7 +271,6 @@
                 }
             }
 
-            // Organization - extract code if it's an object
             var sectorCode = vm.incident.sectorCode || vm.incident.sbaCode || '';
             vm.partA.sectorCode = (typeof sectorCode === 'object' && sectorCode.code) ? sectorCode.code : sectorCode;
 
@@ -288,27 +285,21 @@
 
             vm.partA.exactLocation = vm.incident.exactLocation || '';
 
-            // Description
             vm.partA.incidentDescription = vm.incident.incidentDesc || vm.incident.incidentDescription || '';
             vm.partA.damageDescription = vm.incident.damageDescription || '';
 
-            // Boolean flags
             vm.partA.hasEyewitness = vm.incident.hasEyewitness || vm.incident.anyEyewitness || 'N';
             vm.partA.hasDamage = vm.incident.hasDamage || 'N';
             vm.partA.workingOvertime = vm.incident.isWorkingOvertime || vm.incident.workingOvertime || 'N';
             vm.partA.isJobRelated = vm.incident.isJobrelated || vm.incident.isJobRelated || 'N';
 
-            // Additional info
             vm.partA.hospitalClinicName = vm.incident.examinedHospitalClinicName || vm.incident.hospitalClinicName || '';
             vm.partA.officialWorkingHours = vm.incident.officialWorkingHrs || vm.incident.officialWorkingHours || '';
 
-            // Injured persons
             vm.partA.injuredPersons = vm.incident.injuredPersons || [];
 
-            // Eyewitnesses
             vm.partA.eyewitnesses = vm.incident.eyewitnesses || [];
 
-            // Submitter info
             vm.partA.superiorName = vm.incident.superiorName || '';
             vm.partA.superiorEmpNo = vm.incident.superiorEmpNo || '';
             vm.partA.superiorDesignation = vm.incident.superiorDesignation || '';
@@ -317,7 +308,6 @@
                 vm.partA.submittedDate = new Date(vm.incident.createdDate || vm.incident.submittedDate);
             }
 
-            // Workflow
             vm.partA.hodId = vm.incident.hodId || '';
             vm.partA.wshoId = vm.incident.wshoId || '';
             vm.partA.ahodId = vm.incident.ahodId || '';
@@ -325,12 +315,46 @@
             console.log('Part A data after mapping:', vm.partA);
         }
 
-        // Incident Type Change
+        function refreshKendoDropDowns(vm) {
+            console.log('Refreshing Kendo DropDownList widgets...');
+
+            function refreshDropDown(elementId, dataSource, value) {
+                var widget = $('#' + elementId).data('kendoDropDownList');
+                if (widget && value) {
+                    console.log('Refreshing', elementId, '- Setting value to:', value);
+
+                    if (dataSource && dataSource.length > 0) {
+                        widget.setDataSource(new kendo.data.DataSource({
+                            data: dataSource
+                        }));
+                    }
+
+                    widget.value(value);
+
+                    widget.trigger('change');
+
+                    console.log('  - Widget value after refresh:', widget.value());
+                } else if (!widget) {
+                    console.log('Widget not found:', elementId);
+                } else {
+                    console.log('No value to set for:', elementId);
+                }
+            }
+
+            refreshDropDown('partA_incidentType', vm.partA.incidentTypeOptions.dataSource, vm.partA.incidentType);
+            refreshDropDown('partA_sector', vm.partA.sectorOptions.dataSource, vm.partA.sectorCode);
+            refreshDropDown('partA_lob', vm.partA.lobOptions.dataSource, vm.partA.lobCode);
+            refreshDropDown('partA_department', vm.partA.departmentOptions.dataSource, vm.partA.departmentCode);
+            refreshDropDown('partA_location', vm.partA.locationOptions.dataSource, vm.partA.locationCode);
+            refreshDropDown('partA_hod', vm.partA.hodOptions.dataSource, vm.partA.hodId);
+            refreshDropDown('partA_wsho', vm.partA.wshoOptions.dataSource, vm.partA.wshoId);
+            refreshDropDown('partA_ahod', vm.partA.ahodOptions.dataSource, vm.partA.ahodId);
+        }
+
         function onIncidentTypeChange(vm) {
             vm.showOtherIncidentType = vm.partA.incidentType === 'other' || vm.partA.incidentType === 'OTH';
         }
 
-        // Injured Person Functions
         function addInjuredPerson(vm) {
             if (!vm.injuredPerson.name || !vm.injuredPerson.employeeNo) {
                 alert('Please fill in Name and Employee Number');
@@ -341,10 +365,8 @@
             person.type = vm.injuredPersonType;
             vm.partA.injuredPersons.push(person);
 
-            // Clear form
             vm.injuredPerson = {};
 
-            // Refresh grid
             if (vm.injuredGrid) {
                 vm.injuredGrid.dataSource.read();
             }
@@ -363,8 +385,8 @@
 
         function searchInjuredPerson(vm) {
             if (window.openEmployeeSearch) {
-                window.openEmployeeSearch('injured', function(employee) {
-                    $timeout(function() {
+                window.openEmployeeSearch('injured', function (employee) {
+                    $timeout(function () {
                         vm.injuredPerson.name = employee.name;
                         vm.injuredPerson.employeeNo = employee.empId;
                         vm.injuredPerson.contactNo = employee.contactNo;
@@ -380,7 +402,6 @@
             }
         }
 
-        // Eye Witness Functions
         function addEyeWitness(vm) {
             if (!vm.eyeWitness.name) {
                 alert('Please fill in Name');
@@ -390,10 +411,8 @@
             var witness = angular.copy(vm.eyeWitness);
             vm.partA.eyewitnesses.push(witness);
 
-            // Clear form
             vm.eyeWitness = {};
 
-            // Refresh grid
             if (vm.witnessGrid) {
                 vm.witnessGrid.dataSource.read();
             }
@@ -412,8 +431,8 @@
 
         function searchEyeWitness(vm) {
             if (window.openEmployeeSearch) {
-                window.openEmployeeSearch('witness', function(employee) {
-                    $timeout(function() {
+                window.openEmployeeSearch('witness', function (employee) {
+                    $timeout(function () {
                         vm.eyeWitness.name = employee.name;
                         vm.eyeWitness.employeeNo = employee.empId;
                         vm.eyeWitness.contactNo = employee.contactNo;
@@ -423,10 +442,9 @@
             }
         }
 
-        // Helper functions to get display names from codes
         function getIncidentTypeName(vm, code) {
             if (!code || !vm.partA.incidentTypeOptions.dataSource) return code || '';
-            var item = vm.partA.incidentTypeOptions.dataSource.find(function(i) {
+            var item = vm.partA.incidentTypeOptions.dataSource.find(function (i) {
                 return i.code === code || i.type === code;
             });
             return item ? (item.value || item.description) : code;
@@ -434,25 +452,25 @@
 
         function getSectorName(vm, code) {
             if (!code || !vm.partA.sectorOptions.dataSource) return code || '';
-            var item = vm.partA.sectorOptions.dataSource.find(function(i) { return i.code === code; });
+            var item = vm.partA.sectorOptions.dataSource.find(function (i) { return i.code === code; });
             return item ? item.value : code;
         }
 
         function getLOBName(vm, code) {
             if (!code || !vm.partA.lobOptions.dataSource) return code || '';
-            var item = vm.partA.lobOptions.dataSource.find(function(i) { return i.code === code; });
+            var item = vm.partA.lobOptions.dataSource.find(function (i) { return i.code === code; });
             return item ? item.value : code;
         }
 
         function getDepartmentName(vm, code) {
             if (!code || !vm.partA.departmentOptions.dataSource) return code || '';
-            var item = vm.partA.departmentOptions.dataSource.find(function(i) { return i.code === code; });
+            var item = vm.partA.departmentOptions.dataSource.find(function (i) { return i.code === code; });
             return item ? item.value : code;
         }
 
         function getLocationName(vm, code) {
             if (!code || !vm.partA.locationOptions.dataSource) return code || '';
-            var item = vm.partA.locationOptions.dataSource.find(function(i) { return i.code === code; });
+            var item = vm.partA.locationOptions.dataSource.find(function (i) { return i.code === code; });
             return item ? item.value : code;
         }
     }

@@ -27,8 +27,6 @@
 
         return service;
 
-        // ==================== Initialization ====================
-
         function initializePartC(vm) {
             vm.partC = {
                 isReadOnly: false,
@@ -65,8 +63,6 @@
             vm.contributingFactors = [];
             vm.negligentOptions = [];
         }
-
-        // ==================== Data Loading ====================
 
         function loadPartCData(vm) {
             if (!canViewPartC(vm)) {
@@ -171,8 +167,6 @@
             return Promise.resolve();
         }
 
-        // ==================== Permission Checks ====================
-
         function canViewPartC(vm) {
             return vm.incident.status && parseInt(vm.incident.status) >= 2;
         }
@@ -204,8 +198,6 @@
             return vm.incident.incidentTypes.indexOf('1') !== -1;
         }
 
-        // ==================== Person Interviewed Functions ====================
-
         function addPersonInterviewed(vm) {
             if (!vm.partC.personInterviewed.name) {
                 alert('Please enter person name');
@@ -225,8 +217,6 @@
         function removePersonInterviewed(vm, index) {
             vm.partC.personsInterviewed.splice(index, 1);
         }
-
-        // ==================== Injury Detail Functions ====================
 
         function addInjuryDetail(vm) {
             if (!vm.partC.injuryDetail.injuredPersonId) {
@@ -266,8 +256,6 @@
             vm.partC.injuryDetails.splice(index, 1);
         }
 
-        // ==================== Medical Certificate Functions ====================
-
         function addMedicalCertificate(vm) {
             if (!vm.partC.medicalCert.injuredPersonId) {
                 alert('Please select injured person');
@@ -296,8 +284,6 @@
         function removeMedicalCertificate(vm, index) {
             vm.partC.medicalCertificates.splice(index, 1);
         }
-
-        // ==================== Actions ====================
 
         function savePartC(vm) {
             vm.partC.validationMessage = '';
@@ -391,8 +377,6 @@
                     vm.partC.closing = false;
                 });
         }
-
-        // ==================== Helper Functions ====================
 
         function validatePartC(vm) {
             if (!vm.partC.isNegligent) {

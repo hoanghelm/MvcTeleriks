@@ -21,8 +21,6 @@
 
         return service;
 
-        // ==================== Initialization ====================
-
         function initializePartB(vm) {
             vm.partB = {
                 isReadOnly: false,
@@ -40,8 +38,6 @@
             vm.alternateWshoList = [];
             vm.emailToList = [];
         }
-
-        // ==================== Data Loading ====================
 
         function loadPartBData(vm) {
             if (!canViewPartB(vm)) {
@@ -162,8 +158,6 @@
             vm.partB.injuredCaseType = vm.incident.injuredCaseType || '';
         }
 
-        // ==================== Permission Checks ====================
-
         function canViewPartB(vm) {
             return vm.incident.status && parseInt(vm.incident.status) >= 1;
         }
@@ -187,8 +181,6 @@
 
             return false;
         }
-
-        // ==================== Actions ====================
 
         function submitPartB(vm) {
             vm.partB.validationMessage = '';
@@ -243,8 +235,6 @@
         function removeCopyToPerson(vm, index) {
             vm.partB.additionalCopyToList.splice(index, 1);
         }
-
-        // ==================== Helper Functions ====================
 
         function getInjuredCaseTypeText(vm) {
             if (!vm.partB.injuredCaseType || !vm.injuredCaseTypes.length) {

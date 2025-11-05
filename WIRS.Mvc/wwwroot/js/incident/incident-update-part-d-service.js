@@ -22,8 +22,6 @@
 
         return service;
 
-        // ==================== Initialization ====================
-
         function initializePartD(vm) {
             vm.partD = {
                 isReadOnly: false,
@@ -43,8 +41,6 @@
 
             vm.hsbuList = [];
         }
-
-        // ==================== Data Loading ====================
 
         function loadPartDData(vm, getCurrentDate) {
             if (!canViewPartD(vm)) {
@@ -131,8 +127,6 @@
             });
         }
 
-        // ==================== Permission Checks ====================
-
         function canViewPartD(vm) {
             return vm.incident && vm.incident.status && parseInt(vm.incident.status) >= 3;
         }
@@ -146,8 +140,6 @@
 
             return false;
         }
-
-        // ==================== Actions ====================
 
         function submitPartD(vm) {
             vm.partD.validationMessage = '';
@@ -219,8 +211,6 @@
                 $window.location.href = '/Home/Index';
             }
         }
-
-        // ==================== Helper Functions ====================
 
         function getHsbuName(vm, hsbuId) {
             if (!hsbuId || !vm.hsbuList || vm.hsbuList.length === 0) {
