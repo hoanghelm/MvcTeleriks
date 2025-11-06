@@ -255,10 +255,22 @@
                 return false;
             }
 
-            return vm.incident.incidentTypes.some(function(type) {
-                var typeValue = typeof type === 'object' ? (type.code || type.incidentTypeCode || type.typeCode) : type;
-                return typeValue === '1' || typeValue === 1;
-            });
+            for (var i = 0; i < vm.incident.incidentTypes.length; i++) {
+                var type = vm.incident.incidentTypes[i];
+
+                if (typeof type === 'object' && type !== null) {
+                    var typeValue = type.code || type.incidentTypeCode || type.typeCode || type.type || type.incidentType;
+                    if (typeValue === '1' || typeValue === 1) {
+                        return true;
+                    }
+                } else {
+                    if (type === '1' || type === 1) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         function addPersonInterviewed(vm) {
