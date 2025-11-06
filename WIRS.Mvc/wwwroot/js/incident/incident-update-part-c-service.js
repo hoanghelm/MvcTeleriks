@@ -251,10 +251,35 @@
         }
 
         function isInjuryIncident(vm) {
-            if (!vm.incident || !vm.incident.incidentTypes) {
+            if (!vm.incident) {
                 return false;
             }
-            return vm.incident.incidentTypes.indexOf('1') !== -1;
+
+            if (vm.incident.incidentTypes && Array.isArray(vm.incident.incidentTypes) && vm.incident.incidentTypes.length > 0) {
+                for (var i = 0; i < vm.incident.incidentTypes.length; i++) {
+                    var type = vm.incident.incidentTypes[i];
+                    if (typeof type === 'object' && type !== null) {
+                        if (type.incidentTypeCode === '1' || type.incidentTypeCode === 1 ||
+                            type.code === '1' || type.code === 1 ||
+                            type.typeCode === '1' || type.typeCode === 1 ||
+                            type.type === '1' || type.type === 1) {
+                            return true;
+                        }
+                    } else if (type === '1' || type === 1) {
+                        return true;
+                    }
+                }
+            }
+
+            if (vm.incident.incidentType) {
+                return vm.incident.incidentType === '1' || vm.incident.incidentType === 1;
+            }
+
+            if (vm.incident.injuredPersons && vm.incident.injuredPersons.length > 0) {
+                return true;
+            }
+
+            return false;
         }
 
         function addPersonInterviewed(vm) {

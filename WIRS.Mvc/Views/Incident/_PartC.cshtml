@@ -639,21 +639,18 @@
                                         ng-disabled="vm.partC.closing"
                                         ng-show="vm.partC.showCloseOptions"
                                         class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50">
-                                    <span ng-show="!vm.partC.closing">Close Report</span>
-                                    <span ng-show="vm.partC.closing">Closing...</span>
+                                    Reject
                                 </button>
                                 <button type="button"
                                         ng-click="vm.savePartC()"
                                         ng-disabled="vm.partC.saving"
                                         class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50">
-                                    <span ng-show="!vm.partC.saving">Save</span>
-                                    <span ng-show="vm.partC.saving">Saving...</span>
+                                    Save
                                 </button>
                                 <button type="submit"
                                         ng-disabled="partCForm.$invalid || vm.partC.submitting"
                                         class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
-                                    <span ng-show="!vm.partC.submitting">Submit to Chairman WSH</span>
-                                    <span ng-show="vm.partC.submitting">Submitting...</span>
+                                    Submit to Chairman WSH
                                 </button>
                             </div>
 
