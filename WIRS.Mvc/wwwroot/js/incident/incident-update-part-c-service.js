@@ -52,10 +52,10 @@
                 showCloseOptions: false,
                 injuredPersonOptions: {
                     dataTextField: 'name',
-                    dataValueField: 'employeeNo',
-                    dataSource: [],
+                    dataValueField: 'empNo',
+                    dataSource: new kendo.data.DataSource({ data: [] }),
                     optionLabel: '-- Select Injured Person --',
-                    template: '#= name # (#= employeeNo #)'
+                    valuePrimitive: true
                 },
                 cwshoOptions: {
                     dataTextField: 'userName',
@@ -90,7 +90,7 @@
             }
 
             if (vm.incident.injuredPersons && vm.incident.injuredPersons.length > 0) {
-                vm.partC.injuredPersonOptions.dataSource = vm.incident.injuredPersons;
+                vm.partC.injuredPersonOptions.dataSource.data(vm.incident.injuredPersons);
             }
 
             return Promise.all([
@@ -251,35 +251,14 @@
         }
 
         function isInjuryIncident(vm) {
-            if (!vm.incident) {
+            if (!vm.incident || !vm.incident.incidentTypes || !vm.incident.incidentTypes.length) {
                 return false;
             }
 
-            if (vm.incident.incidentTypes && Array.isArray(vm.incident.incidentTypes) && vm.incident.incidentTypes.length > 0) {
-                for (var i = 0; i < vm.incident.incidentTypes.length; i++) {
-                    var type = vm.incident.incidentTypes[i];
-                    if (typeof type === 'object' && type !== null) {
-                        if (type.incidentTypeCode === '1' || type.incidentTypeCode === 1 ||
-                            type.code === '1' || type.code === 1 ||
-                            type.typeCode === '1' || type.typeCode === 1 ||
-                            type.type === '1' || type.type === 1) {
-                            return true;
-                        }
-                    } else if (type === '1' || type === 1) {
-                        return true;
-                    }
-                }
-            }
-
-            if (vm.incident.incidentType) {
-                return vm.incident.incidentType === '1' || vm.incident.incidentType === 1;
-            }
-
-            if (vm.incident.injuredPersons && vm.incident.injuredPersons.length > 0) {
-                return true;
-            }
-
-            return false;
+            return vm.incident.incidentTypes.some(function(type) {
+                var typeValue = typeof type === 'object' ? (type.code || type.incidentTypeCode || type.typeCode) : type;
+                return typeValue === '1' || typeValue === 1;
+            });
         }
 
         function addPersonInterviewed(vm) {
