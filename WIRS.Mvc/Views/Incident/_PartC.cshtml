@@ -62,7 +62,6 @@
                                         <input kendo-text-box
                                                k-ng-model="vm.partC.personInterviewed.name"
                                                style="width: 100%;"
-                                               placeholder="Enter name or search"
                                                k-enable="!vm.partC.isReadOnly" />
                                         <button type="button"
                                                 ng-click="vm.openEmployeeSearch('personInterviewed')"
@@ -136,8 +135,7 @@
                                           k-ng-model="vm.partC.whatHappenedAndWhy"
                                           k-rows="6"
                                           style="width: 100%;"
-                                          k-enable="!vm.partC.isReadOnly"
-                                          placeholder="Provide detailed investigation findings..."></textarea>
+                                          k-enable="!vm.partC.isReadOnly"></textarea>
                             </div>
                         </div>
                     </div>
@@ -500,8 +498,7 @@
                                               k-ng-model="vm.partC.negligentComments"
                                               k-rows="4"
                                               style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"
-                                              placeholder="Provide details on why the employee was negligent..."></textarea>
+                                              k-enable="!vm.partC.isReadOnly"></textarea>
                                     <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && vm.partC.isNegligent === 'Y' && !vm.partC.negligentComments">
                                         Negligent comments required when negligent is Yes (ERR-137)
                                     </span>
@@ -537,8 +534,7 @@
                                               k-ng-model="vm.partC.riskAssessmentComments"
                                               k-rows="4"
                                               style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"
-                                              placeholder="Explain what needs to be reviewed in the risk assessment..."></textarea>
+                                              k-enable="!vm.partC.isReadOnly"></textarea>
                                 </div>
 
                                 <div>
@@ -548,8 +544,7 @@
                                               k-rows="6"
                                               name="whatHappened"
                                               style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"
-                                              placeholder="Provide detailed root cause analysis - describe the sequence of events and underlying reasons..."></textarea>
+                                              k-enable="!vm.partC.isReadOnly"></textarea>
                                     <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.whatHappenedAndWhy">
                                         What happened and why is required (ERR-138)
                                     </span>
@@ -562,8 +557,7 @@
                                               k-rows="6"
                                               name="recommendedActions"
                                               style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"
-                                              placeholder="List actions to prevent recurrence of this incident..."></textarea>
+                                              k-enable="!vm.partC.isReadOnly"></textarea>
                                     <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.recommendedActions">
                                         Recommended actions is required (ERR-139)
                                     </span>
@@ -589,8 +583,7 @@
                                               k-ng-model="vm.partC.additionalComments"
                                               k-rows="4"
                                               style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"
-                                              placeholder="Any additional information for HOD..."></textarea>
+                                              k-enable="!vm.partC.isReadOnly"></textarea>
                                 </div>
 
                                 <div class="bg-gray-50 p-4 rounded-lg">
