@@ -10,6 +10,7 @@ namespace WIRS.Services.Models
         public string WhatHappenedAndWhy { get; set; }
         public string RecommendedActions { get; set; }
         public string AdditionalComments { get; set; }
+        public string CwshoId { get; set; }
         public List<PersonInterviewedModel> PersonsInterviewed { get; set; }
         public List<InjuryDetailModel> InjuryDetails { get; set; }
         public List<MedicalCertificateModel> MedicalCertificates { get; set; }

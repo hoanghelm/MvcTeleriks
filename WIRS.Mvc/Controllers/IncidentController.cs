@@ -706,22 +706,22 @@ namespace WIRS.Mvc.Controllers
         {
             if (string.IsNullOrEmpty(request.IsNegligent))
             {
-                return "Negligent field is required (ERR-136)";
+                return "Negligent/ Non Negligent is required (ERR-136)";
             }
 
-            if (request.IsNegligent == "Y" && string.IsNullOrEmpty(request.NegligentComments))
+            if (string.IsNullOrEmpty(request.AdditionalComments))
             {
-                return "Negligent comments required when employee is negligent (ERR-137)";
+                return "Comment is required (ERR-137)";
             }
 
-            if (string.IsNullOrEmpty(request.WhatHappenedAndWhy))
+            if (string.IsNullOrEmpty(request.CwshoId))
             {
-                return "What happened and why is required (ERR-138)";
+                return "Name of Chairman WSH is required (ERR-138)";
             }
 
             if (string.IsNullOrEmpty(request.RecommendedActions))
             {
-                return "Recommended actions is required (ERR-139)";
+                return "Corrective and Preventive Action(s) is required (ERR-139)";
             }
 
             return string.Empty;
@@ -736,9 +736,10 @@ namespace WIRS.Mvc.Controllers
                 NegligentComments = request.NegligentComments ?? string.Empty,
                 NeedsRiskAssessmentReview = request.NeedsRiskAssessmentReview ?? "N",
                 RiskAssessmentComments = request.RiskAssessmentComments ?? string.Empty,
-                WhatHappenedAndWhy = request.WhatHappenedAndWhy,
+                WhatHappenedAndWhy = request.WhatHappenedAndWhy ?? string.Empty,
                 RecommendedActions = request.RecommendedActions,
                 AdditionalComments = request.AdditionalComments ?? string.Empty,
+                CwshoId = request.CwshoId ?? string.Empty,
                 PersonsInterviewed = request.PersonsInterviewed?.Select(c => new Services.Models.PersonInterviewedModel()
                 {
                     Name = c.Name,
@@ -1051,6 +1052,7 @@ namespace WIRS.Mvc.Controllers
         public string WhatHappenedAndWhy { get; set; }
         public string RecommendedActions { get; set; }
         public string AdditionalComments { get; set; }
+        public string CwshoId { get; set; }
         public List<PersonInterviewedModel> PersonsInterviewed { get; set; }
         public List<InjuryDetailModel> InjuryDetails { get; set; }
         public List<MedicalCertificateModel> MedicalCertificates { get; set; }

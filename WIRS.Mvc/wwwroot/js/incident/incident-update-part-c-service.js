@@ -429,7 +429,7 @@
             IncidentUpdateService.submitPartC(partCData)
                 .then(function (response) {
                     if (response.success) {
-                        alert('Part C submitted successfully to HOD!');
+                        alert('Part C submitted successfully to Chairman WSH!');
                         $window.location.href = '/Home/Index';
                     } else {
                         vm.partC.validationMessage = response.message || 'Failed to submit Part C';
@@ -488,22 +488,22 @@
 
         function validatePartC(vm) {
             if (!vm.partC.isNegligent) {
-                vm.partC.validationMessage = 'Negligent field is required (ERR-136)';
+                vm.partC.validationMessage = 'Negligent/ Non Negligent is required (ERR-136)';
                 return false;
             }
 
-            if (vm.partC.isNegligent === 'Y' && !vm.partC.negligentComments) {
-                vm.partC.validationMessage = 'Negligent comments required when employee is negligent (ERR-137)';
+            if (!vm.partC.additionalComments) {
+                vm.partC.validationMessage = 'Comment is required (ERR-137)';
                 return false;
             }
 
-            if (!vm.partC.whatHappenedAndWhy) {
-                vm.partC.validationMessage = 'What happened and why is required (ERR-138)';
+            if (!vm.partC.cwshoId) {
+                vm.partC.validationMessage = 'Name of Chairman WSH is required (ERR-138)';
                 return false;
             }
 
             if (!vm.partC.recommendedActions) {
-                vm.partC.validationMessage = 'Recommended actions is required (ERR-139)';
+                vm.partC.validationMessage = 'Corrective and Preventive Action(s) is required (ERR-139)';
                 return false;
             }
 
@@ -530,9 +530,10 @@
                 negligentComments: vm.partC.negligentComments || '',
                 needsRiskAssessmentReview: vm.partC.needsRiskAssessmentReview,
                 riskAssessmentComments: vm.partC.riskAssessmentComments || '',
-                whatHappenedAndWhy: vm.partC.whatHappenedAndWhy,
+                whatHappenedAndWhy: vm.partC.whatHappenedAndWhy || '',
                 recommendedActions: vm.partC.recommendedActions,
                 additionalComments: vm.partC.additionalComments || '',
+                cwshoId: vm.partC.cwshoId || '',
                 personsInterviewed: vm.partC.personsInterviewed,
                 injuryDetails: vm.partC.injuryDetails.map(function (injury) {
                     return {
