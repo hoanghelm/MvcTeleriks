@@ -58,10 +58,11 @@
                     valuePrimitive: true
                 },
                 cwshoOptions: {
-                    dataTextField: 'userName',
-                    dataValueField: 'userId',
-                    dataSource: [],
-                    optionLabel: '-- Select Corporate WSHO --'
+                    dataTextField: 'name',
+                    dataValueField: 'id',
+                    dataSource: new kendo.data.DataSource({ data: [] }),
+                    optionLabel: '-- Select Corporate WSHO --',
+                    valuePrimitive: true
                 }
             };
 
@@ -157,10 +158,10 @@
             )
                 .then(function (data) {
                     vm.cwshoList = data;
-                    vm.partC.cwshoOptions.dataSource = data;
+                    vm.partC.cwshoOptions.dataSource.data(data);
                 })
                 .catch(function (error) {
-                    vm.partC.cwshoOptions.dataSource = [];
+                    vm.partC.cwshoOptions.dataSource.data([]);
                 });
         }
 
