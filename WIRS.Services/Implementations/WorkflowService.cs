@@ -883,30 +883,74 @@ namespace WIRS.Services.Implementations
         private DataSet ConvertInjuryDetailsToDataSet(List<InjuryDetailModel> injuryDetails)
         {
             var ds = new DataSet();
-            var dt = new DataTable("incidents_injury_details");
-            dt.Columns.Add("injured_emp_no", typeof(string));
-            dt.Columns.Add("nature_injury_code", typeof(string));
-            dt.Columns.Add("part_of_body_code", typeof(string));
-            dt.Columns.Add("description", typeof(string));
+            var dt = new DataTable("injured_details");
+            dt.Columns.Add("incident_id", typeof(string));
+            dt.Columns.Add("injured_id", typeof(string));
+            dt.Columns.Add("injury_type", typeof(string));
+            dt.Columns.Add("injury_code", typeof(string));
+            dt.Columns.Add("injury_name", typeof(string));
+            dt.Columns.Add("other_desc", typeof(string));
 
             if (injuryDetails != null)
             {
                 foreach (var injury in injuryDetails)
                 {
-                    foreach (var natureCode in injury.NatureOfInjury ?? new List<string>())
+                    if (injury.HeadNeckTorso != null)
                     {
-                        var bodyParts = new List<string>();
-                        if (injury.HeadNeckTorso != null) bodyParts.AddRange(injury.HeadNeckTorso);
-                        if (injury.UpperLimbs != null) bodyParts.AddRange(injury.UpperLimbs);
-                        if (injury.LowerLimbs != null) bodyParts.AddRange(injury.LowerLimbs);
-
-                        foreach (var bodyPartCode in bodyParts)
+                        foreach (var code in injury.HeadNeckTorso)
                         {
                             var row = dt.NewRow();
-                            row["injured_emp_no"] = injury.InjuredPersonId ?? string.Empty;
-                            row["nature_injury_code"] = natureCode;
-                            row["part_of_body_code"] = bodyPartCode;
-                            row["description"] = injury.Description ?? string.Empty;
+                            row["incident_id"] = string.Empty;
+                            row["injured_id"] = injury.InjuredPersonId ?? string.Empty;
+                            row["injury_type"] = "Head Neck Torso";
+                            row["injury_code"] = code;
+                            row["injury_name"] = string.Empty;
+                            row["other_desc"] = string.Empty;
+                            dt.Rows.Add(row);
+                        }
+                    }
+
+                    if (injury.UpperLimbs != null)
+                    {
+                        foreach (var code in injury.UpperLimbs)
+                        {
+                            var row = dt.NewRow();
+                            row["incident_id"] = string.Empty;
+                            row["injured_id"] = injury.InjuredPersonId ?? string.Empty;
+                            row["injury_type"] = "Upper Limbs";
+                            row["injury_code"] = code;
+                            row["injury_name"] = string.Empty;
+                            row["other_desc"] = string.Empty;
+                            dt.Rows.Add(row);
+                        }
+                    }
+
+                    if (injury.LowerLimbs != null)
+                    {
+                        foreach (var code in injury.LowerLimbs)
+                        {
+                            var row = dt.NewRow();
+                            row["incident_id"] = string.Empty;
+                            row["injured_id"] = injury.InjuredPersonId ?? string.Empty;
+                            row["injury_type"] = "Lower Limbs";
+                            row["injury_code"] = code;
+                            row["injury_name"] = string.Empty;
+                            row["other_desc"] = string.Empty;
+                            dt.Rows.Add(row);
+                        }
+                    }
+
+                    if (injury.NatureOfInjury != null)
+                    {
+                        foreach (var code in injury.NatureOfInjury)
+                        {
+                            var row = dt.NewRow();
+                            row["incident_id"] = string.Empty;
+                            row["injured_id"] = injury.InjuredPersonId ?? string.Empty;
+                            row["injury_type"] = "Nature Of Injury";
+                            row["injury_code"] = code;
+                            row["injury_name"] = string.Empty;
+                            row["other_desc"] = string.Empty;
                             dt.Rows.Add(row);
                         }
                     }
