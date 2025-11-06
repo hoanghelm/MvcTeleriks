@@ -139,7 +139,7 @@
             ];
 
             return Promise.all(promises).catch(function (error) {
-                console.error('Failed to load Part C lookups:', error);
+                return Promise.resolve();
             });
         }
 
@@ -264,9 +264,9 @@
 
             vm.partC.personsInterviewed.push({
                 name: vm.partC.personInterviewed.name,
-                employeeNo: vm.partC.personInterviewed.employeeNo || '',
-                designation: vm.partC.personInterviewed.designation || '',
-                contactNo: vm.partC.personInterviewed.contactNo || ''
+                empid: vm.partC.personInterviewed.employeeNo || '',
+                empdesignation: vm.partC.personInterviewed.designation || '',
+                empcontactno: vm.partC.personInterviewed.contactNo || ''
             });
 
             vm.partC.personInterviewed = {};

@@ -129,9 +129,6 @@
         function loadIncident(incidentId) {
             return IncidentUpdateService.getIncidentById(incidentId)
                 .then(function (incident) {
-                    console.log('Loaded incident data:', incident);
-                    console.log('IncidentTypes array:', incident.incidentTypes);
-                    console.log('IncidentTypes length:', incident.incidentTypes ? incident.incidentTypes.length : 'undefined');
                     vm.incident = incident;
                     return loadStatusName();
                 })
@@ -148,10 +145,8 @@
             return IncidentUpdateService.getStatusName(vm.incident.status)
                 .then(function (statusName) {
                     vm.incident.statusName = statusName;
-                    console.log('Status name loaded:', statusName);
                 })
                 .catch(function (error) {
-                    console.error('Error loading status name:', error);
                     vm.incident.statusName = vm.incident.status;
                 });
         }
@@ -374,9 +369,6 @@
         function loadIncident(incidentId) {
             return IncidentUpdateService.getIncidentById(incidentId)
                 .then(function (incident) {
-                    console.log('Loaded incident data:', incident);
-                    console.log('IncidentTypes array:', incident.incidentTypes);
-                    console.log('IncidentTypes length:', incident.incidentTypes ? incident.incidentTypes.length : 'undefined');
                     vm.incident = incident;
                     return loadStatusName();
                 })
@@ -393,10 +385,8 @@
             return IncidentUpdateService.getStatusName(vm.incident.status)
                 .then(function (statusName) {
                     vm.incident.statusName = statusName;
-                    console.log('Status name loaded:', statusName);
                 })
                 .catch(function (error) {
-                    console.error('Error loading status name:', error);
                     vm.incident.statusName = vm.incident.status;
                 });
         }

@@ -96,6 +96,7 @@
                             </div>
                             <button type="button"
                                     ng-click="vm.addPersonInterviewed()"
+                                    ng-disabled="vm.partC.isReadOnly"
                                     class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                 Add Person
                             </button>
@@ -114,12 +115,13 @@
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         <tr ng-repeat="person in vm.partC.personsInterviewed">
                                             <td class="px-4 py-2 text-sm text-gray-900">{{ person.name }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.employeeNo }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.designation }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.contactNo }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.empid }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.empdesignation }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.empcontactno }}</td>
                                             <td class="px-4 py-2 text-sm">
                                                 <button type="button"
                                                         ng-click="vm.removePersonInterviewed($index)"
+                                                        ng-disabled="vm.partC.isReadOnly"
                                                         class="text-red-600 hover:text-red-800">
                                                     Remove
                                                 </button>
@@ -127,6 +129,15 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Investigation Findings by WSHO</label>
+                                <textarea kendo-text-area
+                                          k-ng-model="vm.partC.whatHappenedAndWhy"
+                                          k-rows="6"
+                                          style="width: 100%;"
+                                          k-enable="!vm.partC.isReadOnly"
+                                          placeholder="Provide detailed investigation findings..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -217,13 +228,16 @@
 
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Injury Description</label>
-                                <textarea ng-model="vm.partC.injuryDetail.description"
-                                          rows="3"
-                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                                <textarea kendo-text-area
+                                          k-ng-model="vm.partC.injuryDetail.description"
+                                          k-rows="3"
+                                          style="width: 100%;"
+                                          k-enable="!vm.partC.isReadOnly"></textarea>
                             </div>
 
                             <button type="button"
                                     ng-click="vm.addInjuryDetail()"
+                                    ng-disabled="vm.partC.isReadOnly"
                                     class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                 Add Injury Detail
                             </button>
@@ -314,6 +328,7 @@
                             </div>
                             <button type="button"
                                     ng-click="vm.addMedicalCertificate()"
+                                    ng-disabled="vm.partC.isReadOnly"
                                     class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                 Add MC
                             </button>
@@ -481,9 +496,11 @@
 
                                 <div ng-show="vm.partC.isNegligent === 'Y'">
                                     <label class="block text-sm font-medium text-gray-700 mb-2 required">Comments on Negligence</label>
-                                    <textarea ng-model="vm.partC.negligentComments"
-                                              rows="4"
-                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    <textarea kendo-text-area
+                                              k-ng-model="vm.partC.negligentComments"
+                                              k-rows="4"
+                                              style="width: 100%;"
+                                              k-enable="!vm.partC.isReadOnly"
                                               placeholder="Provide details on why the employee was negligent..."></textarea>
                                     <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && vm.partC.isNegligent === 'Y' && !vm.partC.negligentComments">
                                         Negligent comments required when negligent is Yes (ERR-137)
@@ -516,32 +533,38 @@
 
                                 <div ng-show="vm.partC.needsRiskAssessmentReview === 'Y'">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Comments on Risk Assessment Review</label>
-                                    <textarea ng-model="vm.partC.riskAssessmentComments"
-                                              rows="4"
-                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    <textarea kendo-text-area
+                                              k-ng-model="vm.partC.riskAssessmentComments"
+                                              k-rows="4"
+                                              style="width: 100%;"
+                                              k-enable="!vm.partC.isReadOnly"
                                               placeholder="Explain what needs to be reviewed in the risk assessment..."></textarea>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2 required">What happened and why?</label>
-                                    <textarea ng-model="vm.partC.whatHappenedAndWhy"
-                                              rows="6"
-                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                              placeholder="Provide detailed root cause analysis - describe the sequence of events and underlying reasons..."
-                                              required></textarea>
-                                    <span class="text-red-600 text-sm" ng-show="partCForm.whatHappened.$touched && partCForm.whatHappened.$invalid">
+                                    <textarea kendo-text-area
+                                              k-ng-model="vm.partC.whatHappenedAndWhy"
+                                              k-rows="6"
+                                              name="whatHappened"
+                                              style="width: 100%;"
+                                              k-enable="!vm.partC.isReadOnly"
+                                              placeholder="Provide detailed root cause analysis - describe the sequence of events and underlying reasons..."></textarea>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.whatHappenedAndWhy">
                                         What happened and why is required (ERR-138)
                                     </span>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2 required">Recommended Corrective/Preventive Actions</label>
-                                    <textarea ng-model="vm.partC.recommendedActions"
-                                              rows="6"
-                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                              placeholder="List actions to prevent recurrence of this incident..."
-                                              required></textarea>
-                                    <span class="text-red-600 text-sm" ng-show="partCForm.recommendedActions.$touched && partCForm.recommendedActions.$invalid">
+                                    <textarea kendo-text-area
+                                              k-ng-model="vm.partC.recommendedActions"
+                                              k-rows="6"
+                                              name="recommendedActions"
+                                              style="width: 100%;"
+                                              k-enable="!vm.partC.isReadOnly"
+                                              placeholder="List actions to prevent recurrence of this incident..."></textarea>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.recommendedActions">
                                         Recommended actions is required (ERR-139)
                                     </span>
                                 </div>
@@ -562,9 +585,11 @@
                             <div class="space-y-6">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Additional Comments</label>
-                                    <textarea ng-model="vm.partC.additionalComments"
-                                              rows="4"
-                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    <textarea kendo-text-area
+                                              k-ng-model="vm.partC.additionalComments"
+                                              k-rows="4"
+                                              style="width: 100%;"
+                                              k-enable="!vm.partC.isReadOnly"
                                               placeholder="Any additional information for HOD..."></textarea>
                                 </div>
 
