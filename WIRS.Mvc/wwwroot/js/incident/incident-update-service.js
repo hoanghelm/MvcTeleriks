@@ -196,49 +196,49 @@
         }
 
         function getNatureOfInjury() {
-            return $http.get('/MasterData/GetLookupByType?type=NatureOfInjury')
+            return $http.get('/MasterData/GetLookupByType?type=Nature Of Injury')
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getHeadNeckTorso() {
-            return $http.get('/MasterData/GetLookupByType?type=HeadNeckTorso')
+            return $http.get('/MasterData/GetLookupByType?type=Head Neck Torso')
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getUpperLimbs() {
-            return $http.get('/MasterData/GetLookupByType?type=UpperLimbs')
+            return $http.get('/MasterData/GetLookupByType?type=Upper Limbs')
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getLowerLimbs() {
-            return $http.get('/MasterData/GetLookupByType?type=LowerLimbs')
+            return $http.get('/MasterData/GetLookupByType?type=Lower Limbs')
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getIncidentClass() {
-            return $http.get('/MasterData/GetLookupByType?type=IncidentClass')
+            return $http.get('/MasterData/GetLookupByType?type=Incident Class')
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getIncidentAgent() {
-            return $http.get('/MasterData/GetLookupByType?type=IncidentAgent')
+            return $http.get('/MasterData/GetLookupByType?type=Incident Agent')
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getUnsafeConditions() {
-            return $http.get('/MasterData/GetLookupByType?type=UnsafeCondition')
+            return $http.get('/MasterData/GetLookupByType?type=Unsafe Condition')
                 .then(handleSuccess)
                 .catch(handleError);
         }
 
         function getUnsafeActs() {
-            return $http.get('/MasterData/GetLookupByType?type=UnsafeAct')
+            return $http.get('/MasterData/GetLookupByType?type=Unsafe Act')
                 .then(handleSuccess)
                 .catch(handleError);
         }

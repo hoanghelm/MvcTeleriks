@@ -22,7 +22,8 @@
             removeMedicalCertificate: removeMedicalCertificate,
             savePartC: savePartC,
             submitPartC: submitPartC,
-            closePartC: closePartC
+            closePartC: closePartC,
+            openEmployeeSearch: openEmployeeSearch
         };
 
         return service;
@@ -341,6 +342,23 @@
 
         function removeMedicalCertificate(vm, index) {
             vm.partC.medicalCertificates.splice(index, 1);
+        }
+
+        function openEmployeeSearch(vm, context) {
+            if (typeof window.openEmployeeSearch === 'function') {
+                window.openEmployeeSearch('partC', function(employee) {
+                    $timeout(function() {
+                        if (context === 'personInterviewed') {
+                            vm.partC.personInterviewed = {
+                                name: employee.name,
+                                employeeNo: employee.empId,
+                                designation: employee.designation,
+                                contactNo: employee.contactNo || ''
+                            };
+                        }
+                    });
+                });
+            }
         }
 
         function savePartC(vm) {

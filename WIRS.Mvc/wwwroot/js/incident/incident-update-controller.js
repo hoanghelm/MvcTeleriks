@@ -65,6 +65,7 @@
         vm.savePartC = function () { PartCService.savePartC(vm); };
         vm.submitPartC = function () { PartCService.submitPartC(vm); };
         vm.closePartC = function () { PartCService.closePartC(vm); };
+        vm.openPartCEmployeeSearch = function (context) { PartCService.openEmployeeSearch(vm, context); };
 
         vm.canViewPartD = function () { return PartDService.canViewPartD(vm); };
         vm.canEditPartD = function () { return PartDService.canEditPartD(vm); };
@@ -305,6 +306,7 @@
         vm.savePartC = function () { PartCService.savePartC(vm); };
         vm.submitPartC = function () { PartCService.submitPartC(vm); };
         vm.closePartC = function () { PartCService.closePartC(vm); };
+        vm.openPartCEmployeeSearch = function (context) { PartCService.openEmployeeSearch(vm, context); };
 
         vm.canViewPartD = function () { return PartDService.canViewPartD(vm); };
         vm.canEditPartD = function () { return PartDService.canEditPartD(vm); };
