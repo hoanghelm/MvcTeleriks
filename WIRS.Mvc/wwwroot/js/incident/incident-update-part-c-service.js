@@ -299,22 +299,27 @@
                 return;
             }
 
-            var selectedNature = vm.natureOfInjury.filter(function (n) { return n.selected; }).map(function (n) { return n.value; }).join(', ');
-            var selectedHead = vm.headNeckTorso.filter(function (h) { return h.selected; }).map(function (h) { return h.value; }).join(', ');
-            var selectedUpper = vm.upperLimbs.filter(function (u) { return u.selected; }).map(function (u) { return u.value; }).join(', ');
-            var selectedLower = vm.lowerLimbs.filter(function (l) { return l.selected; }).map(function (l) { return l.value; }).join(', ');
+            var selectedNatureList = vm.natureOfInjury.filter(function (n) { return n.selected; }).map(function (n) { return n.value; });
+            var selectedHeadList = vm.headNeckTorso.filter(function (h) { return h.selected; }).map(function (h) { return h.value; });
+            var selectedUpperList = vm.upperLimbs.filter(function (u) { return u.selected; }).map(function (u) { return u.value; });
+            var selectedLowerList = vm.lowerLimbs.filter(function (l) { return l.selected; }).map(function (l) { return l.value; });
 
-            var bodyParts = [selectedHead, selectedUpper, selectedLower].filter(function (p) { return p; }).join('; ');
+            var bodyPartsList = selectedHeadList.concat(selectedUpperList).concat(selectedLowerList);
 
-            var injuredPerson = vm.incident.injuredPersons.find(function (p) { return p.employeeNo === vm.partC.injuryDetail.injuredPersonId; });
+            var selectedNature = selectedNatureList.join(', ');
+            var bodyParts = bodyPartsList.join(', ');
+
+            var injuredPerson = vm.incident.injuredPersons.find(function (p) { return p.empNo === vm.partC.injuryDetail.injuredPersonId; });
 
             vm.partC.injuryDetails.push({
                 injuredPersonId: vm.partC.injuryDetail.injuredPersonId,
                 injuredPersonName: injuredPerson ? injuredPerson.name : '',
                 natureOfInjury: selectedNature,
                 bodyParts: bodyParts,
+                natureOfInjuryList: selectedNatureList,
+                bodyPartsList: bodyPartsList,
                 description: vm.partC.injuryDetail.description || '',
-                natureOfInjuryList: vm.natureOfInjury.filter(function (n) { return n.selected; }).map(function (n) { return n.code; }),
+                natureOfInjuryCodeList: vm.natureOfInjury.filter(function (n) { return n.selected; }).map(function (n) { return n.code; }),
                 headNeckTorsoList: vm.headNeckTorso.filter(function (h) { return h.selected; }).map(function (h) { return h.code; }),
                 upperLimbsList: vm.upperLimbs.filter(function (u) { return u.selected; }).map(function (u) { return u.code; }),
                 lowerLimbsList: vm.lowerLimbs.filter(function (l) { return l.selected; }).map(function (l) { return l.code; })
@@ -342,13 +347,23 @@
                 return;
             }
 
-            var injuredPerson = vm.incident.injuredPersons.find(function (p) { return p.employeeNo === vm.partC.medicalCert.injuredPersonId; });
+            var injuredPerson = vm.incident.injuredPersons.find(function (p) { return p.empNo === vm.partC.medicalCert.injuredPersonId; });
+
+            var fromDate = vm.partC.medicalCert.fromDate;
+            var toDate = vm.partC.medicalCert.toDate;
+
+            if (typeof fromDate === 'string' && fromDate.indexOf('T') > -1) {
+                fromDate = new Date(fromDate);
+            }
+            if (typeof toDate === 'string' && toDate.indexOf('T') > -1) {
+                toDate = new Date(toDate);
+            }
 
             vm.partC.medicalCertificates.push({
                 injuredPersonId: vm.partC.medicalCert.injuredPersonId,
                 injuredPersonName: injuredPerson ? injuredPerson.name : '',
-                fromDate: vm.partC.medicalCert.fromDate || '',
-                toDate: vm.partC.medicalCert.toDate || '',
+                fromDate: fromDate,
+                toDate: toDate,
                 numberOfDays: vm.partC.medicalCert.numberOfDays,
                 hasAttachment: false
             });

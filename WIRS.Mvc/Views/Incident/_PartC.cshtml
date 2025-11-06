@@ -261,8 +261,18 @@
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         <tr ng-repeat="injury in vm.partC.injuryDetails">
                                             <td class="px-4 py-2 text-sm text-gray-900">{{ injury.injuredPersonName }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ injury.natureOfInjury }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ injury.bodyParts }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">
+                                                <ul class="list-disc list-inside" ng-if="injury.natureOfInjuryList && injury.natureOfInjuryList.length">
+                                                    <li ng-repeat="item in injury.natureOfInjuryList">{{ item }}</li>
+                                                </ul>
+                                                <span ng-if="!injury.natureOfInjuryList || !injury.natureOfInjuryList.length">{{ injury.natureOfInjury }}</span>
+                                            </td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">
+                                                <ul class="list-disc list-inside" ng-if="injury.bodyPartsList && injury.bodyPartsList.length">
+                                                    <li ng-repeat="item in injury.bodyPartsList">{{ item }}</li>
+                                                </ul>
+                                                <span ng-if="!injury.bodyPartsList || !injury.bodyPartsList.length">{{ injury.bodyParts }}</span>
+                                            </td>
                                             <td class="px-4 py-2 text-sm text-gray-900">{{ injury.description }}</td>
                                             <td class="px-4 py-2 text-sm">
                                                 <button type="button"
@@ -354,8 +364,8 @@
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         <tr ng-repeat="mc in vm.partC.medicalCertificates">
                                             <td class="px-4 py-2 text-sm text-gray-900">{{ mc.injuredPersonName }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ mc.fromDate }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ mc.toDate }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ mc.fromDate | date:'dd-MMM-yyyy' }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ mc.toDate | date:'dd-MMM-yyyy' }}</td>
                                             <td class="px-4 py-2 text-sm text-gray-900">{{ mc.numberOfDays }}</td>
                                             <td class="px-4 py-2 text-sm text-gray-900">
                                                 <span ng-show="mc.hasAttachment" class="text-green-600">Yes</span>
