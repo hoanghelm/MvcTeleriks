@@ -858,8 +858,8 @@ namespace WIRS.Services.Implementations
         {
             var ds = new DataSet();
             var dt = new DataTable("PersonInterviewed");
-            dt.Columns.Add("name", typeof(string));
             dt.Columns.Add("empid", typeof(string));
+            dt.Columns.Add("empname", typeof(string));
             dt.Columns.Add("empdesignation", typeof(string));
             dt.Columns.Add("empcontactno", typeof(string));
 
@@ -868,8 +868,8 @@ namespace WIRS.Services.Implementations
                 foreach (var person in personsInterviewed)
                 {
                     var row = dt.NewRow();
-                    row["name"] = person.Name ?? string.Empty;
                     row["empid"] = person.EmployeeNo ?? string.Empty;
+                    row["empname"] = person.Name ?? string.Empty;
                     row["empdesignation"] = person.Designation ?? string.Empty;
                     row["empcontactno"] = person.ContactNo ?? string.Empty;
                     dt.Rows.Add(row);

@@ -282,9 +282,9 @@
 
             vm.partC.personsInterviewed.push({
                 name: vm.partC.personInterviewed.name,
-                empid: vm.partC.personInterviewed.employeeNo || '',
-                empdesignation: vm.partC.personInterviewed.designation || '',
-                empcontactno: vm.partC.personInterviewed.contactNo || ''
+                employeeNo: vm.partC.personInterviewed.employeeNo || '',
+                designation: vm.partC.personInterviewed.designation || '',
+                contactNo: vm.partC.personInterviewed.contactNo || ''
             });
 
             vm.partC.personInterviewed = {};
