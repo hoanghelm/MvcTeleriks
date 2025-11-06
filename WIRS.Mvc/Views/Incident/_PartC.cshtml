@@ -1,6 +1,6 @@
 <div class="part-c-container bg-white shadow-md rounded-lg p-6">
     <div class="mb-6">
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part C - WSHO Investigation</h3>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part C - Investigation By WSHO</h3>
         <p class="text-sm text-gray-600">Detailed investigation and root cause analysis</p>
     </div>
 
@@ -46,11 +46,11 @@
                     </div>
                 </div>
 
-                <!-- Section C-2: Persons Interviewed -->
+                <!-- Section C-2: Particulars of Person (s) Interviewed -->
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC2">
-                            <span class="font-semibold">C-2: Persons Interviewed</span>
+                            <span class="font-semibold">C-2: Particulars of Person (s) Interviewed</span>
                         </button>
                     </h2>
                     <div id="collapseC2" class="accordion-collapse collapse show">
@@ -387,11 +387,11 @@
                     </div>
                 </div>
 
-                <!-- Section C-5: Incident Classification and Cause Analysis -->
+                <!-- Section C-5: Incident Analysis -->
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC5">
-                            <span class="font-semibold">C-5: Incident Classification and Cause Analysis</span>
+                            <span class="font-semibold">C-5: Incident Analysis</span>
                         </button>
                     </h2>
                     <div id="collapseC5" class="accordion-collapse collapse show">
@@ -476,29 +476,52 @@
                     </div>
                 </div>
 
-                <!-- Section C-6: Root Cause Analysis -->
+                <!-- Section C-6: Recommendations On The Action(s) To Be Taken -->
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC6">
-                            <span class="font-semibold">C-6: Root Cause Analysis</span>
+                            <span class="font-semibold">C-6: Recommendations On The Action(s) To Be Taken</span>
                         </button>
                     </h2>
                     <div id="collapseC6" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <div class="space-y-6">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Was the incident job-related? (from Part A)</label>
-                                    <p class="text-gray-900">{{ vm.incident.isJobrelated === 'Y' ? 'Yes' : 'No' }}</p>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Corrective and Preventive Action(s)</label>
+                                    <textarea kendo-text-area
+                                              k-ng-model="vm.partC.recommendedActions"
+                                              k-rows="6"
+                                              name="recommendedActions"
+                                              style="width: 100%;"
+                                              k-enable="!vm.partC.isReadOnly"></textarea>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.recommendedActions">
+                                        Corrective and Preventive Action(s) is required (ERR-139)
+                                    </span>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Section C-7: Additional Comment -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC7">
+                            <span class="font-semibold">C-7: Additional Comment</span>
+                        </button>
+                    </h2>
+                    <div id="collapseC7" class="accordion-collapse collapse show">
+                        <div class="accordion-body">
+                            <div class="space-y-6">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Was employee negligent?</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Negligent/ Non Negligent</label>
                                     <div class="space-y-2">
                                         <div ng-repeat="option in vm.negligentOptions" class="flex items-center">
                                             <input type="radio"
                                                    name="negligent"
                                                    ng-model="vm.partC.isNegligent"
                                                    ng-value="option.code"
+                                                   ng-disabled="vm.partC.isReadOnly"
                                                    id="neg{{ $index }}"
                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                                             <label for="neg{{ $index }}" class="ml-2 block text-sm text-gray-700">
@@ -507,128 +530,43 @@
                                         </div>
                                     </div>
                                     <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.isNegligent">
-                                        Negligent field is required (ERR-136)
-                                    </span>
-                                </div>
-
-                                <div ng-show="vm.partC.isNegligent === 'Y'">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Comments on Negligence</label>
-                                    <textarea kendo-text-area
-                                              k-ng-model="vm.partC.negligentComments"
-                                              k-rows="4"
-                                              style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"></textarea>
-                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && vm.partC.isNegligent === 'Y' && !vm.partC.negligentComments">
-                                        Negligent comments required when negligent is Yes (ERR-137)
+                                        Negligent/ Non Negligent is required (ERR-136)
                                     </span>
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Does risk assessment need review?</label>
-                                    <div class="space-y-2">
-                                        <div class="flex items-center">
-                                            <input type="radio"
-                                                   name="riskReview"
-                                                   ng-model="vm.partC.needsRiskAssessmentReview"
-                                                   value="Y"
-                                                   id="riskY"
-                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                            <label for="riskY" class="ml-2 block text-sm text-gray-700">Yes</label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input type="radio"
-                                                   name="riskReview"
-                                                   ng-model="vm.partC.needsRiskAssessmentReview"
-                                                   value="N"
-                                                   id="riskN"
-                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
-                                            <label for="riskN" class="ml-2 block text-sm text-gray-700">No</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div ng-show="vm.partC.needsRiskAssessmentReview === 'Y'">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Comments on Risk Assessment Review</label>
-                                    <textarea kendo-text-area
-                                              k-ng-model="vm.partC.riskAssessmentComments"
-                                              k-rows="4"
-                                              style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">What happened and why?</label>
-                                    <textarea kendo-text-area
-                                              k-ng-model="vm.partC.whatHappenedAndWhy"
-                                              k-rows="6"
-                                              name="whatHappened"
-                                              style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"></textarea>
-                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.whatHappenedAndWhy">
-                                        What happened and why is required (ERR-138)
-                                    </span>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Recommended Corrective/Preventive Actions</label>
-                                    <textarea kendo-text-area
-                                              k-ng-model="vm.partC.recommendedActions"
-                                              k-rows="6"
-                                              name="recommendedActions"
-                                              style="width: 100%;"
-                                              k-enable="!vm.partC.isReadOnly"></textarea>
-                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.recommendedActions">
-                                        Recommended actions is required (ERR-139)
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section C-7: Final Submission -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC7">
-                            <span class="font-semibold">C-7: Additional Comments and Submission</span>
-                        </button>
-                    </h2>
-                    <div id="collapseC7" class="accordion-collapse collapse show">
-                        <div class="accordion-body">
-                            <div class="space-y-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Additional Comments</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Comment</label>
                                     <textarea kendo-text-area
                                               k-ng-model="vm.partC.additionalComments"
                                               k-rows="4"
                                               style="width: 100%;"
                                               k-enable="!vm.partC.isReadOnly"></textarea>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.additionalComments">
+                                        Comment is required (ERR-137)
+                                    </span>
                                 </div>
 
-                                <div class="bg-gray-50 p-4 rounded-lg">
-                                    <h4 class="font-semibold text-gray-700 mb-3">WSHO Submission Info</h4>
-                                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600">Name</label>
-                                            <p class="mt-1 text-gray-900">{{ vm.currentUser.name }}</p>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600">Employee ID</label>
-                                            <p class="mt-1 text-gray-900">{{ vm.currentUser.userId }}</p>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600">Designation</label>
-                                            <p class="mt-1 text-gray-900">{{ vm.currentUser.designation }}</p>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600">Date</label>
-                                            <p class="mt-1 text-gray-900">{{ vm.getCurrentDate() }}</p>
-                                        </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Name</label>
+                                        <p class="mt-1 text-gray-900">{{ vm.currentUser.name }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Employee Number</label>
+                                        <p class="mt-1 text-gray-900">{{ vm.currentUser.userId }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Date of Submission</label>
+                                        <p class="mt-1 text-gray-900">{{ vm.getCurrentDate() }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Designation</label>
+                                        <p class="mt-1 text-gray-900">{{ vm.currentUser.designation }}</p>
                                     </div>
                                 </div>
 
-                                <div ng-show="vm.partC.showCloseOptions" class="form-group">
-                                    <label for="partC_cwsho" class="block text-sm font-medium text-gray-700 mb-1 required">Forward To (for closure)</label>
+                                <div class="form-group">
+                                    <label for="partC_cwsho" class="block text-sm font-medium text-gray-700 mb-1 required">Name of Chairman WSH</label>
                                     <select kendo-drop-down-list
                                             k-options="vm.partC.cwshoOptions"
                                             k-ng-model="vm.partC.cwshoId"
@@ -636,6 +574,9 @@
                                             class="md:w-1/2"
                                             k-enable="!vm.partC.isReadOnly">
                                     </select>
+                                    <span class="text-red-600 text-sm" ng-show="partCForm.$submitted && !vm.partC.cwshoId">
+                                        Name of Chairman WSH is required (ERR-138)
+                                    </span>
                                 </div>
                             </div>
 
@@ -649,7 +590,7 @@
                                         ng-disabled="vm.partC.closing"
                                         ng-show="vm.partC.showCloseOptions"
                                         class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50">
-                                    Reject
+                                    Close Report
                                 </button>
                                 <button type="button"
                                         ng-click="vm.savePartC()"
