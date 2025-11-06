@@ -748,14 +748,88 @@ namespace WIRS.Services.Implementations
             return await _workflowIncidentDataAccess.insert_incidents_workflows(incident.incident_id, workflow.GetXml());
         }
 
-        public Task<string> SavePartCAsync(PartCSubmitModel model, string userId)
+        public async Task<string> SavePartCAsync(PartCSubmitModel model, string userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var incident = new WorkflowIncident
+                {
+                    incident_id = model.IncidentId,
+                    negligent = model.IsNegligent,
+                    negligent_comments = model.NegligentComments ?? string.Empty,
+                    recommend_action_desc = model.RecommendedActions,
+                    what_happened_and_why_comments = model.WhatHappenedAndWhy ?? string.Empty,
+                    status = "02",
+                    modified_by = userId
+                };
+
+                var ireportDs = ConvertIReportToDataSet(model.IncidentId);
+                var interviewedDs = ConvertPersonsInterviewedToDataSet(model.PersonsInterviewed);
+                var injuryDetailsDs = ConvertInjuryDetailsToDataSet(model.InjuryDetails);
+                var causeAnalysisDs = ConvertCauseAnalysisToDataSet(model);
+                var medicalLeavesDs = ConvertMedicalCertificatesToDataSet(model.MedicalCertificates);
+                var workflowDs = new DataSet();
+                var attachmentDs = new DataSet();
+
+                var errorCode = await _workflowIncidentDataAccess.submit_incident_partc(
+                    incident,
+                    ireportDs.GetXml(),
+                    interviewedDs.GetXml(),
+                    injuryDetailsDs.GetXml(),
+                    causeAnalysisDs.GetXml(),
+                    medicalLeavesDs.GetXml(),
+                    workflowDs.GetXml(),
+                    attachmentDs.GetXml()
+                );
+
+                return errorCode;
+            }
+            catch (Exception)
+            {
+                return "ERROR_SAVE_PARTC";
+            }
         }
 
-        public Task<string> SubmitPartCAsync(PartCSubmitModel model, string userId)
+        public async Task<string> SubmitPartCAsync(PartCSubmitModel model, string userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var incident = new WorkflowIncident
+                {
+                    incident_id = model.IncidentId,
+                    negligent = model.IsNegligent,
+                    negligent_comments = model.AdditionalComments ?? string.Empty,
+                    recommend_action_desc = model.RecommendedActions,
+                    what_happened_and_why_comments = model.WhatHappenedAndWhy ?? string.Empty,
+                    status = "03",
+                    modified_by = userId
+                };
+
+                var ireportDs = ConvertIReportToDataSet(model.IncidentId);
+                var interviewedDs = ConvertPersonsInterviewedToDataSet(model.PersonsInterviewed);
+                var injuryDetailsDs = ConvertInjuryDetailsToDataSet(model.InjuryDetails);
+                var causeAnalysisDs = ConvertCauseAnalysisToDataSet(model);
+                var medicalLeavesDs = ConvertMedicalCertificatesToDataSet(model.MedicalCertificates);
+                var workflowDs = CreatePartCWorkflowDataSet(model.IncidentId, userId, model.CwshoId, model.AdditionalComments);
+                var attachmentDs = new DataSet();
+
+                var errorCode = await _workflowIncidentDataAccess.submit_incident_partc(
+                    incident,
+                    ireportDs.GetXml(),
+                    interviewedDs.GetXml(),
+                    injuryDetailsDs.GetXml(),
+                    causeAnalysisDs.GetXml(),
+                    medicalLeavesDs.GetXml(),
+                    workflowDs.GetXml(),
+                    attachmentDs.GetXml()
+                );
+
+                return errorCode;
+            }
+            catch (Exception)
+            {
+                return "ERROR_SUBMIT_PARTC";
+            }
         }
 
         public Task<string> ClosePartCAsync(PartCCloseModel model, string userId)
@@ -766,6 +840,207 @@ namespace WIRS.Services.Implementations
         public Task<string> SubmitPartDAsync(PartDSubmitModel model, string userId)
         {
             throw new NotImplementedException();
+        }
+
+        private DataSet ConvertIReportToDataSet(string incidentId)
+        {
+            var ds = new DataSet();
+            var dt = new DataTable("incidents_injured");
+            dt.Columns.Add("injured_emp_no", typeof(string));
+            dt.Columns.Add("fourth_day_mc_date", typeof(string));
+            dt.Columns.Add("ireport_no", typeof(string));
+            dt.Columns.Add("ireport_date", typeof(string));
+            ds.Tables.Add(dt);
+            return ds;
+        }
+
+        private DataSet ConvertPersonsInterviewedToDataSet(List<PersonInterviewedModel> personsInterviewed)
+        {
+            var ds = new DataSet();
+            var dt = new DataTable("PersonInterviewed");
+            dt.Columns.Add("name", typeof(string));
+            dt.Columns.Add("empid", typeof(string));
+            dt.Columns.Add("empdesignation", typeof(string));
+            dt.Columns.Add("empcontactno", typeof(string));
+
+            if (personsInterviewed != null)
+            {
+                foreach (var person in personsInterviewed)
+                {
+                    var row = dt.NewRow();
+                    row["name"] = person.Name ?? string.Empty;
+                    row["empid"] = person.EmployeeNo ?? string.Empty;
+                    row["empdesignation"] = person.Designation ?? string.Empty;
+                    row["empcontactno"] = person.ContactNo ?? string.Empty;
+                    dt.Rows.Add(row);
+                }
+            }
+
+            ds.Tables.Add(dt);
+            return ds;
+        }
+
+        private DataSet ConvertInjuryDetailsToDataSet(List<InjuryDetailModel> injuryDetails)
+        {
+            var ds = new DataSet();
+            var dt = new DataTable("incidents_injury_details");
+            dt.Columns.Add("injured_emp_no", typeof(string));
+            dt.Columns.Add("nature_injury_code", typeof(string));
+            dt.Columns.Add("part_of_body_code", typeof(string));
+            dt.Columns.Add("description", typeof(string));
+
+            if (injuryDetails != null)
+            {
+                foreach (var injury in injuryDetails)
+                {
+                    foreach (var natureCode in injury.NatureOfInjury ?? new List<string>())
+                    {
+                        var bodyParts = new List<string>();
+                        if (injury.HeadNeckTorso != null) bodyParts.AddRange(injury.HeadNeckTorso);
+                        if (injury.UpperLimbs != null) bodyParts.AddRange(injury.UpperLimbs);
+                        if (injury.LowerLimbs != null) bodyParts.AddRange(injury.LowerLimbs);
+
+                        foreach (var bodyPartCode in bodyParts)
+                        {
+                            var row = dt.NewRow();
+                            row["injured_emp_no"] = injury.InjuredPersonId ?? string.Empty;
+                            row["nature_injury_code"] = natureCode;
+                            row["part_of_body_code"] = bodyPartCode;
+                            row["description"] = injury.Description ?? string.Empty;
+                            dt.Rows.Add(row);
+                        }
+                    }
+                }
+            }
+
+            ds.Tables.Add(dt);
+            return ds;
+        }
+
+        private DataSet ConvertCauseAnalysisToDataSet(PartCSubmitModel model)
+        {
+            var ds = new DataSet();
+            var dt = new DataTable("cause_analysis");
+            dt.Columns.Add("lookup_type", typeof(string));
+            dt.Columns.Add("lookup_code", typeof(string));
+            dt.Columns.Add("type_description", typeof(string));
+
+            if (model.IncidentClassList != null)
+            {
+                foreach (var code in model.IncidentClassList)
+                {
+                    var row = dt.NewRow();
+                    row["lookup_type"] = "Incident Class";
+                    row["lookup_code"] = code;
+                    row["type_description"] = string.Empty;
+                    dt.Rows.Add(row);
+                }
+            }
+
+            if (model.IncidentAgentList != null)
+            {
+                foreach (var code in model.IncidentAgentList)
+                {
+                    var row = dt.NewRow();
+                    row["lookup_type"] = "Incident Agent";
+                    row["lookup_code"] = code;
+                    row["type_description"] = string.Empty;
+                    dt.Rows.Add(row);
+                }
+            }
+
+            if (model.UnsafeConditionsList != null)
+            {
+                foreach (var code in model.UnsafeConditionsList)
+                {
+                    var row = dt.NewRow();
+                    row["lookup_type"] = "Unsafe Condition";
+                    row["lookup_code"] = code;
+                    row["type_description"] = string.Empty;
+                    dt.Rows.Add(row);
+                }
+            }
+
+            if (model.UnsafeActsList != null)
+            {
+                foreach (var code in model.UnsafeActsList)
+                {
+                    var row = dt.NewRow();
+                    row["lookup_type"] = "Unsafe Act";
+                    row["lookup_code"] = code;
+                    row["type_description"] = string.Empty;
+                    dt.Rows.Add(row);
+                }
+            }
+
+            if (model.ContributingFactorsList != null)
+            {
+                foreach (var code in model.ContributingFactorsList)
+                {
+                    var row = dt.NewRow();
+                    row["lookup_type"] = "Factors";
+                    row["lookup_code"] = code;
+                    row["type_description"] = string.Empty;
+                    dt.Rows.Add(row);
+                }
+            }
+
+            ds.Tables.Add(dt);
+            return ds;
+        }
+
+        private DataSet ConvertMedicalCertificatesToDataSet(List<MedicalCertificateModel> medicalCertificates)
+        {
+            var ds = new DataSet();
+            var dt = new DataTable("incidents_medical_leaves");
+            dt.Columns.Add("injured_emp_no", typeof(string));
+            dt.Columns.Add("from_date", typeof(string));
+            dt.Columns.Add("to_date", typeof(string));
+            dt.Columns.Add("no_of_days", typeof(string));
+
+            if (medicalCertificates != null)
+            {
+                foreach (var mc in medicalCertificates)
+                {
+                    var row = dt.NewRow();
+                    row["injured_emp_no"] = mc.InjuredPersonId ?? string.Empty;
+                    row["from_date"] = mc.FromDate ?? string.Empty;
+                    row["to_date"] = mc.ToDate ?? string.Empty;
+                    row["no_of_days"] = mc.NumberOfDays.ToString();
+                    dt.Rows.Add(row);
+                }
+            }
+
+            ds.Tables.Add(dt);
+            return ds;
+        }
+
+        private DataSet CreatePartCWorkflowDataSet(string incidentId, string fromUserId, string toUserId, string remarks)
+        {
+            var ds = new DataSet("NewDataSet");
+            var dt = new DataTable("incidents_workflows");
+            dt.Columns.Add("incident_id", typeof(string));
+            dt.Columns.Add("actions_code", typeof(string));
+            dt.Columns.Add("actions_role", typeof(string));
+            dt.Columns.Add("from", typeof(string));
+            dt.Columns.Add("to", typeof(string));
+            dt.Columns.Add("remarks", typeof(string));
+            dt.Columns.Add("Date", typeof(string));
+            dt.Columns.Add("attachment", typeof(string));
+
+            var row = dt.NewRow();
+            row["incident_id"] = incidentId;
+            row["actions_code"] = "03";
+            row["actions_role"] = "CWSHO";
+            row["from"] = fromUserId;
+            row["to"] = toUserId ?? string.Empty;
+            row["remarks"] = remarks ?? string.Empty;
+            row["Date"] = string.Empty;
+            row["attachment"] = string.Empty;
+            dt.Rows.Add(row);
+
+            ds.Tables.Add(dt);
+            return ds;
         }
     }
 }
