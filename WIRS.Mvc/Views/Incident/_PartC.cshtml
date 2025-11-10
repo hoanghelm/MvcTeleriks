@@ -578,19 +578,19 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Name</label>
-                                        <p class="mt-1 text-gray-900">{{ vm.currentUser.name }}</p>
+                                        <p class="mt-1 text-gray-900">{{ vm.partC.submitterName || vm.currentUser.name }}</p>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Employee Number</label>
-                                        <p class="mt-1 text-gray-900">{{ vm.currentUser.userId }}</p>
+                                        <p class="mt-1 text-gray-900">{{ vm.partC.submitterEmpId || vm.currentUser.userId }}</p>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Date of Submission</label>
-                                        <p class="mt-1 text-gray-900">{{ vm.getCurrentDate() }}</p>
+                                        <p class="mt-1 text-gray-900">{{ vm.partC.submissionDate || vm.getCurrentDate() }}</p>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Designation</label>
-                                        <p class="mt-1 text-gray-900">{{ vm.currentUser.designation }}</p>
+                                        <p class="mt-1 text-gray-900">{{ vm.partC.submitterDesignation || vm.currentUser.designation }}</p>
                                     </div>
                                 </div>
 

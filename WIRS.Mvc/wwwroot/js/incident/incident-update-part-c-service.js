@@ -185,14 +185,45 @@
         function determinePartCMode(vm) {
             if (vm.incident.status === '02') {
                 vm.partC.isReadOnly = false;
+                vm.partC.submitterName = '';
+                vm.partC.submitterEmpId = '';
+                vm.partC.submitterDesignation = '';
+                vm.partC.submissionDate = '';
             } else if (parseInt(vm.incident.status) > 2) {
                 vm.partC.isReadOnly = true;
+                loadPartCWorkflowData(vm);
             }
+        }
+
+        function loadPartCWorkflowData(vm) {
+            if (!vm.incident.workflows || vm.incident.workflows.length === 0) {
+                return;
+            }
+
+            var partCWorkflows = vm.incident.workflows.filter(function (wf) {
+                return wf.status === '02' || wf.status === '03';
+            });
+
+            if (partCWorkflows.length === 0) {
+                return;
+            }
+
+            partCWorkflows.sort(function (a, b) {
+                var dateA = new Date(a.submittedDate);
+                var dateB = new Date(b.submittedDate);
+                return dateB - dateA;
+            });
+
+            var latestWorkflow = partCWorkflows[0];
+            vm.partC.submitterName = latestWorkflow.fromName || '';
+            vm.partC.submitterEmpId = latestWorkflow.from || '';
+            vm.partC.submitterDesignation = latestWorkflow.fromDesignation || '';
+            vm.partC.submissionDate = latestWorkflow.submittedDate || '';
         }
 
         function loadPartCReadOnlyData(vm) {
             vm.partC.isNegligent = vm.incident.negligent || '';
-            vm.partC.negligentComments = vm.incident.negligentComments || '';
+            vm.partC.additionalComments = vm.incident.negligentComments || '';
             vm.partC.whatHappenedAndWhy = vm.incident.whatHappenedAndWhyComments || '';
             vm.partC.recommendedActions = vm.incident.recommendActionDesc || '';
 
