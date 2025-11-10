@@ -200,8 +200,8 @@
                 return;
             }
 
-            var partCWorkflows = vm.incident.workflows.filter(function (wf) {
-                return wf.status === '02' || wf.status === '03';
+            var partCWorkflows = vm.incident.workflows.filter(function (w) {
+                return w.actionCode === '03';
             });
 
             if (partCWorkflows.length === 0) {
