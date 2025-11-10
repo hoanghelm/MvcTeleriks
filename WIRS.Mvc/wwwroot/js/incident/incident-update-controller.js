@@ -3,9 +3,9 @@
         .module('incidentUpdateApp')
         .controller('IncidentUpdateController', IncidentUpdateController);
 
-    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', 'IncidentUpdateService', 'PartAService', 'PartBService', 'PartCService', 'PartDService'];
+    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', '$q', 'IncidentUpdateService', 'PartAService', 'PartBService', 'PartCService', 'PartDService'];
 
-    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, IncidentUpdateService, PartAService, PartBService, PartCService, PartDService) {
+    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, $q, IncidentUpdateService, PartAService, PartBService, PartCService, PartDService) {
         var vm = this;
 
         vm.loading = true;
@@ -82,12 +82,12 @@
                 return;
             }
 
-            Promise.all([
+            $q.all([
                 loadCurrentUser(),
                 loadIncident(incidentId)
             ])
                 .then(function () {
-                    return Promise.all([
+                    return $q.all([
                         PartAService.loadPartAData(vm),
                         PartBService.loadPartBData(vm),
                         PartCService.loadPartCData(vm),

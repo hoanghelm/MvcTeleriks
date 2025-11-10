@@ -5,9 +5,9 @@
         .module('incidentUpdateApp')
         .factory('PartDService', PartDService);
 
-    PartDService.$inject = ['$window', '$timeout', 'IncidentUpdateService'];
+    PartDService.$inject = ['$window', '$timeout', '$q', 'IncidentUpdateService'];
 
-    function PartDService($window, $timeout, IncidentUpdateService) {
+    function PartDService($window, $timeout, $q, IncidentUpdateService) {
         var service = {
             initializePartD: initializePartD,
             loadPartDData: loadPartDData,
@@ -52,7 +52,7 @@
 
         function loadPartDData(vm, getCurrentDate) {
             if (!canViewPartD(vm)) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
             determinePartDMode(vm);
@@ -62,7 +62,7 @@
                 loadPartDReadOnlyData(vm);
             }
 
-            return Promise.all([
+            return $q.all([
                 loadWSHOs(vm),
                 loadHeadLOBs(vm)
             ]).then(function () {
@@ -118,7 +118,7 @@
 
         function loadWSHOs(vm) {
             if (!vm.incident.sectorCode || !vm.incident.lobCode) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
             return IncidentUpdateService.getWSHOs(
@@ -143,7 +143,7 @@
 
         function loadHeadLOBs(vm) {
             if (!vm.incident.sectorCode || !vm.incident.lobCode) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
             return IncidentUpdateService.getHODs(

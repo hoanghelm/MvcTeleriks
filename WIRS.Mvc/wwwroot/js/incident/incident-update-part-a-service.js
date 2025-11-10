@@ -5,9 +5,9 @@
         .module('incidentUpdateApp')
         .factory('PartAService', PartAService);
 
-    PartAService.$inject = ['$timeout', '$sce', 'IncidentUpdateService'];
+    PartAService.$inject = ['$timeout', '$sce', '$q', 'IncidentUpdateService'];
 
-    function PartAService($timeout, $sce, IncidentUpdateService) {
+    function PartAService($timeout, $sce, $q, IncidentUpdateService) {
         var service = {
             initializePartA: initializePartA,
             loadPartAData: loadPartAData,
@@ -166,7 +166,7 @@
         }
 
         function loadPartAData(vm) {
-            return Promise.all([
+            return $q.all([
                 loadPartALookups(vm),
                 loadPartAWorkflowUsers(vm)
             ]).then(function () {
@@ -180,7 +180,7 @@
         }
 
         function loadPartALookups(vm) {
-            return Promise.all([
+            return $q.all([
                 IncidentUpdateService.getIncidentTypes().then(function (data) {
                     vm.partA.incidentTypeOptions.dataSource = data;
                 }),
@@ -213,7 +213,7 @@
         }
 
         function loadPartAWorkflowUsers(vm) {
-            return Promise.all([
+            return $q.all([
                 IncidentUpdateService.getHODs(
                     vm.incident.sectorCode || vm.incident.sbaCode,
                     vm.incident.lobCode || vm.incident.sbuCode,

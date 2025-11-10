@@ -5,9 +5,9 @@
         .module('incidentUpdateApp')
         .factory('PartCService', PartCService);
 
-    PartCService.$inject = ['$window', '$timeout', 'IncidentUpdateService'];
+    PartCService.$inject = ['$window', '$timeout', '$q', 'IncidentUpdateService'];
 
-    function PartCService($window, $timeout, IncidentUpdateService) {
+    function PartCService($window, $timeout, $q, IncidentUpdateService) {
         var service = {
             initializePartC: initializePartC,
             loadPartCData: loadPartCData,
@@ -81,7 +81,7 @@
 
         function loadPartCData(vm) {
             if (!canViewPartC(vm)) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
             determinePartCMode(vm);
@@ -90,7 +90,7 @@
                 vm.partC.injuredPersonOptions.dataSource.data(vm.incident.injuredPersons);
             }
 
-            return Promise.all([
+            return $q.all([
                 loadPartCLookups(vm),
                 loadCWSHOs(vm)
             ]).then(function () {
@@ -138,14 +138,14 @@
                 })
             ];
 
-            return Promise.all(promises).catch(function (error) {
-                return Promise.resolve();
+            return $q.all(promises).catch(function (error) {
+                return $q.resolve();
             });
         }
 
         function loadCWSHOs(vm) {
             if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
             return IncidentUpdateService.getCWSHOs(
@@ -322,7 +322,7 @@
                 }
             }
 
-            return Promise.resolve();
+            return $q.resolve();
         }
 
         function canViewPartC(vm) {

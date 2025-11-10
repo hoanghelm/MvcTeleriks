@@ -5,9 +5,9 @@
         .module('incidentUpdateApp')
         .factory('PartBService', PartBService);
 
-    PartBService.$inject = ['$window', '$timeout', 'IncidentUpdateService'];
+    PartBService.$inject = ['$window', '$timeout', '$q', 'IncidentUpdateService'];
 
-    function PartBService($window, $timeout, IncidentUpdateService) {
+    function PartBService($window, $timeout, $q, IncidentUpdateService) {
         var service = {
             initializePartB: initializePartB,
             loadPartBData: loadPartBData,
@@ -58,10 +58,10 @@
 
         function loadPartBData(vm) {
             if (!canViewPartB(vm)) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
-            return Promise.all([
+            return $q.all([
                 loadInjuredCaseTypes(vm),
                 loadWSHOs(vm),
                 loadAlternateWSHOs(vm),
@@ -85,7 +85,7 @@
 
         function loadWSHOs(vm) {
             if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
             return IncidentUpdateService.getWSHOs(
@@ -105,7 +105,7 @@
 
         function loadAlternateWSHOs(vm) {
             if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
             return IncidentUpdateService.getAlternateWSHOs(
@@ -125,7 +125,7 @@
 
         function loadEmailToList(vm) {
             if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
-                return Promise.resolve();
+                return $q.resolve();
             }
 
             return IncidentUpdateService.getPartBCopyToList(
