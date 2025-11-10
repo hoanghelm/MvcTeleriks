@@ -702,6 +702,92 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> RevertPartDToWSHO([FromBody] PartDActionRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.Comments))
+                {
+                    return Json(new { success = false, message = "Review & Comment is required", errorCode = "ERR-137" });
+                }
+
+                if (string.IsNullOrEmpty(request.WshoId))
+                {
+                    return Json(new { success = false, message = "Name of WSHO is required", errorCode = "ERR-135" });
+                }
+
+                var result = await _workflowService.RevertPartDToWSHOAsync(request.IncidentId, request.Comments, request.WshoId, currentUser.UserId);
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part D reverted successfully to WSHO", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while reverting Part D", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitPartDToHeadLOB([FromBody] PartDActionRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.Comments))
+                {
+                    return Json(new { success = false, message = "Review & Comment is required", errorCode = "ERR-137" });
+                }
+
+                if (string.IsNullOrEmpty(request.HeadLobId))
+                {
+                    return Json(new { success = false, message = "Name of Head LOB is required", errorCode = "ERR-133" });
+                }
+
+                var result = await _workflowService.SubmitPartDToHeadLOBAsync(request.IncidentId, request.Comments, request.HeadLobId, currentUser.UserId);
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part D submitted successfully to Head LOB", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while submitting Part D", error = ex.Message });
+            }
+        }
+
         private string ValidatePartC(PartCSaveRequest request)
         {
             if (string.IsNullOrEmpty(request.IsNegligent))
@@ -1108,5 +1194,14 @@ namespace WIRS.Mvc.Controllers
         public string HsbuId { get; set; }
         public List<string> EmailToList { get; set; }
         public List<CopyToPersonModel> AdditionalCopyToList { get; set; }
+    }
+
+    public class PartDActionRequest
+    {
+        public string IncidentId { get; set; }
+        public string Comments { get; set; }
+        public string WshoId { get; set; }
+        public string HeadLobId { get; set; }
+        public string ActionType { get; set; }
     }
 }

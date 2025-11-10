@@ -816,6 +816,119 @@ namespace WIRS.Services.Implementations
             throw new NotImplementedException();
         }
 
+        public async Task<string> RevertPartDToWSHOAsync(string incidentId, string comments, string wshoId, string userId)
+        {
+            try
+            {
+                var incident = new WorkflowIncident
+                {
+                    incident_id = incidentId,
+                    status = "02",
+                    modified_by = userId
+                };
+
+                await _workflowIncidentDataAccess.update_Incidents(incident);
+
+                var workflowDs = new DataSet();
+                var dt = new DataTable();
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                DataRow wshoRow = dt.NewRow();
+                wshoRow["incident_id"] = incidentId;
+                wshoRow["actions_code"] = "03";
+                wshoRow["actions_role"] = "WSHO";
+                wshoRow["from"] = userId;
+                wshoRow["to"] = wshoId;
+                wshoRow["remarks"] = comments;
+                wshoRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                wshoRow["attachment"] = string.Empty;
+                dt.Rows.Add(wshoRow);
+
+                var incidentData = await _workflowIncidentDataAccess.get_incident_by_id(new WorkflowIncident { incident_id = incidentId });
+                if (incidentData?.Tables?.Count > 0 && incidentData.Tables[0].Rows.Count > 0)
+                {
+                    var awshoId = incidentData.Tables[0].Rows[0]["awsho_id"]?.ToString();
+                    if (!string.IsNullOrEmpty(awshoId))
+                    {
+                        DataRow awshoRow = dt.NewRow();
+                        awshoRow["incident_id"] = incidentId;
+                        awshoRow["actions_code"] = "03";
+                        awshoRow["actions_role"] = "A_WSHO";
+                        awshoRow["from"] = userId;
+                        awshoRow["to"] = awshoId;
+                        awshoRow["remarks"] = string.Empty;
+                        awshoRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        awshoRow["attachment"] = string.Empty;
+                        dt.Rows.Add(awshoRow);
+                    }
+                }
+
+                workflowDs.Tables.Add(dt);
+
+                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                return errorCode;
+            }
+            catch (Exception)
+            {
+                return "ERROR_REVERT_PARTD";
+            }
+        }
+
+        public async Task<string> SubmitPartDToHeadLOBAsync(string incidentId, string comments, string headLobId, string userId)
+        {
+            try
+            {
+                var incident = new WorkflowIncident
+                {
+                    incident_id = incidentId,
+                    status = "04",
+                    modified_by = userId
+                };
+
+                await _workflowIncidentDataAccess.update_Incidents(incident);
+
+                var workflowDs = new DataSet();
+                var dt = new DataTable();
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                DataRow headLobRow = dt.NewRow();
+                headLobRow["incident_id"] = incidentId;
+                headLobRow["actions_code"] = "03";
+                headLobRow["actions_role"] = "HSBU";
+                headLobRow["from"] = userId;
+                headLobRow["to"] = headLobId;
+                headLobRow["remarks"] = comments;
+                headLobRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                headLobRow["attachment"] = string.Empty;
+                dt.Rows.Add(headLobRow);
+
+                workflowDs.Tables.Add(dt);
+
+                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                return errorCode;
+            }
+            catch (Exception)
+            {
+                return "ERROR_SUBMIT_PARTD";
+            }
+        }
+
         private DataSet ConvertIReportToDataSet(PartCSubmitModel model)
         {
             var ds = new DataSet();

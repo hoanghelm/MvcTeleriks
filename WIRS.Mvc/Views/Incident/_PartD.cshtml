@@ -1,9 +1,8 @@
-@* Part D - HOD Comments on Investigation *@
+@* Part D - Review & Comment By Chairman WSH Committee *@
 
 <div class="bg-white shadow-md rounded-lg p-6">
     <div class="mb-6">
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part D - HOD Comments on Investigation</h3>
-        <p class="text-sm text-gray-600">Review the WSHO's investigation findings and provide your comments before forwarding to HSBU for approval.</p>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part D - Review & Comment By Chairman WSH Committee</h3>
     </div>
 
     <div ng-show="vm.partD.validationMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -14,175 +13,101 @@
         {{ vm.partD.successMessage }}
     </div>
 
-    <form name="partDForm" ng-submit="vm.submitPartD()" novalidate>
+    <form name="partDForm" novalidate>
         <div class="space-y-6">
-            <!-- Section 1: HOD Comments -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4">1. HOD Comments</h4>
-
-                <div>
-                    <label for="partD_comments" class="block text-sm font-medium text-gray-700 mb-1 required">
-                        Comments on Investigation Findings
-                    </label>
-                    <textarea kendo-text-area
-                              k-ng-model="vm.partD.comments"
-                              k-rows="6"
-                              id="partD_comments"
-                              name="partDComments"
-                              style="width: 100%;"
-                              k-enable="!vm.partD.isReadOnly"
-                              maxlength="2000"
-                              required></textarea>
-                    <div class="flex justify-between items-center mt-1">
-                        <span class="text-red-600 text-sm" ng-show="partDForm.partDComments.$touched && partDForm.partDComments.$invalid">
-                            Comments are required (ERR-137)
-                        </span>
-                        <span class="text-sm text-gray-500">{{ vm.partD.comments ? vm.partD.comments.length : 0 }} / 2000 characters</span>
-                    </div>
+            <div class="form-group">
+                <label for="partD_comments" class="block text-sm font-medium text-gray-700 mb-1 required">
+                    Review & Comment
+                </label>
+                <textarea kendo-text-area
+                          k-ng-model="vm.partD.comments"
+                          k-rows="6"
+                          id="partD_comments"
+                          name="partDComments"
+                          style="width: 100%;"
+                          k-enable="!vm.partD.isReadOnly"
+                          maxlength="4000"
+                          required></textarea>
+                <div class="flex justify-between items-center mt-1">
+                    <span class="text-red-600 text-sm" ng-show="!vm.partD.isReadOnly && partDForm.partDComments.$touched && partDForm.partDComments.$invalid">
+                        Review & Comment is required
+                    </span>
+                    <span class="text-sm text-gray-500">{{ vm.partD.comments ? vm.partD.comments.length : 0 }} / 4000 characters</span>
                 </div>
             </div>
 
-            <!-- Section 2: Forward To -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4">2. Forward To</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <p class="mt-1 text-gray-900">{{ vm.partD.submitterName || vm.currentUser.name }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Employee Number</label>
+                    <p class="mt-1 text-gray-900">{{ vm.partD.submitterEmpId || vm.currentUser.userId }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Date of Submission</label>
+                    <p class="mt-1 text-gray-900">{{ vm.partD.submissionDate || vm.getCurrentDate() }}</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                    <p class="mt-1 text-gray-900">{{ vm.partD.submitterDesignation || vm.currentUser.designation }}</p>
+                </div>
+            </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
-                    <label for="partD_hsbu" class="block text-sm font-medium text-gray-700 mb-1 required">
-                        Head of SBU (HSBU)
+                    <label for="partD_wsho" class="block text-sm font-medium text-gray-700 mb-1">
+                        Name of WSHO
                     </label>
                     <select kendo-drop-down-list
-                            k-options="vm.partD.hsbuOptions"
-                            k-ng-model="vm.partD.hsbuId"
-                            id="partD_hsbu"
-                            name="partDHsbu"
-                            class="w-full"
-                            k-enable="!vm.partD.isReadOnly"
-                            required>
+                            k-options="vm.partD.wshoOptions"
+                            k-ng-model="vm.partD.wshoId"
+                            id="partD_wsho"
+                            name="partDWsho"
+                            style="width: 100%;"
+                            k-enable="!vm.partD.isReadOnly">
                     </select>
-                    <span class="text-red-600 text-sm" ng-show="partDForm.partDHsbu.$touched && partDForm.partDHsbu.$invalid">
-                        HSBU selection is required (ERR-133)
-                    </span>
+                </div>
+                <div class="form-group">
+                    <label for="partD_headlob" class="block text-sm font-medium text-gray-700 mb-1">
+                        Name of Head LOB
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partD.headLobOptions"
+                            k-ng-model="vm.partD.headLobId"
+                            id="partD_headlob"
+                            name="partDHeadLob"
+                            style="width: 100%;"
+                            k-enable="!vm.partD.isReadOnly">
+                    </select>
                 </div>
             </div>
 
-            <!-- Section 3: CC/Email To -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4">3. CC/Email To</h4>
-
-                <!-- Standard Email To List -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Standard Email Recipients</label>
-                    <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
-                        <div ng-repeat="person in vm.partD.emailToList" class="flex items-center">
-                            <input type="checkbox"
-                                   id="emailTo_{{ person.userId }}"
-                                   ng-model="person.selected"
-                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                   ng-disabled="vm.partD.isReadOnly">
-                            <label for="emailTo_{{ person.userId }}" class="ml-2 text-sm text-gray-700">
-                                {{ person.userName }} ({{ person.userId }}) - {{ person.designation }}
-                            </label>
-                        </div>
-                        <div ng-show="vm.partD.emailToList.length === 0" class="text-sm text-gray-500 italic">
-                            No standard recipients found
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Additional Copy To -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Additional Recipients (Optional)</label>
-                    <div ng-show="!vm.partD.isReadOnly" class="mb-3">
-                        <button type="button"
-                                ng-click="vm.openEmployeeSearchForPartD()"
-                                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <i class="fas fa-search mr-2"></i>Add Recipient
-                        </button>
-                    </div>
-
-                    <div ng-show="vm.partD.additionalCopyToList.length > 0" class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 border border-gray-300 rounded">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Employee ID</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
-                                    <th ng-show="!vm.partD.isReadOnly" class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr ng-repeat="person in vm.partD.additionalCopyToList">
-                                    <td class="px-4 py-3 text-sm text-gray-900">{{ person.employeeId }}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-900">{{ person.name }}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-900">{{ person.designation }}</td>
-                                    <td ng-show="!vm.partD.isReadOnly" class="px-4 py-3 text-center">
-                                        <button type="button"
-                                                ng-click="vm.removeAdditionalCopyToFromPartD($index)"
-                                                class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="flex justify-between space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partD.isReadOnly">
+                <div></div>
+                <div class="flex space-x-4">
+                    <button type="button"
+                            ng-click="vm.revertToWSHO()"
+                            ng-disabled="vm.partD.isSubmitting"
+                            class="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <span ng-show="!vm.partD.isSubmitting">Revert to WSHO</span>
+                        <span ng-show="vm.partD.isSubmitting">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Processing...
+                        </span>
+                    </button>
+                    <button type="button"
+                            ng-click="vm.submitToHeadLOB()"
+                            ng-disabled="vm.partD.isSubmitting"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <span ng-show="!vm.partD.isSubmitting">Submit to Head LOB</span>
+                        <span ng-show="vm.partD.isSubmitting">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Submitting...
+                        </span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Section 4: Submitter Information -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="text-lg font-semibold text-gray-700 mb-4">4. Submitter Information</h4>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                        <input kendo-text-box
-                               k-ng-model="vm.currentUser.userName"
-                               style="width: 100%;"
-                               k-enable="false" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
-                        <input kendo-text-box
-                               k-ng-model="vm.currentUser.userId"
-                               style="width: 100%;"
-                               k-enable="false" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
-                        <input kendo-text-box
-                               k-ng-model="vm.currentUser.designation"
-                               style="width: 100%;"
-                               k-enable="false" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                        <input kendo-text-box
-                               k-ng-model="vm.partD.currentDate"
-                               style="width: 100%;"
-                               k-enable="false" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partD.isReadOnly">
-                <button type="button"
-                        ng-click="vm.cancelPartD()"
-                        class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-                    Cancel
-                </button>
-                <button type="submit"
-                        ng-disabled="partDForm.$invalid || vm.partD.isSubmitting"
-                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                    <span ng-show="!vm.partD.isSubmitting">Submit to HSBU</span>
-                    <span ng-show="vm.partD.isSubmitting">
-                        <i class="fas fa-spinner fa-spin mr-2"></i>Submitting...
-                    </span>
-                </button>
-            </div>
-
-            <!-- Workflow History -->
             <div class="mt-6" ng-show="vm.getWorkflowsByAction('04').length > 0">
                 <h4 class="text-lg font-semibold text-gray-700 mb-3">Workflow History</h4>
                 <table class="min-w-full divide-y divide-gray-200 border border-gray-300">

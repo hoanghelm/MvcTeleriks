@@ -17,6 +17,8 @@ namespace WIRS.Services.Interfaces
         Task<string> SubmitPartCAsync(PartCSubmitModel model, string userId);
         Task<string> ClosePartCAsync(PartCCloseModel model, string userId);
         Task<string> SubmitPartDAsync(PartDSubmitModel model, string userId);
+        Task<string> RevertPartDToWSHOAsync(string incidentId, string comments, string wshoId, string userId);
+        Task<string> SubmitPartDToHeadLOBAsync(string incidentId, string comments, string headLobId, string userId);
         Task<string> SubmitIncidentPartCAsync(WorkflowIncidentPartCModel model, string userId);
         Task<DataSet> GetIncidentWorkflowsAsync(string incidentId, string status = "");
         Task<List<IncidentStagePermissionModel>> GetIncidentStagePermissionsAsync(string incidentId, string userId);

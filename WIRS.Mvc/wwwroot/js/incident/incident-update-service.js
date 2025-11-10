@@ -40,7 +40,9 @@
             closePartC: closePartC,
             getHSBUs: getHSBUs,
             getPartDCopyToList: getPartDCopyToList,
-            submitPartD: submitPartD
+            submitPartD: submitPartD,
+            revertPartDToWSHO: revertPartDToWSHO,
+            submitPartDToHeadLOB: submitPartDToHeadLOB
         };
 
         return service;
@@ -297,12 +299,23 @@
                 .catch(handleError);
         }
 
+        function revertPartDToWSHO(revertData) {
+            return $http.post('/Incident/RevertPartDToWSHO', revertData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function submitPartDToHeadLOB(submitData) {
+            return $http.post('/Incident/SubmitPartDToHeadLOB', submitData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
         function handleSuccess(response) {
             return response.data;
         }
 
         function handleError(error) {
-            console.error('API Error:', error);
             return $q.reject(error.data || error.statusText || 'An error occurred');
         }
     }

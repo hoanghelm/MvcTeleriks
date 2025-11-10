@@ -13,11 +13,8 @@
             loadPartDData: loadPartDData,
             canViewPartD: canViewPartD,
             canEditPartD: canEditPartD,
-            submitPartD: submitPartD,
-            openEmployeeSearchForPartD: openEmployeeSearchForPartD,
-            removeAdditionalCopyToFromPartD: removeAdditionalCopyToFromPartD,
-            cancelPartD: cancelPartD,
-            getHsbuName: getHsbuName
+            revertToWSHO: revertToWSHO,
+            submitToHeadLOB: submitToHeadLOB
         };
 
         return service;
@@ -26,26 +23,31 @@
             vm.partD = {
                 isReadOnly: false,
                 comments: '',
-                hsbuId: '',
-                emailToList: [],
-                additionalCopyToList: [],
+                wshoId: '',
+                headLobId: '',
                 submitterName: '',
                 submitterEmpId: '',
                 submitterDesignation: '',
-                submittedDate: '',
-                currentDate: '',
+                submissionDate: '',
                 validationMessage: '',
                 successMessage: '',
                 isSubmitting: false,
-                hsbuOptions: {
+                wshoOptions: {
                     dataTextField: 'userName',
                     dataValueField: 'userId',
                     dataSource: [],
-                    optionLabel: '-- Select HSBU --'
+                    optionLabel: '-- Select WSHO --'
+                },
+                headLobOptions: {
+                    dataTextField: 'userName',
+                    dataValueField: 'userId',
+                    dataSource: [],
+                    optionLabel: '-- Select Head LOB --'
                 }
             };
 
-            vm.hsbuList = [];
+            vm.wshoList = [];
+            vm.headLobList = [];
         }
 
         function loadPartDData(vm, getCurrentDate) {
@@ -53,16 +55,16 @@
                 return Promise.resolve();
             }
 
-            vm.partD.currentDate = getCurrentDate();
             determinePartDMode(vm);
 
             if (vm.partD.isReadOnly) {
-                return loadPartDReadOnlyData(vm);
+                loadPartDWorkflowData(vm);
+                loadPartDReadOnlyData(vm);
             }
 
             return Promise.all([
-                loadHSBUs(vm),
-                loadPartDEmailToList(vm)
+                loadWSHOs(vm),
+                loadHeadLOBs(vm)
             ]).then(function () {
                 if (!vm.partD.isReadOnly) {
                     $timeout(function () {
@@ -73,45 +75,94 @@
         }
 
         function determinePartDMode(vm) {
-            vm.partD.isReadOnly = vm.incident.status !== '03' || !canEditPartD(vm);
+            if (vm.incident.status === '03') {
+                vm.partD.isReadOnly = false;
+                vm.partD.submitterName = '';
+                vm.partD.submitterEmpId = '';
+                vm.partD.submitterDesignation = '';
+                vm.partD.submissionDate = '';
+            } else if (parseInt(vm.incident.status) > 3) {
+                vm.partD.isReadOnly = true;
+            }
+        }
+
+        function loadPartDWorkflowData(vm) {
+            if (!vm.incident.workflows || vm.incident.workflows.length === 0) {
+                return;
+            }
+
+            var partDWorkflows = vm.incident.workflows.filter(function (w) {
+                return w.actionCode === '04';
+            });
+
+            if (partDWorkflows.length === 0) {
+                return;
+            }
+
+            partDWorkflows.sort(function (a, b) {
+                var dateA = new Date(a.submittedDate);
+                var dateB = new Date(b.submittedDate);
+                return dateB - dateA;
+            });
+
+            var latestWorkflow = partDWorkflows[0];
+            vm.partD.submitterName = latestWorkflow.fromName || '';
+            vm.partD.submitterEmpId = latestWorkflow.from || '';
+            vm.partD.submitterDesignation = latestWorkflow.fromDesignation || '';
+            vm.partD.submissionDate = latestWorkflow.submittedDate || '';
         }
 
         function loadPartDReadOnlyData(vm) {
             vm.partD.comments = vm.incident.partDComments || '';
-            vm.partD.hsbuId = vm.incident.hsbuId || '';
-            vm.partD.submitterName = vm.incident.partDSubmitterName || '';
-            vm.partD.submitterEmpId = vm.incident.partDSubmitterEmpId || '';
-            vm.partD.submitterDesignation = vm.incident.partDSubmitterDesignation || '';
-            vm.partD.submittedDate = vm.incident.partDSubmittedDate || '';
-
-            return Promise.all([
-                loadHSBUs(vm),
-                loadPartDEmailToList(vm)
-            ]);
         }
 
-        function loadHSBUs(vm) {
+        function loadWSHOs(vm) {
             if (!vm.incident.sectorCode || !vm.incident.lobCode) {
                 return Promise.resolve();
             }
 
-            return IncidentUpdateService.getHSBUs(
+            return IncidentUpdateService.getWSHOs(
                 vm.incident.sectorCode,
                 vm.incident.lobCode,
                 vm.incident.departmentCode || '',
                 vm.incident.locationCode || ''
             ).then(function (data) {
-                vm.hsbuList = data.map(function (item) {
+                vm.wshoList = data.map(function (item) {
                     return {
                         userId: item.userId || item.employeeNo,
                         userName: item.userName || item.name,
                         designation: item.designation || ''
                     };
                 });
-                vm.partD.hsbuOptions.dataSource = vm.hsbuList;
+                vm.partD.wshoOptions.dataSource = vm.wshoList;
             }).catch(function (error) {
-                vm.hsbuList = [];
-                vm.partD.hsbuOptions.dataSource = [];
+                vm.wshoList = [];
+                vm.partD.wshoOptions.dataSource = [];
+            });
+        }
+
+        function loadHeadLOBs(vm) {
+            if (!vm.incident.sectorCode || !vm.incident.lobCode) {
+                return Promise.resolve();
+            }
+
+            return IncidentUpdateService.getHODs(
+                vm.incident.sectorCode,
+                vm.incident.lobCode,
+                vm.incident.departmentCode || '',
+                vm.incident.locationCode || ''
+            ).then(function (data) {
+                vm.headLobList = data.map(function (item) {
+                    return {
+                        userId: item.userId || item.employeeNo,
+                        userName: item.userName || item.name,
+                        designation: item.designation || ''
+                    };
+                });
+                vm.partD.headLobOptions.dataSource = vm.headLobList;
+            }).catch(function (error) {
+                vm.headLobList = [];
+                vm.partD.headLobOptions.dataSource = [];
             });
         }
 
@@ -129,32 +180,8 @@
                 }
             }
 
-            refreshDropDown('partD_hsbu', vm.partD.hsbuOptions.dataSource, vm.partD.hsbuId);
-        }
-
-        function loadPartDEmailToList(vm) {
-            if (!vm.incident.sectorCode || !vm.incident.lobCode) {
-                return Promise.resolve();
-            }
-
-            return IncidentUpdateService.getPartDCopyToList(
-                vm.incident.sectorCode,
-                vm.incident.lobCode,
-                vm.incident.departmentCode || '',
-                vm.incident.locationCode || ''
-            ).then(function (data) {
-                vm.partD.emailToList = data.map(function (item) {
-                    return {
-                        userId: item.userId || item.employeeNo,
-                        userName: item.userName || item.name,
-                        designation: item.designation || '',
-                        selected: true
-                    };
-                });
-            }).catch(function (error) {
-                console.error('Error loading email to list:', error);
-                vm.partD.emailToList = [];
-            });
+            refreshDropDown('partD_wsho', vm.partD.wshoOptions.dataSource, vm.partD.wshoId);
+            refreshDropDown('partD_headlob', vm.partD.headLobOptions.dataSource, vm.partD.headLobId);
         }
 
         function canViewPartD(vm) {
@@ -180,54 +207,88 @@
             if (!vm.incident || vm.incident.status !== '03') return false;
             if (!vm.currentUser || !vm.currentUser.userId) return false;
 
-            if (vm.incident.hodId === vm.currentUser.userId) return true;
-            if (vm.incident.ahodId === vm.currentUser.userId) return true;
+            if (vm.incident.cwshoId === vm.currentUser.userId) return true;
 
             return false;
         }
 
-        function submitPartD(vm) {
+        function revertToWSHO(vm) {
             vm.partD.validationMessage = '';
             vm.partD.successMessage = '';
 
             if (!vm.partD.comments || vm.partD.comments.trim() === '') {
-                vm.partD.validationMessage = 'Comments are required (ERR-137)';
+                vm.partD.validationMessage = 'Review & Comment is required (ERR-137)';
                 return;
             }
 
-            if (!vm.partD.hsbuId) {
-                vm.partD.validationMessage = 'HSBU selection is required (ERR-133)';
+            if (!vm.partD.wshoId) {
+                vm.partD.validationMessage = 'Name of WSHO is required (ERR-135)';
                 return;
             }
 
-            if (!confirm('Are you sure you want to submit Part D to HSBU? This action cannot be undone.')) {
+            if (!confirm('Are you sure you want to revert to WSHO? This action cannot be undone.')) {
                 return;
             }
 
             vm.partD.isSubmitting = true;
 
-            var selectedEmailTo = vm.partD.emailToList
-                .filter(function (person) { return person.selected; })
-                .map(function (person) { return person.userId; });
+            var revertData = {
+                incidentId: vm.incident.incidentId,
+                comments: vm.partD.comments,
+                wshoId: vm.partD.wshoId,
+                actionType: 'revert'
+            };
+
+            IncidentUpdateService.revertPartDToWSHO(revertData)
+                .then(function (response) {
+                    if (response.success) {
+                        vm.partD.successMessage = response.message || 'Part D reverted successfully to WSHO';
+                        setTimeout(function () {
+                            $window.location.href = '/Home/Index';
+                        }, 2000);
+                    } else {
+                        vm.partD.validationMessage = response.message || 'Failed to revert Part D';
+                    }
+                })
+                .catch(function (error) {
+                    vm.partD.validationMessage = error.message || 'An error occurred while reverting Part D';
+                })
+                .finally(function () {
+                    vm.partD.isSubmitting = false;
+                });
+        }
+
+        function submitToHeadLOB(vm) {
+            vm.partD.validationMessage = '';
+            vm.partD.successMessage = '';
+
+            if (!vm.partD.comments || vm.partD.comments.trim() === '') {
+                vm.partD.validationMessage = 'Review & Comment is required (ERR-137)';
+                return;
+            }
+
+            if (!vm.partD.headLobId) {
+                vm.partD.validationMessage = 'Name of Head LOB is required (ERR-133)';
+                return;
+            }
+
+            if (!confirm('Are you sure you want to submit to Head LOB? This action cannot be undone.')) {
+                return;
+            }
+
+            vm.partD.isSubmitting = true;
 
             var submitData = {
                 incidentId: vm.incident.incidentId,
                 comments: vm.partD.comments,
-                hsbuId: vm.partD.hsbuId,
-                emailToList: selectedEmailTo,
-                additionalCopyToList: vm.partD.additionalCopyToList.map(function (person) {
-                    return {
-                        employeeNo: person.employeeId,
-                        name: person.name,
-                        designation: person.designation
-                    };
-                })
+                headLobId: vm.partD.headLobId,
+                actionType: 'submit'
             };
 
-            IncidentUpdateService.submitPartD(submitData)
+            IncidentUpdateService.submitPartDToHeadLOB(submitData)
                 .then(function (response) {
                     if (response.success) {
-                        vm.partD.successMessage = response.message || 'Part D submitted successfully to HSBU';
+                        vm.partD.successMessage = response.message || 'Part D submitted successfully to Head LOB';
                         setTimeout(function () {
                             $window.location.href = '/Home/Index';
                         }, 2000);
@@ -241,30 +302,6 @@
                 .finally(function () {
                     vm.partD.isSubmitting = false;
                 });
-        }
-
-        function openEmployeeSearchForPartD(vm) {
-            alert('Employee search functionality will be implemented');
-        }
-
-        function removeAdditionalCopyToFromPartD(vm, index) {
-            vm.partD.additionalCopyToList.splice(index, 1);
-        }
-
-        function cancelPartD() {
-            if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
-                $window.location.href = '/Home/Index';
-            }
-        }
-
-        function getHsbuName(vm, hsbuId) {
-            if (!hsbuId || !vm.hsbuList || vm.hsbuList.length === 0) {
-                return 'N/A';
-            }
-            var hsbu = vm.hsbuList.find(function (h) {
-                return h.userId === hsbuId;
-            });
-            return hsbu ? hsbu.userName + ' (' + hsbu.userId + ')' : 'N/A';
         }
     }
 })();
