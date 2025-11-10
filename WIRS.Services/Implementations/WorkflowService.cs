@@ -1122,14 +1122,17 @@ namespace WIRS.Services.Implementations
                 if (dataSet == null || dataSet.Tables.Count == 0)
                     return null;
 
-                var injuryDetails = await MapInjuryDetailsAsync(incidentId, dataSet);
+                var injuryDetails = new List<InjuryDetailModel>();
+                var medicalCertificates = new List<MedicalCertificateModel>();
+
+                await MapInjuryDetailsAndMedicalCertificatesAsync(incidentId, dataSet, injuryDetails, medicalCertificates);
 
                 var partCModel = new WorkflowIncidentPartCModel
                 {
                     IncidentId = incidentId,
                     PersonsInterviewed = MapPersonsInterviewed(dataSet),
                     InjuryDetails = injuryDetails,
-                    MedicalCertificates = MapMedicalCertificates(dataSet),
+                    MedicalCertificates = medicalCertificates,
                     IncidentClassList = MapCauseAnalysisByType(dataSet, "Incident Class"),
                     IncidentAgentList = MapCauseAnalysisByType(dataSet, "Incident Agent"),
                     UnsafeConditionsList = MapCauseAnalysisByType(dataSet, "Unsafe Condition"),
@@ -1167,13 +1170,12 @@ namespace WIRS.Services.Implementations
             return list;
         }
 
-        private async Task<List<InjuryDetailModel>> MapInjuryDetailsAsync(string incidentId, DataSet dataSet)
+        private async Task MapInjuryDetailsAndMedicalCertificatesAsync(string incidentId, DataSet dataSet, List<InjuryDetailModel> injuryDetails, List<MedicalCertificateModel> medicalCertificates)
         {
-            var list = new List<InjuryDetailModel>();
-            if (dataSet == null || dataSet.Tables.Count < 5) return list;
+            if (dataSet == null || dataSet.Tables.Count < 5) return;
 
             DataTable injuredPersonsTable = dataSet.Tables[4];
-            if (injuredPersonsTable == null || injuredPersonsTable.Rows.Count == 0) return list;
+            if (injuredPersonsTable == null || injuredPersonsTable.Rows.Count == 0) return;
 
             foreach (DataRow ipRow in injuredPersonsTable.Rows)
             {
@@ -1182,77 +1184,71 @@ namespace WIRS.Services.Implementations
 
                 if (string.IsNullOrEmpty(injuredEmpNo)) continue;
 
-                var injuryDetail = new InjuryDetailModel
-                {
-                    InjuredPersonId = injuredEmpNo,
-                    InjuredPersonName = injuredName,
-                    NatureOfInjury = new List<string>(),
-                    HeadNeckTorso = new List<string>(),
-                    UpperLimbs = new List<string>(),
-                    LowerLimbs = new List<string>(),
-                    Description = string.Empty
-                };
-
                 var injuryDescDs = await _workflowIncidentDataAccess.get_injured_person_injury_description(incidentId, injuredEmpNo);
 
-                if (injuryDescDs != null && injuryDescDs.Tables.Count > 5)
+                if (injuryDescDs != null)
                 {
-                    DataTable displayTable = injuryDescDs.Tables[5];
-                    if (displayTable.Rows.Count > 0)
+                    var injuryDetail = new InjuryDetailModel
                     {
-                        DataRow displayRow = displayTable.Rows[0];
-                        injuryDetail.Description = displayRow["injured_description"]?.ToString() ?? string.Empty;
+                        InjuredPersonId = injuredEmpNo,
+                        InjuredPersonName = injuredName,
+                        NatureOfInjury = new List<string>(),
+                        HeadNeckTorso = new List<string>(),
+                        UpperLimbs = new List<string>(),
+                        LowerLimbs = new List<string>(),
+                        Description = string.Empty
+                    };
+
+                    if (injuryDescDs.Tables.Count > 5)
+                    {
+                        DataTable displayTable = injuryDescDs.Tables[5];
+                        if (displayTable.Rows.Count > 0)
+                        {
+                            DataRow displayRow = displayTable.Rows[0];
+                            injuryDetail.Description = displayRow["injured_description"]?.ToString() ?? string.Empty;
+                        }
+                    }
+
+                    if (injuryDescDs.Tables.Count > 1)
+                    {
+                        DataTable detailsTable = injuryDescDs.Tables[1];
+                        foreach (DataRow row in detailsTable.Rows)
+                        {
+                            var injuryType = row["injury_type"]?.ToString() ?? string.Empty;
+                            var injuryCode = row["injury_code"]?.ToString() ?? string.Empty;
+
+                            if (injuryType == "Nature Of Injury")
+                                injuryDetail.NatureOfInjury.Add(injuryCode);
+                            else if (injuryType == "Head Neck Torso")
+                                injuryDetail.HeadNeckTorso.Add(injuryCode);
+                            else if (injuryType == "Upper Limbs")
+                                injuryDetail.UpperLimbs.Add(injuryCode);
+                            else if (injuryType == "Lower Limbs")
+                                injuryDetail.LowerLimbs.Add(injuryCode);
+                        }
+                    }
+
+                    injuryDetails.Add(injuryDetail);
+
+                    if (injuryDescDs.Tables.Count > 3)
+                    {
+                        DataTable mcTable = injuryDescDs.Tables[3];
+                        foreach (DataRow mcRow in mcTable.Rows)
+                        {
+                            medicalCertificates.Add(new MedicalCertificateModel
+                            {
+                                InjuredPersonId = mcRow["injured_id"]?.ToString() ?? string.Empty,
+                                InjuredPersonName = mcRow["injured_name"]?.ToString() ?? string.Empty,
+                                FromDate = mcRow["from_date"]?.ToString() ?? string.Empty,
+                                ToDate = mcRow["to_date"]?.ToString() ?? string.Empty,
+                                NumberOfDays = int.TryParse(mcRow["no_days"]?.ToString(), out var days) ? days : 0,
+                                AttachmentPath = string.Empty,
+                                HasAttachment = false
+                            });
+                        }
                     }
                 }
-
-                if (injuryDescDs != null && injuryDescDs.Tables.Count > 1)
-                {
-                    DataTable detailsTable = injuryDescDs.Tables[1];
-                    foreach (DataRow row in detailsTable.Rows)
-                    {
-                        var injuryType = row["injury_type"]?.ToString() ?? string.Empty;
-                        var injuryCode = row["injury_code"]?.ToString() ?? string.Empty;
-
-                        if (injuryType == "Nature Of Injury")
-                            injuryDetail.NatureOfInjury.Add(injuryCode);
-                        else if (injuryType == "Head Neck Torso")
-                            injuryDetail.HeadNeckTorso.Add(injuryCode);
-                        else if (injuryType == "Upper Limbs")
-                            injuryDetail.UpperLimbs.Add(injuryCode);
-                        else if (injuryType == "Lower Limbs")
-                            injuryDetail.LowerLimbs.Add(injuryCode);
-                    }
-                }
-
-                list.Add(injuryDetail);
             }
-
-            return list;
-        }
-
-        private List<MedicalCertificateModel> MapMedicalCertificates(DataSet dataSet)
-        {
-            var list = new List<MedicalCertificateModel>();
-            if (dataSet == null || dataSet.Tables.Count < 2) return list;
-
-            DataTable table = dataSet.Tables[1];
-            if (table == null || table.Rows.Count == 0) return list;
-
-            foreach (DataRow row in table.Rows)
-            {
-                list.Add(new MedicalCertificateModel
-                {
-                    InjuredPersonId = row["injured_emp_no"]?.ToString() ?? string.Empty,
-                    InjuredPersonName = string.Empty,
-                    FromDate = row["from_date"]?.ToString() ?? string.Empty,
-                    ToDate = row["to_date"]?.ToString() ?? string.Empty,
-                    NumberOfDays = int.TryParse(row["no_of_days"]?.ToString(), out var days) ? days : 0,
-                    AttachmentPath = string.Empty,
-                    HasAttachment = false
-                });
-            }
-
-            return list;
         }
 
         private List<string> MapCauseAnalysisByType(DataSet dataSet, string lookupType)
