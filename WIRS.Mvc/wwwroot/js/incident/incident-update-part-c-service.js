@@ -199,18 +199,62 @@
             if (vm.incident.partCData) {
                 vm.partC.personsInterviewed = vm.incident.partCData.personsInterviewed || [];
                 vm.partC.injuryDetails = (vm.incident.partCData.injuryDetails || []).map(function (injury) {
+                    var natureOfInjuryNames = [];
+                    var headNeckTorsoNames = [];
+                    var upperLimbsNames = [];
+                    var lowerLimbsNames = [];
+
+                    if (injury.natureOfInjury && injury.natureOfInjury.length) {
+                        for (var i = 0; i < injury.natureOfInjury.length; i++) {
+                            var code = injury.natureOfInjury[i];
+                            var lookup = vm.natureOfInjury.find(function (item) { return item.code === code; });
+                            if (lookup) natureOfInjuryNames.push(lookup.value);
+                        }
+                    }
+
+                    if (injury.headNeckTorso && injury.headNeckTorso.length) {
+                        for (var j = 0; j < injury.headNeckTorso.length; j++) {
+                            var hcode = injury.headNeckTorso[j];
+                            var hlookup = vm.headNeckTorso.find(function (item) { return item.code === hcode; });
+                            if (hlookup) headNeckTorsoNames.push(hlookup.value);
+                        }
+                    }
+
+                    if (injury.upperLimbs && injury.upperLimbs.length) {
+                        for (var k = 0; k < injury.upperLimbs.length; k++) {
+                            var ucode = injury.upperLimbs[k];
+                            var ulookup = vm.upperLimbs.find(function (item) { return item.code === ucode; });
+                            if (ulookup) upperLimbsNames.push(ulookup.value);
+                        }
+                    }
+
+                    if (injury.lowerLimbs && injury.lowerLimbs.length) {
+                        for (var l = 0; l < injury.lowerLimbs.length; l++) {
+                            var lcode = injury.lowerLimbs[l];
+                            var llookup = vm.lowerLimbs.find(function (item) { return item.code === lcode; });
+                            if (llookup) lowerLimbsNames.push(llookup.value);
+                        }
+                    }
+
+                    var bodyParts = [];
+                    if (headNeckTorsoNames.length) bodyParts = bodyParts.concat(headNeckTorsoNames);
+                    if (upperLimbsNames.length) bodyParts = bodyParts.concat(upperLimbsNames);
+                    if (lowerLimbsNames.length) bodyParts = bodyParts.concat(lowerLimbsNames);
+
                     return {
                         injuredPersonId: injury.injuredPersonId,
                         injuredPersonName: injury.injuredPersonName,
-                        natureOfInjuryList: injury.natureOfInjury || [],
-                        headNeckTorsoList: injury.headNeckTorso || [],
-                        upperLimbsList: injury.upperLimbs || [],
-                        lowerLimbsList: injury.lowerLimbs || [],
+                        natureOfInjuryList: natureOfInjuryNames,
+                        headNeckTorsoList: headNeckTorsoNames,
+                        upperLimbsList: upperLimbsNames,
+                        lowerLimbsList: lowerLimbsNames,
+                        bodyPartsList: bodyParts,
                         description: injury.description || '',
-                        natureOfInjury: (injury.natureOfInjury || []).join(', '),
-                        headNeckTorso: (injury.headNeckTorso || []).join(', '),
-                        upperLimbs: (injury.upperLimbs || []).join(', '),
-                        lowerLimbs: (injury.lowerLimbs || []).join(', ')
+                        natureOfInjury: natureOfInjuryNames.join(', '),
+                        headNeckTorso: headNeckTorsoNames.join(', '),
+                        upperLimbs: upperLimbsNames.join(', '),
+                        lowerLimbs: lowerLimbsNames.join(', '),
+                        bodyParts: bodyParts.join(', ')
                     };
                 });
                 vm.partC.medicalCertificates = vm.incident.partCData.medicalCertificates || [];
