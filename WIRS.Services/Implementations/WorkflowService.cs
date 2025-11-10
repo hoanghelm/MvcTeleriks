@@ -1176,7 +1176,18 @@ namespace WIRS.Services.Implementations
             var groupedByPerson = new Dictionary<string, List<DataRow>>();
             foreach (DataRow row in table.Rows)
             {
-                var injuredId = row["injured_id"]?.ToString() ?? string.Empty;
+                var injuredId = string.Empty;
+                if (table.Columns.Contains("injured_id"))
+                {
+                    injuredId = row["injured_id"]?.ToString() ?? string.Empty;
+                }
+                else if (table.Columns.Contains("injured_emp_no"))
+                {
+                    injuredId = row["injured_emp_no"]?.ToString() ?? string.Empty;
+                }
+
+                if (string.IsNullOrEmpty(injuredId)) continue;
+
                 if (!groupedByPerson.ContainsKey(injuredId))
                 {
                     groupedByPerson[injuredId] = new List<DataRow>();
