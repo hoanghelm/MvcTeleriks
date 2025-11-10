@@ -1146,9 +1146,10 @@ namespace WIRS.Services.Implementations
         private List<PersonInterviewedModel> MapPersonsInterviewed(DataSet dataSet)
         {
             var list = new List<PersonInterviewedModel>();
-            var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "PersonInterviewed");
+            if (dataSet == null || dataSet.Tables.Count == 0) return list;
 
-            if (table == null) return list;
+            var table = dataSet.Tables[0];
+            if (table == null || table.Rows.Count == 0) return list;
 
             foreach (DataRow row in table.Rows)
             {
@@ -1167,9 +1168,10 @@ namespace WIRS.Services.Implementations
         private List<InjuryDetailModel> MapInjuryDetails(DataSet dataSet)
         {
             var list = new List<InjuryDetailModel>();
-            var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "injured_details");
+            if (dataSet == null || dataSet.Tables.Count < 5) return list;
 
-            if (table == null) return list;
+            var table = dataSet.Tables[4];
+            if (table == null || table.Rows.Count == 0) return list;
 
             var groupedByPerson = table.Rows.Cast<DataRow>()
                 .GroupBy(r => new
@@ -1214,9 +1216,10 @@ namespace WIRS.Services.Implementations
         private List<MedicalCertificateModel> MapMedicalCertificates(DataSet dataSet)
         {
             var list = new List<MedicalCertificateModel>();
-            var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "incidents_medical_leaves");
+            if (dataSet == null || dataSet.Tables.Count < 2) return list;
 
-            if (table == null) return list;
+            var table = dataSet.Tables[1];
+            if (table == null || table.Rows.Count == 0) return list;
 
             foreach (DataRow row in table.Rows)
             {
@@ -1238,9 +1241,10 @@ namespace WIRS.Services.Implementations
         private List<string> MapCauseAnalysisByType(DataSet dataSet, string lookupType)
         {
             var list = new List<string>();
-            var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "cause_analysis");
+            if (dataSet == null || dataSet.Tables.Count < 4) return list;
 
-            if (table == null) return list;
+            var table = dataSet.Tables[3];
+            if (table == null || table.Rows.Count == 0) return list;
 
             foreach (DataRow row in table.Rows)
             {
