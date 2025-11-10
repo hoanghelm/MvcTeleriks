@@ -1122,11 +1122,13 @@ namespace WIRS.Services.Implementations
                 if (dataSet == null || dataSet.Tables.Count == 0)
                     return null;
 
+                var injuryDetails = await MapInjuryDetailsAsync(incidentId, dataSet);
+
                 var partCModel = new WorkflowIncidentPartCModel
                 {
                     IncidentId = incidentId,
                     PersonsInterviewed = MapPersonsInterviewed(dataSet),
-                    InjuryDetails = MapInjuryDetails(dataSet),
+                    InjuryDetails = injuryDetails,
                     MedicalCertificates = MapMedicalCertificates(dataSet),
                     IncidentClassList = MapCauseAnalysisByType(dataSet, "Incident Class"),
                     IncidentAgentList = MapCauseAnalysisByType(dataSet, "Incident Agent"),
@@ -1165,42 +1167,25 @@ namespace WIRS.Services.Implementations
             return list;
         }
 
-        private List<InjuryDetailModel> MapInjuryDetails(DataSet dataSet)
+        private async Task<List<InjuryDetailModel>> MapInjuryDetailsAsync(string incidentId, DataSet dataSet)
         {
             var list = new List<InjuryDetailModel>();
             if (dataSet == null || dataSet.Tables.Count < 5) return list;
 
-            DataTable table = dataSet.Tables[4];
-            if (table == null || table.Rows.Count == 0) return list;
+            DataTable injuredPersonsTable = dataSet.Tables[4];
+            if (injuredPersonsTable == null || injuredPersonsTable.Rows.Count == 0) return list;
 
-            var groupedByPerson = new Dictionary<string, List<DataRow>>();
-            foreach (DataRow row in table.Rows)
+            foreach (DataRow ipRow in injuredPersonsTable.Rows)
             {
-                var injuredId = string.Empty;
-                if (table.Columns.Contains("injured_id"))
-                {
-                    injuredId = row["injured_id"]?.ToString() ?? string.Empty;
-                }
-                else if (table.Columns.Contains("injured_emp_no"))
-                {
-                    injuredId = row["injured_emp_no"]?.ToString() ?? string.Empty;
-                }
+                var injuredEmpNo = ipRow["injured_emp_no"]?.ToString() ?? string.Empty;
+                var injuredName = ipRow["injured_name"]?.ToString() ?? string.Empty;
 
-                if (string.IsNullOrEmpty(injuredId)) continue;
+                if (string.IsNullOrEmpty(injuredEmpNo)) continue;
 
-                if (!groupedByPerson.ContainsKey(injuredId))
-                {
-                    groupedByPerson[injuredId] = new List<DataRow>();
-                }
-                groupedByPerson[injuredId].Add(row);
-            }
-
-            foreach (var group in groupedByPerson)
-            {
                 var injuryDetail = new InjuryDetailModel
                 {
-                    InjuredPersonId = group.Key,
-                    InjuredPersonName = string.Empty,
+                    InjuredPersonId = injuredEmpNo,
+                    InjuredPersonName = injuredName,
                     NatureOfInjury = new List<string>(),
                     HeadNeckTorso = new List<string>(),
                     UpperLimbs = new List<string>(),
@@ -1208,19 +1193,35 @@ namespace WIRS.Services.Implementations
                     Description = string.Empty
                 };
 
-                foreach (var row in group.Value)
-                {
-                    var injuryType = row["injury_type"]?.ToString() ?? string.Empty;
-                    var injuryCode = row["injury_code"]?.ToString() ?? string.Empty;
+                var injuryDescDs = await _workflowIncidentDataAccess.get_injured_person_injury_description(incidentId, injuredEmpNo);
 
-                    if (injuryType == "Nature Of Injury")
-                        injuryDetail.NatureOfInjury.Add(injuryCode);
-                    else if (injuryType == "Head Neck Torso")
-                        injuryDetail.HeadNeckTorso.Add(injuryCode);
-                    else if (injuryType == "Upper Limbs")
-                        injuryDetail.UpperLimbs.Add(injuryCode);
-                    else if (injuryType == "Lower Limbs")
-                        injuryDetail.LowerLimbs.Add(injuryCode);
+                if (injuryDescDs != null && injuryDescDs.Tables.Count > 5)
+                {
+                    DataTable displayTable = injuryDescDs.Tables[5];
+                    if (displayTable.Rows.Count > 0)
+                    {
+                        DataRow displayRow = displayTable.Rows[0];
+                        injuryDetail.Description = displayRow["injured_description"]?.ToString() ?? string.Empty;
+                    }
+                }
+
+                if (injuryDescDs != null && injuryDescDs.Tables.Count > 1)
+                {
+                    DataTable detailsTable = injuryDescDs.Tables[1];
+                    foreach (DataRow row in detailsTable.Rows)
+                    {
+                        var injuryType = row["injury_type"]?.ToString() ?? string.Empty;
+                        var injuryCode = row["injury_code"]?.ToString() ?? string.Empty;
+
+                        if (injuryType == "Nature Of Injury")
+                            injuryDetail.NatureOfInjury.Add(injuryCode);
+                        else if (injuryType == "Head Neck Torso")
+                            injuryDetail.HeadNeckTorso.Add(injuryCode);
+                        else if (injuryType == "Upper Limbs")
+                            injuryDetail.UpperLimbs.Add(injuryCode);
+                        else if (injuryType == "Lower Limbs")
+                            injuryDetail.LowerLimbs.Add(injuryCode);
+                    }
                 }
 
                 list.Add(injuryDetail);
