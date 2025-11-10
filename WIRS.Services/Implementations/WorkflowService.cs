@@ -1148,7 +1148,7 @@ namespace WIRS.Services.Implementations
             var list = new List<PersonInterviewedModel>();
             if (dataSet == null || dataSet.Tables.Count == 0) return list;
 
-            var table = dataSet.Tables[0];
+            DataTable table = dataSet.Tables[0];
             if (table == null || table.Rows.Count == 0) return list;
 
             foreach (DataRow row in table.Rows)
@@ -1170,20 +1170,25 @@ namespace WIRS.Services.Implementations
             var list = new List<InjuryDetailModel>();
             if (dataSet == null || dataSet.Tables.Count < 5) return list;
 
-            var table = dataSet.Tables[4];
+            DataTable table = dataSet.Tables[4];
             if (table == null || table.Rows.Count == 0) return list;
 
-            var groupedByPerson = table.Rows.Cast<DataRow>()
-                .GroupBy(r => new
+            var groupedByPerson = new Dictionary<string, List<DataRow>>();
+            foreach (DataRow row in table.Rows)
+            {
+                var injuredId = row["injured_id"]?.ToString() ?? string.Empty;
+                if (!groupedByPerson.ContainsKey(injuredId))
                 {
-                    InjuredId = r["injured_id"]?.ToString() ?? string.Empty
-                });
+                    groupedByPerson[injuredId] = new List<DataRow>();
+                }
+                groupedByPerson[injuredId].Add(row);
+            }
 
             foreach (var group in groupedByPerson)
             {
                 var injuryDetail = new InjuryDetailModel
                 {
-                    InjuredPersonId = group.Key.InjuredId,
+                    InjuredPersonId = group.Key,
                     InjuredPersonName = string.Empty,
                     NatureOfInjury = new List<string>(),
                     HeadNeckTorso = new List<string>(),
@@ -1192,7 +1197,7 @@ namespace WIRS.Services.Implementations
                     Description = string.Empty
                 };
 
-                foreach (var row in group)
+                foreach (var row in group.Value)
                 {
                     var injuryType = row["injury_type"]?.ToString() ?? string.Empty;
                     var injuryCode = row["injury_code"]?.ToString() ?? string.Empty;
@@ -1218,7 +1223,7 @@ namespace WIRS.Services.Implementations
             var list = new List<MedicalCertificateModel>();
             if (dataSet == null || dataSet.Tables.Count < 2) return list;
 
-            var table = dataSet.Tables[1];
+            DataTable table = dataSet.Tables[1];
             if (table == null || table.Rows.Count == 0) return list;
 
             foreach (DataRow row in table.Rows)
@@ -1243,7 +1248,7 @@ namespace WIRS.Services.Implementations
             var list = new List<string>();
             if (dataSet == null || dataSet.Tables.Count < 4) return list;
 
-            var table = dataSet.Tables[3];
+            DataTable table = dataSet.Tables[3];
             if (table == null || table.Rows.Count == 0) return list;
 
             foreach (DataRow row in table.Rows)
