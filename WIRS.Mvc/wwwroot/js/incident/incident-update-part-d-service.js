@@ -119,15 +119,15 @@
         }
 
         function loadWSHOs(vm) {
-            if (!vm.incident.sectorCode || !vm.incident.lobCode) {
+            if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
                 return $q.resolve();
             }
 
             return IncidentUpdateService.getWSHOs(
-                vm.incident.sectorCode,
-                vm.incident.lobCode,
-                vm.incident.departmentCode || '',
-                vm.incident.locationCode || ''
+                vm.incident.sbaCode,
+                vm.incident.sbuCode,
+                vm.incident.department || '',
+                vm.incident.location || ''
             ).then(function (data) {
                 vm.wshoList = data;
                 vm.partD.wshoOptions.dataSource.data(data);
@@ -138,15 +138,15 @@
         }
 
         function loadHeadLOBs(vm) {
-            if (!vm.incident.sectorCode || !vm.incident.lobCode) {
+            if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
                 return $q.resolve();
             }
 
             return IncidentUpdateService.getHeadLOBs(
-                vm.incident.sectorCode,
-                vm.incident.lobCode,
-                vm.incident.departmentCode || '',
-                vm.incident.locationCode || ''
+                vm.incident.sbaCode,
+                vm.incident.sbuCode,
+                vm.incident.department || '',
+                vm.incident.location || ''
             ).then(function (data) {
                 vm.headLobList = data;
                 vm.partD.headLobOptions.dataSource.data(data);
