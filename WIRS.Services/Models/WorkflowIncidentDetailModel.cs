@@ -68,43 +68,13 @@ namespace WIRS.Services.Models
     {
         public string IncidentId { get; set; } = string.Empty;
         public List<PersonInterviewedModel> PersonsInterviewed { get; set; } = new();
-        public List<PartCInjuryDetailModel> InjuryDetails { get; set; } = new();
-        public List<PartCMedicalCertificateModel> MedicalCertificates { get; set; } = new();
+        public List<InjuryDetailModel> InjuryDetails { get; set; } = new();
+        public List<MedicalCertificateModel> MedicalCertificates { get; set; } = new();
         public List<string> IncidentClassList { get; set; } = new();
         public List<string> IncidentAgentList { get; set; } = new();
         public List<string> UnsafeConditionsList { get; set; } = new();
         public List<string> UnsafeActsList { get; set; } = new();
         public List<string> ContributingFactorsList { get; set; } = new();
-    }
-
-    public class PersonInterviewedModel
-    {
-        public string Name { get; set; } = string.Empty;
-        public string EmployeeNo { get; set; } = string.Empty;
-        public string Designation { get; set; } = string.Empty;
-        public string ContactNo { get; set; } = string.Empty;
-    }
-
-    public class PartCInjuryDetailModel
-    {
-        public string InjuredPersonId { get; set; } = string.Empty;
-        public string InjuredPersonName { get; set; } = string.Empty;
-        public List<string> NatureOfInjury { get; set; } = new();
-        public List<string> HeadNeckTorso { get; set; } = new();
-        public List<string> UpperLimbs { get; set; } = new();
-        public List<string> LowerLimbs { get; set; } = new();
-        public string Description { get; set; } = string.Empty;
-    }
-
-    public class PartCMedicalCertificateModel
-    {
-        public string InjuredPersonId { get; set; } = string.Empty;
-        public string InjuredPersonName { get; set; } = string.Empty;
-        public string FromDate { get; set; } = string.Empty;
-        public string ToDate { get; set; } = string.Empty;
-        public int NumberOfDays { get; set; }
-        public string AttachmentPath { get; set; } = string.Empty;
-        public bool HasAttachment { get; set; }
     }
 
     public class IncidentWorkflowModel

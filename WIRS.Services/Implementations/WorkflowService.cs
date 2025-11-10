@@ -162,39 +162,9 @@ namespace WIRS.Services.Implementations
             }
         }
 
-        public async Task<string> SubmitIncidentPartCAsync(WorkflowIncidentPartCModel model, string userId)
+        public Task<string> SubmitIncidentPartCAsync(WorkflowIncidentPartCModel model, string userId)
         {
-            try
-            {
-                var workflowIncident = new WorkflowIncident 
-                { 
-                    incident_id = model.IncidentId,
-                    modified_by = userId,
-                    modify_date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-                };
-
-                var injuredPersonXml = ConvertInjuredPersonsToXml(new List<InjuredPersonModel>());
-                var interviewedXml = ConvertIntervieweesToXml(model.Interviewees);
-                var injuryDetailsXml = ConvertInjuryDetailsToXml(model.InjuryDetails);
-                var causeAnalysisXml = ConvertCauseAnalysisToXml(model.CauseAnalysis);
-                var medicalLeavesXml = ConvertMedicalLeavesToXml(model.MedicalLeaves);
-                var workflowsXml = ConvertWorkflowsToXml(model.Workflows);
-                var attachmentsXml = ConvertAttachmentsToXml(model.Attachments);
-
-                return await _workflowIncidentDataAccess.submit_incident_partc(
-                    workflowIncident,
-                    injuredPersonXml,
-                    interviewedXml,
-                    injuryDetailsXml,
-                    causeAnalysisXml,
-                    medicalLeavesXml,
-                    workflowsXml,
-                    attachmentsXml);
-            }
-            catch (Exception)
-            {
-                return "ERROR_SUBMIT_PARTC";
-            }
+            throw new NotImplementedException();
         }
 
         public async Task<DataSet> GetIncidentWorkflowsAsync(string incidentId, string status = "")
@@ -1194,9 +1164,9 @@ namespace WIRS.Services.Implementations
             return list;
         }
 
-        private List<PartCInjuryDetailModel> MapInjuryDetails(DataSet dataSet)
+        private List<InjuryDetailModel> MapInjuryDetails(DataSet dataSet)
         {
-            var list = new List<PartCInjuryDetailModel>();
+            var list = new List<InjuryDetailModel>();
             var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "injured_details");
 
             if (table == null) return list;
@@ -1209,13 +1179,15 @@ namespace WIRS.Services.Implementations
 
             foreach (var group in groupedByPerson)
             {
-                var injuryDetail = new PartCInjuryDetailModel
+                var injuryDetail = new InjuryDetailModel
                 {
                     InjuredPersonId = group.Key.InjuredId,
+                    InjuredPersonName = string.Empty,
                     NatureOfInjury = new List<string>(),
                     HeadNeckTorso = new List<string>(),
                     UpperLimbs = new List<string>(),
-                    LowerLimbs = new List<string>()
+                    LowerLimbs = new List<string>(),
+                    Description = string.Empty
                 };
 
                 foreach (var row in group)
@@ -1239,21 +1211,23 @@ namespace WIRS.Services.Implementations
             return list;
         }
 
-        private List<PartCMedicalCertificateModel> MapMedicalCertificates(DataSet dataSet)
+        private List<MedicalCertificateModel> MapMedicalCertificates(DataSet dataSet)
         {
-            var list = new List<PartCMedicalCertificateModel>();
+            var list = new List<MedicalCertificateModel>();
             var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "incidents_medical_leaves");
 
             if (table == null) return list;
 
             foreach (DataRow row in table.Rows)
             {
-                list.Add(new PartCMedicalCertificateModel
+                list.Add(new MedicalCertificateModel
                 {
                     InjuredPersonId = row["injured_emp_no"]?.ToString() ?? string.Empty,
+                    InjuredPersonName = string.Empty,
                     FromDate = row["from_date"]?.ToString() ?? string.Empty,
                     ToDate = row["to_date"]?.ToString() ?? string.Empty,
                     NumberOfDays = int.TryParse(row["no_of_days"]?.ToString(), out var days) ? days : 0,
+                    AttachmentPath = string.Empty,
                     HasAttachment = false
                 });
             }
