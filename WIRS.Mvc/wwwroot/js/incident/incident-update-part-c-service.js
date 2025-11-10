@@ -86,10 +86,6 @@
 
             determinePartCMode(vm);
 
-            if (vm.partC.isReadOnly) {
-                return loadPartCReadOnlyData(vm);
-            }
-
             if (vm.incident.injuredPersons && vm.incident.injuredPersons.length > 0) {
                 vm.partC.injuredPersonOptions.dataSource.data(vm.incident.injuredPersons);
             }
@@ -98,7 +94,9 @@
                 loadPartCLookups(vm),
                 loadCWSHOs(vm)
             ]).then(function () {
-                if (!vm.partC.isReadOnly) {
+                if (vm.partC.isReadOnly) {
+                    loadPartCReadOnlyData(vm);
+                } else {
                     $timeout(function () {
                         refreshKendoDropDowns(vm);
                     }, 0);
@@ -193,22 +191,62 @@
         }
 
         function loadPartCReadOnlyData(vm) {
-            if (vm.incident.workflows && vm.incident.workflows.length > 0) {
-                var partCWorkflow = vm.incident.workflows.find(function (w) {
-                    return w.status === '03' && w.role === 'WSHO';
-                });
+            vm.partC.isNegligent = vm.incident.negligent || '';
+            vm.partC.negligentComments = vm.incident.negligentComments || '';
+            vm.partC.whatHappenedAndWhy = vm.incident.whatHappenedAndWhyComments || '';
+            vm.partC.recommendedActions = vm.incident.recommendActionDesc || '';
 
-                if (partCWorkflow) {
-                    vm.partC.isNegligent = vm.incident.negligent || '';
-                    vm.partC.negligentComments = vm.incident.negligentComments || '';
-                    vm.partC.whatHappenedAndWhy = vm.incident.whatHappenedAndWhyComments || '';
-                    vm.partC.recommendedActions = vm.incident.recommendActionDesc || '';
-                    vm.partC.submitterName = partCWorkflow.submitterName || '';
-                    vm.partC.submitterEmpId = partCWorkflow.submitterEmpId || '';
-                    vm.partC.submitterDesignation = partCWorkflow.submitterDesignation || '';
-                    vm.partC.submissionDate = partCWorkflow.submissionDate || '';
+            if (vm.incident.partCData) {
+                vm.partC.personsInterviewed = vm.incident.partCData.personsInterviewed || [];
+                vm.partC.injuryDetails = (vm.incident.partCData.injuryDetails || []).map(function (injury) {
+                    return {
+                        injuredPersonId: injury.injuredPersonId,
+                        injuredPersonName: injury.injuredPersonName,
+                        natureOfInjuryList: injury.natureOfInjury || [],
+                        headNeckTorsoList: injury.headNeckTorso || [],
+                        upperLimbsList: injury.upperLimbs || [],
+                        lowerLimbsList: injury.lowerLimbs || [],
+                        description: injury.description || '',
+                        natureOfInjury: (injury.natureOfInjury || []).join(', '),
+                        headNeckTorso: (injury.headNeckTorso || []).join(', '),
+                        upperLimbs: (injury.upperLimbs || []).join(', '),
+                        lowerLimbs: (injury.lowerLimbs || []).join(', ')
+                    };
+                });
+                vm.partC.medicalCertificates = vm.incident.partCData.medicalCertificates || [];
+
+                if (vm.incident.partCData.incidentClassList) {
+                    vm.incident.partCData.incidentClassList.forEach(function (code) {
+                        var item = vm.incidentClass.find(function (i) { return i.code === code; });
+                        if (item) item.selected = true;
+                    });
+                }
+                if (vm.incident.partCData.incidentAgentList) {
+                    vm.incident.partCData.incidentAgentList.forEach(function (code) {
+                        var item = vm.incidentAgent.find(function (i) { return i.code === code; });
+                        if (item) item.selected = true;
+                    });
+                }
+                if (vm.incident.partCData.unsafeConditionsList) {
+                    vm.incident.partCData.unsafeConditionsList.forEach(function (code) {
+                        var item = vm.unsafeConditions.find(function (i) { return i.code === code; });
+                        if (item) item.selected = true;
+                    });
+                }
+                if (vm.incident.partCData.unsafeActsList) {
+                    vm.incident.partCData.unsafeActsList.forEach(function (code) {
+                        var item = vm.unsafeActs.find(function (i) { return i.code === code; });
+                        if (item) item.selected = true;
+                    });
+                }
+                if (vm.incident.partCData.contributingFactorsList) {
+                    vm.incident.partCData.contributingFactorsList.forEach(function (code) {
+                        var item = vm.contributingFactors.find(function (i) { return i.code === code; });
+                        if (item) item.selected = true;
+                    });
                 }
             }
+
             return Promise.resolve();
         }
 

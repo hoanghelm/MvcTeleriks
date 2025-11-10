@@ -109,6 +109,9 @@ namespace WIRS.Services.Implementations
                 incident.CanWorkflow = await CanUserWorkflowIncidentAsync(incidentId, userId);
                 incident.StagePermissions = await GetIncidentStagePermissionsAsync(incidentId, userId);
 
+                var partCData = await LoadPartCDataAsync(incidentId);
+                incident.PartCData = partCData;
+
                 return incident;
             }
             catch (Exception)
@@ -1137,6 +1140,145 @@ namespace WIRS.Services.Implementations
 
             ds.Tables.Add(dt);
             return ds;
+        }
+
+        private async Task<WorkflowIncidentPartCModel?> LoadPartCDataAsync(string incidentId)
+        {
+            try
+            {
+                var workflowIncident = new WorkflowIncident { incident_id = incidentId };
+                var dataSet = await _workflowIncidentDataAccess.get_incident_partc_id(workflowIncident);
+
+                if (dataSet == null || dataSet.Tables.Count == 0)
+                    return null;
+
+                var partCModel = new WorkflowIncidentPartCModel
+                {
+                    IncidentId = incidentId,
+                    PersonsInterviewed = MapPersonsInterviewed(dataSet),
+                    InjuryDetails = MapInjuryDetails(dataSet),
+                    MedicalCertificates = MapMedicalCertificates(dataSet),
+                    IncidentClassList = MapCauseAnalysisByType(dataSet, "Incident Class"),
+                    IncidentAgentList = MapCauseAnalysisByType(dataSet, "Incident Agent"),
+                    UnsafeConditionsList = MapCauseAnalysisByType(dataSet, "Unsafe Condition"),
+                    UnsafeActsList = MapCauseAnalysisByType(dataSet, "Unsafe Act"),
+                    ContributingFactorsList = MapCauseAnalysisByType(dataSet, "Factors")
+                };
+
+                return partCModel;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private List<PersonInterviewedModel> MapPersonsInterviewed(DataSet dataSet)
+        {
+            var list = new List<PersonInterviewedModel>();
+            var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "PersonInterviewed");
+
+            if (table == null) return list;
+
+            foreach (DataRow row in table.Rows)
+            {
+                list.Add(new PersonInterviewedModel
+                {
+                    Name = row["empname"]?.ToString() ?? string.Empty,
+                    EmployeeNo = row["empid"]?.ToString() ?? string.Empty,
+                    Designation = row["empdesignation"]?.ToString() ?? string.Empty,
+                    ContactNo = row["empcontactno"]?.ToString() ?? string.Empty
+                });
+            }
+
+            return list;
+        }
+
+        private List<PartCInjuryDetailModel> MapInjuryDetails(DataSet dataSet)
+        {
+            var list = new List<PartCInjuryDetailModel>();
+            var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "injured_details");
+
+            if (table == null) return list;
+
+            var groupedByPerson = table.Rows.Cast<DataRow>()
+                .GroupBy(r => new
+                {
+                    InjuredId = r["injured_id"]?.ToString() ?? string.Empty
+                });
+
+            foreach (var group in groupedByPerson)
+            {
+                var injuryDetail = new PartCInjuryDetailModel
+                {
+                    InjuredPersonId = group.Key.InjuredId,
+                    NatureOfInjury = new List<string>(),
+                    HeadNeckTorso = new List<string>(),
+                    UpperLimbs = new List<string>(),
+                    LowerLimbs = new List<string>()
+                };
+
+                foreach (var row in group)
+                {
+                    var injuryType = row["injury_type"]?.ToString() ?? string.Empty;
+                    var injuryCode = row["injury_code"]?.ToString() ?? string.Empty;
+
+                    if (injuryType == "Nature Of Injury")
+                        injuryDetail.NatureOfInjury.Add(injuryCode);
+                    else if (injuryType == "Head Neck Torso")
+                        injuryDetail.HeadNeckTorso.Add(injuryCode);
+                    else if (injuryType == "Upper Limbs")
+                        injuryDetail.UpperLimbs.Add(injuryCode);
+                    else if (injuryType == "Lower Limbs")
+                        injuryDetail.LowerLimbs.Add(injuryCode);
+                }
+
+                list.Add(injuryDetail);
+            }
+
+            return list;
+        }
+
+        private List<PartCMedicalCertificateModel> MapMedicalCertificates(DataSet dataSet)
+        {
+            var list = new List<PartCMedicalCertificateModel>();
+            var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "incidents_medical_leaves");
+
+            if (table == null) return list;
+
+            foreach (DataRow row in table.Rows)
+            {
+                list.Add(new PartCMedicalCertificateModel
+                {
+                    InjuredPersonId = row["injured_emp_no"]?.ToString() ?? string.Empty,
+                    FromDate = row["from_date"]?.ToString() ?? string.Empty,
+                    ToDate = row["to_date"]?.ToString() ?? string.Empty,
+                    NumberOfDays = int.TryParse(row["no_of_days"]?.ToString(), out var days) ? days : 0,
+                    HasAttachment = false
+                });
+            }
+
+            return list;
+        }
+
+        private List<string> MapCauseAnalysisByType(DataSet dataSet, string lookupType)
+        {
+            var list = new List<string>();
+            var table = dataSet.Tables.Cast<DataTable>().FirstOrDefault(t => t.TableName == "cause_analysis");
+
+            if (table == null) return list;
+
+            foreach (DataRow row in table.Rows)
+            {
+                if ((row["lookup_type"]?.ToString() ?? string.Empty) == lookupType)
+                {
+                    var code = row["lookup_code"]?.ToString() ?? string.Empty;
+                    if (!string.IsNullOrEmpty(code))
+                        list.Add(code);
+                }
+            }
+
+            return list;
         }
     }
 }
