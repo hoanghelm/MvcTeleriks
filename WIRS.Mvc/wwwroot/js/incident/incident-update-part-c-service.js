@@ -539,7 +539,7 @@
                     return {
                         injuredPersonId: injury.injuredPersonId,
                         injuredPersonName: injury.injuredPersonName,
-                        natureOfInjury: injury.natureOfInjuryList,
+                        natureOfInjury: injury.natureOfInjuryCodeList,
                         headNeckTorso: injury.headNeckTorsoList,
                         upperLimbs: injury.upperLimbsList,
                         lowerLimbs: injury.lowerLimbsList,

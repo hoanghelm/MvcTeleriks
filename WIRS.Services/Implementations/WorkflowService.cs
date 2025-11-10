@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data;
 using System.Text.Json;
 using WIRS.DataAccess.Entities;
@@ -763,11 +764,11 @@ namespace WIRS.Services.Implementations
                     modified_by = userId
                 };
 
-                var ireportDs = ConvertIReportToDataSet(model.IncidentId);
+                var ireportDs = ConvertIReportToDataSet(model);
                 var interviewedDs = ConvertPersonsInterviewedToDataSet(model.PersonsInterviewed);
-                var injuryDetailsDs = ConvertInjuryDetailsToDataSet(model.InjuryDetails);
+                var injuryDetailsDs = ConvertInjuryDetailsToDataSet(model);
                 var causeAnalysisDs = ConvertCauseAnalysisToDataSet(model);
-                var medicalLeavesDs = ConvertMedicalCertificatesToDataSet(model.MedicalCertificates);
+                var medicalLeavesDs = ConvertMedicalCertificatesToDataSet(model.IncidentId, model.MedicalCertificates);
                 var workflowDs = new DataSet();
                 var attachmentDs = new DataSet();
 
@@ -805,11 +806,11 @@ namespace WIRS.Services.Implementations
                     modified_by = userId
                 };
 
-                var ireportDs = ConvertIReportToDataSet(model.IncidentId);
+                var ireportDs = ConvertIReportToDataSet(model);
                 var interviewedDs = ConvertPersonsInterviewedToDataSet(model.PersonsInterviewed);
-                var injuryDetailsDs = ConvertInjuryDetailsToDataSet(model.InjuryDetails);
+                var injuryDetailsDs = ConvertInjuryDetailsToDataSet(model);
                 var causeAnalysisDs = ConvertCauseAnalysisToDataSet(model);
-                var medicalLeavesDs = ConvertMedicalCertificatesToDataSet(model.MedicalCertificates);
+                var medicalLeavesDs = ConvertMedicalCertificatesToDataSet(model.IncidentId, model.MedicalCertificates);
                 var workflowDs = CreatePartCWorkflowDataSet(model.IncidentId, userId, model.CwshoId, model.AdditionalComments);
                 var attachmentDs = new DataSet();
 
@@ -842,7 +843,7 @@ namespace WIRS.Services.Implementations
             throw new NotImplementedException();
         }
 
-        private DataSet ConvertIReportToDataSet(string incidentId)
+        private DataSet ConvertIReportToDataSet(PartCSubmitModel model)
         {
             var ds = new DataSet();
             var dt = new DataTable("incidents_injured");
@@ -850,6 +851,17 @@ namespace WIRS.Services.Implementations
             dt.Columns.Add("fourth_day_mc_date", typeof(string));
             dt.Columns.Add("ireport_no", typeof(string));
             dt.Columns.Add("ireport_date", typeof(string));
+
+            foreach (var injuredDetail in model.InjuryDetails)
+            {
+                var row = dt.NewRow();
+                row["injured_emp_no"] = injuredDetail.InjuredPersonId ?? string.Empty;
+                row["fourth_day_mc_date"] = string.Empty;
+                row["ireport_no"] = string.Empty;
+                row["ireport_date"] = string.Empty;
+                dt.Rows.Add(row);
+            }
+
             ds.Tables.Add(dt);
             return ds;
         }
@@ -880,9 +892,37 @@ namespace WIRS.Services.Implementations
             return ds;
         }
 
-        private DataSet ConvertInjuryDetailsToDataSet(List<InjuryDetailModel> injuryDetails)
+        private DataSet ConvertInjuryDetailsToDataSet(PartCSubmitModel model)
         {
             var ds = new DataSet();
+            var injuredDisplayDt = new DataTable("injured_details_display");
+            injuredDisplayDt.Columns.Add("incident_id", typeof(string));
+            injuredDisplayDt.Columns.Add("injured_id", typeof(string));
+            injuredDisplayDt.Columns.Add("empname", typeof(string));
+            injuredDisplayDt.Columns.Add("part_of_body_injured", typeof(string));
+            injuredDisplayDt.Columns.Add("nature_injury", typeof(string));
+            injuredDisplayDt.Columns.Add("injured_description", typeof(string));
+            injuredDisplayDt.Columns.Add("attach_statement", typeof(string));
+            injuredDisplayDt.Columns.Add("head_neck_torso", typeof(string));
+            injuredDisplayDt.Columns.Add("upper_limbs", typeof(string));
+            injuredDisplayDt.Columns.Add("lower_limps", typeof(string));
+            foreach (var injury in model.InjuryDetails)
+            {
+                var row = injuredDisplayDt.NewRow();
+                row["incident_id"] = model.IncidentId;
+                row["injured_id"] = injury.InjuredPersonId;
+                row["empname"] = injury.InjuredPersonName;
+                row["part_of_body_injured"] = string.Empty;
+                row["nature_injury"] = string.Empty;
+                row["injured_description"] = injury.Description;
+                row["attach_statement"] = string.Empty;
+                row["head_neck_torso"] = string.Empty;
+                row["upper_limbs"] = string.Empty;
+                row["lower_limps"] = string.Empty;
+                injuredDisplayDt.Rows.Add(row);
+            }
+            ds.Tables.Add(injuredDisplayDt);
+
             var dt = new DataTable("injured_details");
             dt.Columns.Add("incident_id", typeof(string));
             dt.Columns.Add("injured_id", typeof(string));
@@ -891,16 +931,16 @@ namespace WIRS.Services.Implementations
             dt.Columns.Add("injury_name", typeof(string));
             dt.Columns.Add("other_desc", typeof(string));
 
-            if (injuryDetails != null)
+            if (model.InjuryDetails != null)
             {
-                foreach (var injury in injuryDetails)
+                foreach (var injury in model.InjuryDetails)
                 {
                     if (injury.HeadNeckTorso != null)
                     {
                         foreach (var code in injury.HeadNeckTorso)
                         {
                             var row = dt.NewRow();
-                            row["incident_id"] = string.Empty;
+                            row["incident_id"] = model.IncidentId;
                             row["injured_id"] = injury.InjuredPersonId ?? string.Empty;
                             row["injury_type"] = "Head Neck Torso";
                             row["injury_code"] = code;
@@ -915,7 +955,7 @@ namespace WIRS.Services.Implementations
                         foreach (var code in injury.UpperLimbs)
                         {
                             var row = dt.NewRow();
-                            row["incident_id"] = string.Empty;
+                            row["incident_id"] = model.IncidentId;
                             row["injured_id"] = injury.InjuredPersonId ?? string.Empty;
                             row["injury_type"] = "Upper Limbs";
                             row["injury_code"] = code;
@@ -930,7 +970,7 @@ namespace WIRS.Services.Implementations
                         foreach (var code in injury.LowerLimbs)
                         {
                             var row = dt.NewRow();
-                            row["incident_id"] = string.Empty;
+                            row["incident_id"] = model.IncidentId;
                             row["injured_id"] = injury.InjuredPersonId ?? string.Empty;
                             row["injury_type"] = "Lower Limbs";
                             row["injury_code"] = code;
@@ -945,7 +985,7 @@ namespace WIRS.Services.Implementations
                         foreach (var code in injury.NatureOfInjury)
                         {
                             var row = dt.NewRow();
-                            row["incident_id"] = string.Empty;
+                            row["incident_id"] = model.IncidentId;
                             row["injured_id"] = injury.InjuredPersonId ?? string.Empty;
                             row["injury_type"] = "Nature Of Injury";
                             row["injury_code"] = code;
@@ -1033,24 +1073,36 @@ namespace WIRS.Services.Implementations
             return ds;
         }
 
-        private DataSet ConvertMedicalCertificatesToDataSet(List<MedicalCertificateModel> medicalCertificates)
+        private DataSet ConvertMedicalCertificatesToDataSet(string incidentId, List<MedicalCertificateModel> medicalCertificates)
         {
             var ds = new DataSet();
-            var dt = new DataTable("incidents_medical_leaves");
-            dt.Columns.Add("injured_emp_no", typeof(string));
+            var dt = new DataTable("injured_mc");
+            dt.Columns.Add("incident_id", typeof(string));
+            dt.Columns.Add("injured_id", typeof(string));
+            dt.Columns.Add("injured_name", typeof(string));
+            dt.Columns.Add("hospital_clinic_name", typeof(string));
             dt.Columns.Add("from_date", typeof(string));
             dt.Columns.Add("to_date", typeof(string));
-            dt.Columns.Add("no_of_days", typeof(string));
+            dt.Columns.Add("no_days", typeof(string));
+            dt.Columns.Add("morethan24hrs", typeof(string));
+            dt.Columns.Add("morethan24hrs_text", typeof(string));
+            dt.Columns.Add("attachment", typeof(string));
 
             if (medicalCertificates != null)
             {
                 foreach (var mc in medicalCertificates)
                 {
                     var row = dt.NewRow();
-                    row["injured_emp_no"] = mc.InjuredPersonId ?? string.Empty;
+                    row["incident_id"] = incidentId;
+                    row["injured_id"] = mc.InjuredPersonId;
+                    row["injured_name"] = mc.InjuredPersonName ?? string.Empty;
+                    row["hospital_clinic_name"] = string.Empty;
                     row["from_date"] = mc.FromDate ?? string.Empty;
                     row["to_date"] = mc.ToDate ?? string.Empty;
-                    row["no_of_days"] = mc.NumberOfDays.ToString();
+                    row["no_days"] = mc.NumberOfDays.ToString() ?? string.Empty;
+                    row["morethan24hrs"] = "0";
+                    row["morethan24hrs_text"] = string.Empty;
+                    row["attachment"] = mc.AttachmentPath ?? string.Empty;
                     dt.Rows.Add(row);
                 }
             }
