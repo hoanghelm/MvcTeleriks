@@ -218,7 +218,7 @@
             vm.partC.submitterName = latestWorkflow.fromName || '';
             vm.partC.submitterEmpId = latestWorkflow.from || '';
             vm.partC.submitterDesignation = latestWorkflow.fromDesignation || '';
-            vm.partC.submissionDate = latestWorkflow.submittedDate || '';
+            vm.partC.submissionDate = latestWorkflow.date || '';
         }
 
         function loadPartCReadOnlyData(vm) {
