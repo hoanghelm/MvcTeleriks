@@ -289,58 +289,55 @@
                     </h2>
                     <div id="collapseC4" class="accordion-collapse collapse show">
                         <div class="accordion-body">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div class="form-group">
-                                    <label for="partC_mcInjuredPerson" class="block text-sm font-medium text-gray-700 mb-1">Select Injured Person</label>
-                                    <select kendo-drop-down-list
-                                            k-options="vm.partC.injuredPersonOptions"
-                                            k-ng-model="vm.partC.medicalCert.injuredPersonId"
-                                            id="partC_mcInjuredPerson"
-                                            class="w-full"
-                                            k-enable="!vm.partC.isReadOnly">
-                                    </select>
+                            <div ng-show="!vm.partC.isReadOnly">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div class="form-group">
+                                        <label for="partC_mcInjuredPerson" class="block text-sm font-medium text-gray-700 mb-1">Select Injured Person</label>
+                                        <select kendo-drop-down-list
+                                                k-options="vm.partC.injuredPersonOptions"
+                                                k-ng-model="vm.partC.medicalCert.injuredPersonId"
+                                                id="partC_mcInjuredPerson"
+                                                class="w-full">
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Number of Days</label>
+                                        <input kendo-numeric-text-box
+                                               k-ng-model="vm.partC.medicalCert.numberOfDays"
+                                               k-min="1"
+                                               k-format="'n0'"
+                                               style="width: 100%;" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">MC From Date</label>
+                                        <input kendo-date-picker
+                                               k-ng-model="vm.partC.medicalCert.fromDate"
+                                               k-format="'dd-MMM-yyyy'"
+                                               style="width: 100%;" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">MC To Date</label>
+                                        <input kendo-date-picker
+                                               k-ng-model="vm.partC.medicalCert.toDate"
+                                               k-format="'dd-MMM-yyyy'"
+                                               style="width: 100%;" />
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700">MC Attachment (PDF, JPG, PNG)</label>
+                                        <input type="file"
+                                               accept=".pdf,.jpg,.jpeg,.png"
+                                               class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Number of Days</label>
-                                    <input kendo-numeric-text-box
-                                           k-ng-model="vm.partC.medicalCert.numberOfDays"
-                                           k-min="1"
-                                           k-format="'n0'"
-                                           style="width: 100%;"
-                                           k-enable="!vm.partC.isReadOnly" />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">MC From Date</label>
-                                    <input kendo-date-picker
-                                           k-ng-model="vm.partC.medicalCert.fromDate"
-                                           k-format="'dd-MMM-yyyy'"
-                                           style="width: 100%;"
-                                           k-enable="!vm.partC.isReadOnly" />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">MC To Date</label>
-                                    <input kendo-date-picker
-                                           k-ng-model="vm.partC.medicalCert.toDate"
-                                           k-format="'dd-MMM-yyyy'"
-                                           style="width: 100%;"
-                                           k-enable="!vm.partC.isReadOnly" />
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700">MC Attachment (PDF, JPG, PNG)</label>
-                                    <input type="file"
-                                           accept=".pdf,.jpg,.jpeg,.png"
-                                           class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                                </div>
+                                <button type="button"
+                                        ng-click="vm.addMedicalCertificate()"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    Add MC
+                                </button>
                             </div>
-                            <button type="button"
-                                    ng-click="vm.addMedicalCertificate()"
-                                    ng-disabled="vm.partC.isReadOnly"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                                Add MC
-                            </button>
 
                             <div ng-show="vm.partC.medicalCertificates.length > 0" class="mt-4 overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
+                                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                                     <thead class="bg-gray-100">
                                         <tr>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Injured Person</th>
@@ -348,7 +345,7 @@
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">To Date</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Days</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Attachment</th>
-                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                                            <th ng-show="!vm.partC.isReadOnly" class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
@@ -361,11 +358,10 @@
                                                 <span ng-show="mc.hasAttachment" class="text-green-600">Yes</span>
                                                 <span ng-show="!mc.hasAttachment" class="text-gray-400">No</span>
                                             </td>
-                                            <td class="px-4 py-2 text-sm">
+                                            <td ng-show="!vm.partC.isReadOnly" class="px-4 py-2 text-sm">
                                                 <button type="button"
                                                         ng-click="vm.removeMedicalCertificate($index)"
-                                                        ng-disabled="vm.partC.isReadOnly"
-                                                        class="text-red-600 hover:text-red-800 disabled:opacity-50">
+                                                        class="text-red-600 hover:text-red-800">
                                                     Remove
                                                 </button>
                                             </td>
@@ -393,6 +389,7 @@
                                         <div ng-repeat="cls in vm.incidentClass" class="flex items-center">
                                             <input type="checkbox"
                                                    ng-model="cls.selected"
+                                                   ng-disabled="vm.partC.isReadOnly"
                                                    id="class{{ $index }}"
                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                             <label for="class{{ $index }}" class="ml-2 block text-sm text-gray-700">
@@ -408,6 +405,7 @@
                                         <div ng-repeat="agent in vm.incidentAgent" class="flex items-center">
                                             <input type="checkbox"
                                                    ng-model="agent.selected"
+                                                   ng-disabled="vm.partC.isReadOnly"
                                                    id="agent{{ $index }}"
                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                             <label for="agent{{ $index }}" class="ml-2 block text-sm text-gray-700">
@@ -423,6 +421,7 @@
                                         <div ng-repeat="condition in vm.unsafeConditions" class="flex items-center">
                                             <input type="checkbox"
                                                    ng-model="condition.selected"
+                                                   ng-disabled="vm.partC.isReadOnly"
                                                    id="unsafe{{ $index }}"
                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                             <label for="unsafe{{ $index }}" class="ml-2 block text-sm text-gray-700">
@@ -438,6 +437,7 @@
                                         <div ng-repeat="act in vm.unsafeActs" class="flex items-center">
                                             <input type="checkbox"
                                                    ng-model="act.selected"
+                                                   ng-disabled="vm.partC.isReadOnly"
                                                    id="act{{ $index }}"
                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                             <label for="act{{ $index }}" class="ml-2 block text-sm text-gray-700">
@@ -453,6 +453,7 @@
                                         <div ng-repeat="factor in vm.contributingFactors" class="flex items-center">
                                             <input type="checkbox"
                                                    ng-model="factor.selected"
+                                                   ng-disabled="vm.partC.isReadOnly"
                                                    id="factor{{ $index }}"
                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                             <label for="factor{{ $index }}" class="ml-2 block text-sm text-gray-700">
