@@ -263,6 +263,33 @@ namespace WIRS.Services.Implementations
 			}
 		}
 
+		public async Task<List<UserItem>> GetHeadLOBs(string sba_code, string sbu_code, string department_code, string location_code)
+		{
+			try
+			{
+				var result = new List<UserItem>();
+				var dataSet = await _userDataAccess.get_h_hod_by_sbu(sba_code, sbu_code, department_code, location_code);
+
+				if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow row in dataSet.Tables[0].Rows)
+					{
+						result.Add(new UserItem
+						{
+							Id = row["empid"]?.ToString() ?? string.Empty,
+							Name = row["empname"]?.ToString() ?? string.Empty
+						});
+					}
+				}
+
+				return result;
+			}
+			catch
+			{
+				return new List<UserItem>();
+			}
+		}
+
 		public async Task<bool> CheckUserExists(string userId)
 		{
 			try
