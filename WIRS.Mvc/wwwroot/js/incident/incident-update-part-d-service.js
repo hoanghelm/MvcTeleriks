@@ -33,16 +33,18 @@
                 successMessage: '',
                 isSubmitting: false,
                 wshoOptions: {
-                    dataTextField: 'userName',
-                    dataValueField: 'userId',
-                    dataSource: [],
-                    optionLabel: '-- Select WSHO --'
+                    dataTextField: 'name',
+                    dataValueField: 'id',
+                    dataSource: new kendo.data.DataSource({ data: [] }),
+                    optionLabel: '-- Select WSHO --',
+                    valuePrimitive: true
                 },
                 headLobOptions: {
-                    dataTextField: 'userName',
-                    dataValueField: 'userId',
-                    dataSource: [],
-                    optionLabel: '-- Select Head LOB --'
+                    dataTextField: 'name',
+                    dataValueField: 'id',
+                    dataSource: new kendo.data.DataSource({ data: [] }),
+                    optionLabel: '-- Select Head LOB --',
+                    valuePrimitive: true
                 }
             };
 
@@ -127,17 +129,11 @@
                 vm.incident.departmentCode || '',
                 vm.incident.locationCode || ''
             ).then(function (data) {
-                vm.wshoList = data.map(function (item) {
-                    return {
-                        userId: item.userId || item.employeeNo,
-                        userName: item.userName || item.name,
-                        designation: item.designation || ''
-                    };
-                });
-                vm.partD.wshoOptions.dataSource = vm.wshoList;
+                vm.wshoList = data;
+                vm.partD.wshoOptions.dataSource.data(data);
             }).catch(function (error) {
                 vm.wshoList = [];
-                vm.partD.wshoOptions.dataSource = [];
+                vm.partD.wshoOptions.dataSource.data([]);
             });
         }
 
@@ -146,23 +142,17 @@
                 return $q.resolve();
             }
 
-            return IncidentUpdateService.getHODs(
+            return IncidentUpdateService.getHeadLOBs(
                 vm.incident.sectorCode,
                 vm.incident.lobCode,
                 vm.incident.departmentCode || '',
                 vm.incident.locationCode || ''
             ).then(function (data) {
-                vm.headLobList = data.map(function (item) {
-                    return {
-                        userId: item.userId || item.employeeNo,
-                        userName: item.userName || item.name,
-                        designation: item.designation || ''
-                    };
-                });
-                vm.partD.headLobOptions.dataSource = vm.headLobList;
+                vm.headLobList = data;
+                vm.partD.headLobOptions.dataSource.data(data);
             }).catch(function (error) {
                 vm.headLobList = [];
-                vm.partD.headLobOptions.dataSource = [];
+                vm.partD.headLobOptions.dataSource.data([]);
             });
         }
 

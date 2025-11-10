@@ -42,7 +42,8 @@
             getPartDCopyToList: getPartDCopyToList,
             submitPartD: submitPartD,
             revertPartDToWSHO: revertPartDToWSHO,
-            submitPartDToHeadLOB: submitPartDToHeadLOB
+            submitPartDToHeadLOB: submitPartDToHeadLOB,
+            getHeadLOBs: getHeadLOBs
         };
 
         return service;
@@ -307,6 +308,15 @@
 
         function submitPartDToHeadLOB(submitData) {
             return $http.post('/Incident/SubmitPartDToHeadLOB', submitData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getHeadLOBs(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetHeadLOBs?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
                 .then(handleSuccess)
                 .catch(handleError);
         }

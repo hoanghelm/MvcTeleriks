@@ -18,6 +18,7 @@ namespace WIRS.Services.Interfaces
 		Task<List<UserItem>> GetCWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
 		Task<List<UserItem>> GetHSBUs(string sba_code, string sbu_code, string department_code, string location_code);
 		Task<List<UserItem>> GetAWSHOs(string sba_code, string sbu_code, string department_code, string location_code);
+		Task<List<UserItem>> GetHeadLOBs(string sba_code, string sbu_code, string department_code, string location_code);
 
 		Task<bool> CheckUserExists(string userId);
 		Task<UserCreationModel?> ValidateUserExists(string userId);

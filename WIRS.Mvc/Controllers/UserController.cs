@@ -496,6 +496,25 @@ namespace WIRS.Mvc.Controllers
 				return Json(new { success = false, message = "Error retrieving HSBUs", error = ex.Message });
 			}
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetHeadLOBs(string sectorCode, string lobCode, string departmentCode = "", string locationCode = "")
+		{
+			try
+			{
+				if (string.IsNullOrWhiteSpace(sectorCode) || string.IsNullOrWhiteSpace(lobCode))
+				{
+					return Json(new { success = false, message = "Sector and LOB codes are required" });
+				}
+
+				var headLobs = await _userService.GetHeadLOBs(sectorCode, lobCode, departmentCode, locationCode);
+				return Json(headLobs);
+			}
+			catch (Exception ex)
+			{
+				return Json(new { success = false, message = "Error retrieving Head LOBs", error = ex.Message });
+			}
+		}
 	}
 
 	public class UserSearchRequest
