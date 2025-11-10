@@ -55,73 +55,68 @@
                     </h2>
                     <div id="collapseC2" class="accordion-collapse collapse show">
                         <div class="accordion-body">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Name</label>
-                                    <div class="flex gap-2">
+                            <div ng-show="!vm.partC.isReadOnly">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Name</label>
+                                        <div class="flex gap-2">
+                                            <input kendo-text-box
+                                                   k-ng-model="vm.partC.personInterviewed.name"
+                                                   style="width: 100%;" />
+                                            <button type="button"
+                                                    ng-click="vm.openPartCEmployeeSearch('personInterviewed')"
+                                                    class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+                                                Search
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Employee No/NRIC</label>
                                         <input kendo-text-box
-                                               k-ng-model="vm.partC.personInterviewed.name"
-                                               style="width: 100%;"
-                                               k-enable="!vm.partC.isReadOnly" />
-                                        <button type="button"
-                                                ng-click="vm.openPartCEmployeeSearch('personInterviewed')"
-                                                ng-disabled="vm.partC.isReadOnly"
-                                                class="px-3 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 disabled:opacity-50">
-                                            Search
-                                        </button>
+                                               k-ng-model="vm.partC.personInterviewed.employeeNo"
+                                               style="width: 100%;" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Designation</label>
+                                        <input kendo-text-box
+                                               k-ng-model="vm.partC.personInterviewed.designation"
+                                               style="width: 100%;" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Contact Number</label>
+                                        <input kendo-text-box
+                                               k-ng-model="vm.partC.personInterviewed.contactNo"
+                                               style="width: 100%;" />
                                     </div>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Employee No/NRIC</label>
-                                    <input kendo-text-box
-                                           k-ng-model="vm.partC.personInterviewed.employeeNo"
-                                           style="width: 100%;"
-                                           k-enable="!vm.partC.isReadOnly" />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Designation</label>
-                                    <input kendo-text-box
-                                           k-ng-model="vm.partC.personInterviewed.designation"
-                                           style="width: 100%;"
-                                           k-enable="!vm.partC.isReadOnly" />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Contact Number</label>
-                                    <input kendo-text-box
-                                           k-ng-model="vm.partC.personInterviewed.contactNo"
-                                           style="width: 100%;"
-                                           k-enable="!vm.partC.isReadOnly" />
-                                </div>
+                                <button type="button"
+                                        ng-click="vm.addPersonInterviewed()"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    Add Person
+                                </button>
                             </div>
-                            <button type="button"
-                                    ng-click="vm.addPersonInterviewed()"
-                                    ng-disabled="vm.partC.isReadOnly"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                                Add Person
-                            </button>
 
                             <div ng-show="vm.partC.personsInterviewed.length > 0" class="mt-4 overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
+                                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                                     <thead class="bg-gray-100">
                                         <tr>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Contact No</th>
-                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                                            <th ng-show="!vm.partC.isReadOnly" class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         <tr ng-repeat="person in vm.partC.personsInterviewed">
                                             <td class="px-4 py-2 text-sm text-gray-900">{{ person.name }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.empid }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.empdesignation }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.empcontactno }}</td>
-                                            <td class="px-4 py-2 text-sm">
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.employeeNo }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.designation }}</td>
+                                            <td class="px-4 py-2 text-sm text-gray-900">{{ person.contactNo }}</td>
+                                            <td ng-show="!vm.partC.isReadOnly" class="px-4 py-2 text-sm">
                                                 <button type="button"
                                                         ng-click="vm.removePersonInterviewed($index)"
-                                                        ng-disabled="vm.partC.isReadOnly"
-                                                        class="text-red-600 hover:text-red-800 disabled:opacity-50">
+                                                        class="text-red-600 hover:text-red-800">
                                                     Remove
                                                 </button>
                                             </td>
@@ -151,111 +146,107 @@
                     <div id="collapseC3" class="accordion-collapse collapse show">
                         <div class="accordion-body">
                             <p class="text-sm text-gray-600 mb-3">Only applicable for injury-type incidents.</p>
-                            <div class="mb-4 form-group">
-                                <label for="partC_injuredPerson" class="block text-sm font-medium text-gray-700 mb-1">Select Injured Person</label>
-                                <select kendo-drop-down-list
-                                        k-options="vm.partC.injuredPersonOptions"
-                                        k-ng-model="vm.partC.injuryDetail.injuredPersonId"
-                                        id="partC_injuredPerson"
-                                        class="md:w-1/2"
-                                        k-enable="!vm.partC.isReadOnly">
-                                </select>
-                            </div>
 
-                            <fieldset class="border border-gray-300 rounded-lg p-4 mb-4 bg-gray-50">
-                                <legend class="text-md font-semibold text-gray-900 px-2">Part of Body Injured</legend>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Head, Neck & Torso</label>
-                                        <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
-                                            <div ng-repeat="part in vm.headNeckTorso" class="flex items-center">
-                                                <input type="checkbox"
-                                                       ng-model="part.selected"
-                                                       ng-disabled="vm.partC.isReadOnly"
-                                                       id="head{{ $index }}"
-                                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                                <label for="head{{ $index }}" class="ml-2 block text-sm text-gray-700">
-                                                    {{ part.value }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Upper Limbs</label>
-                                        <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
-                                            <div ng-repeat="limb in vm.upperLimbs" class="flex items-center">
-                                                <input type="checkbox"
-                                                       ng-model="limb.selected"
-                                                       ng-disabled="vm.partC.isReadOnly"
-                                                       id="upper{{ $index }}"
-                                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                                <label for="upper{{ $index }}" class="ml-2 block text-sm text-gray-700">
-                                                    {{ limb.value }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Lower Limbs</label>
-                                        <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
-                                            <div ng-repeat="limb in vm.lowerLimbs" class="flex items-center">
-                                                <input type="checkbox"
-                                                       ng-model="limb.selected"
-                                                       ng-disabled="vm.partC.isReadOnly"
-                                                       id="lower{{ $index }}"
-                                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                                <label for="lower{{ $index }}" class="ml-2 block text-sm text-gray-700">
-                                                    {{ limb.value }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div ng-show="!vm.partC.isReadOnly">
+                                <div class="mb-4 form-group">
+                                    <label for="partC_injuredPerson" class="block text-sm font-medium text-gray-700 mb-1">Select Injured Person</label>
+                                    <select kendo-drop-down-list
+                                            k-options="vm.partC.injuredPersonOptions"
+                                            k-ng-model="vm.partC.injuryDetail.injuredPersonId"
+                                            id="partC_injuredPerson"
+                                            class="md:w-1/2">
+                                    </select>
                                 </div>
-                            </fieldset>
 
-                            <fieldset class="border border-gray-300 rounded-lg p-4 mb-4 bg-gray-50">
-                                <legend class="text-md font-semibold text-gray-900 px-2">Nature of Injury</legend>
-                                <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
-                                    <div ng-repeat="nature in vm.natureOfInjury" class="inline-block w-1/3">
-                                        <input type="checkbox"
-                                               ng-model="nature.selected"
-                                               ng-disabled="vm.partC.isReadOnly"
-                                               id="nature{{ $index }}"
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <label for="nature{{ $index }}" class="ml-2 text-sm text-gray-700">
-                                            {{ nature.value }}
-                                        </label>
+                                <fieldset class="border border-gray-300 rounded-lg p-4 mb-4 bg-gray-50">
+                                    <legend class="text-md font-semibold text-gray-900 px-2">Part of Body Injured</legend>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Head, Neck & Torso</label>
+                                            <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
+                                                <div ng-repeat="part in vm.headNeckTorso" class="flex items-center">
+                                                    <input type="checkbox"
+                                                           ng-model="part.selected"
+                                                           id="head{{ $index }}"
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                    <label for="head{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                        {{ part.value }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Upper Limbs</label>
+                                            <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
+                                                <div ng-repeat="limb in vm.upperLimbs" class="flex items-center">
+                                                    <input type="checkbox"
+                                                           ng-model="limb.selected"
+                                                           id="upper{{ $index }}"
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                    <label for="upper{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                        {{ limb.value }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Lower Limbs</label>
+                                            <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
+                                                <div ng-repeat="limb in vm.lowerLimbs" class="flex items-center">
+                                                    <input type="checkbox"
+                                                           ng-model="limb.selected"
+                                                           id="lower{{ $index }}"
+                                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                                    <label for="lower{{ $index }}" class="ml-2 block text-sm text-gray-700">
+                                                        {{ limb.value }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+                                </fieldset>
+
+                                <fieldset class="border border-gray-300 rounded-lg p-4 mb-4 bg-gray-50">
+                                    <legend class="text-md font-semibold text-gray-900 px-2">Nature of Injury</legend>
+                                    <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-300 rounded p-3 bg-white">
+                                        <div ng-repeat="nature in vm.natureOfInjury" class="inline-block w-1/3">
+                                            <input type="checkbox"
+                                                   ng-model="nature.selected"
+                                                   id="nature{{ $index }}"
+                                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                            <label for="nature{{ $index }}" class="ml-2 text-sm text-gray-700">
+                                                {{ nature.value }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700">Injury Description</label>
+                                    <textarea kendo-text-area
+                                              k-ng-model="vm.partC.injuryDetail.description"
+                                              k-rows="3"
+                                              style="width: 100%;"></textarea>
                                 </div>
-                            </fieldset>
 
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700">Injury Description</label>
-                                <textarea kendo-text-area
-                                          k-ng-model="vm.partC.injuryDetail.description"
-                                          k-rows="3"
-                                          style="width: 100%;"
-                                          k-enable="!vm.partC.isReadOnly"></textarea>
+                                <button type="button"
+                                        ng-click="vm.addInjuryDetail()"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    Add Injury Detail
+                                </button>
                             </div>
-
-                            <button type="button"
-                                    ng-click="vm.addInjuryDetail()"
-                                    ng-disabled="vm.partC.isReadOnly"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
-                                Add Injury Detail
-                            </button>
 
                             <div ng-show="vm.partC.injuryDetails.length > 0" class="mt-4 overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
+                                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
                                     <thead class="bg-gray-100">
                                         <tr>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Injured Person</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Nature of Injury</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Body Parts</th>
                                             <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Description</th>
-                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                                            <th ng-show="!vm.partC.isReadOnly" class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
@@ -274,11 +265,10 @@
                                                 <span ng-if="!injury.bodyPartsList || !injury.bodyPartsList.length">{{ injury.bodyParts }}</span>
                                             </td>
                                             <td class="px-4 py-2 text-sm text-gray-900">{{ injury.description }}</td>
-                                            <td class="px-4 py-2 text-sm">
+                                            <td ng-show="!vm.partC.isReadOnly" class="px-4 py-2 text-sm">
                                                 <button type="button"
                                                         ng-click="vm.removeInjuryDetail($index)"
-                                                        ng-disabled="vm.partC.isReadOnly"
-                                                        class="text-red-600 hover:text-red-800 disabled:opacity-50">
+                                                        class="text-red-600 hover:text-red-800">
                                                     Remove
                                                 </button>
                                             </td>
