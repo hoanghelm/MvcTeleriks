@@ -182,11 +182,9 @@
         function loadPartALookups(vm) {
             return Promise.all([
                 IncidentUpdateService.getIncidentTypes().then(function (data) {
-                    console.log('Incident types loaded:', data);
                     vm.partA.incidentTypeOptions.dataSource = data;
                 }),
                 IncidentUpdateService.getSectors().then(function (data) {
-                    console.log('Sectors loaded:', data);
                     vm.partA.sectorOptions.dataSource = data;
                 }),
                 IncidentUpdateService.getLOBs(vm.incident.sectorCode || vm.incident.sbaCode).then(function (data) {
@@ -242,19 +240,14 @@
         function mapIncidentToPartA(vm) {
             if (!vm.incident) return;
 
-            console.log('Mapping incident to Part A', vm.incident);
-
             if (vm.incident.incidentTypes && vm.incident.incidentTypes.length > 0) {
                 var incType = vm.incident.incidentTypes[0];
                 vm.partA.incidentType = incType.type || incType.code || '';
-                console.log('Setting incident type to:', vm.partA.incidentType, 'from:', incType);
             } else if (vm.incident.incidentType) {
                 var incType = vm.incident.incidentType;
                 vm.partA.incidentType = (typeof incType === 'object' && incType.code) ? incType.code : incType;
-                console.log('Setting incident type from incident.incidentType:', vm.partA.incidentType);
             } else {
                 vm.partA.incidentType = '';
-                console.log('No incident types found in incident data');
             }
             vm.partA.incidentOther = vm.incident.incidentOther || '';
 
@@ -311,18 +304,12 @@
             vm.partA.hodId = vm.incident.hodId || '';
             vm.partA.wshoId = vm.incident.wshoId || '';
             vm.partA.ahodId = vm.incident.ahodId || '';
-
-            console.log('Part A data after mapping:', vm.partA);
         }
 
         function refreshKendoDropDowns(vm) {
-            console.log('Refreshing Kendo DropDownList widgets...');
-
             function refreshDropDown(elementId, dataSource, value) {
                 var widget = $('#' + elementId).data('kendoDropDownList');
                 if (widget && value) {
-                    console.log('Refreshing', elementId, '- Setting value to:', value);
-
                     if (dataSource && dataSource.length > 0) {
                         widget.setDataSource(new kendo.data.DataSource({
                             data: dataSource
@@ -332,12 +319,6 @@
                     widget.value(value);
 
                     widget.trigger('change');
-
-                    console.log('  - Widget value after refresh:', widget.value());
-                } else if (!widget) {
-                    console.log('Widget not found:', elementId);
-                } else {
-                    console.log('No value to set for:', elementId);
                 }
             }
 

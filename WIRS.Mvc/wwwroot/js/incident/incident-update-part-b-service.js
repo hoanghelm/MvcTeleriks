@@ -80,7 +80,6 @@
                     }
                 })
                 .catch(function (error) {
-                    console.error('Failed to load injured case types:', error);
                 });
         }
 
@@ -146,7 +145,6 @@
                     });
                 })
                 .catch(function (error) {
-                    console.error('Failed to load email to list:', error);
                 });
         }
 
