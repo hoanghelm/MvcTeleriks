@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" ng-show="!vm.partD.isReadOnly">
                 <div class="form-group">
                     <label for="partD_wsho" class="block text-sm font-medium text-gray-700 mb-1">
                         Name of WSHO
@@ -65,8 +65,7 @@
                             k-ng-model="vm.partD.wshoId"
                             id="partD_wsho"
                             name="partDWsho"
-                            style="width: 100%;"
-                            k-enable="!vm.partD.isReadOnly">
+                            style="width: 100%;">
                     </select>
                 </div>
                 <div class="form-group">
@@ -78,8 +77,7 @@
                             k-ng-model="vm.partD.headLobId"
                             id="partD_headlob"
                             name="partDHeadLob"
-                            style="width: 100%;"
-                            k-enable="!vm.partD.isReadOnly">
+                            style="width: 100%;">
                     </select>
                 </div>
             </div>
