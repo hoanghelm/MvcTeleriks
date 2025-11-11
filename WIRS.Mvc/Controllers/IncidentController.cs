@@ -897,6 +897,104 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SubmitPartG([FromForm] PartGSubmitRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.Comments))
+                {
+                    return Json(new { success = false, message = "Review & Comment is required", errorCode = "ERR-134" });
+                }
+
+                if (string.IsNullOrEmpty(request.CwshoId))
+                {
+                    return Json(new { success = false, message = "Name of Chairman WSH is required", errorCode = "ERR-133" });
+                }
+
+                var result = await _workflowService.SubmitPartGAsync(
+                    request.IncidentId,
+                    request.Comments,
+                    request.CwshoId,
+                    request.Attachments,
+                    currentUser.UserId
+                );
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part G submitted successfully to Chairman WSH", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while submitting Part G", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RevertPartGToHOD([FromForm] PartGSubmitRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.Comments))
+                {
+                    return Json(new { success = false, message = "Review & Comment is required", errorCode = "ERR-134" });
+                }
+
+                if (string.IsNullOrEmpty(request.HodId))
+                {
+                    return Json(new { success = false, message = "Name of HOD is required", errorCode = "ERR-133" });
+                }
+
+                var result = await _workflowService.RevertPartGToHODAsync(
+                    request.IncidentId,
+                    request.Comments,
+                    request.HodId,
+                    request.Attachments,
+                    currentUser.UserId
+                );
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part G reverted successfully to HOD", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while reverting Part G", error = ex.Message });
+            }
+        }
+
         private string ValidatePartC(PartCSaveRequest request)
         {
             if (string.IsNullOrEmpty(request.IsNegligent))
@@ -1323,5 +1421,14 @@ namespace WIRS.Mvc.Controllers
         public string WshoId { get; set; }
         public List<IFormFile> Attachments { get; set; }
         public List<IFormFile> RiskAttachments { get; set; }
+    }
+
+    public class PartGSubmitRequest
+    {
+        public string IncidentId { get; set; }
+        public string Comments { get; set; }
+        public string HodId { get; set; }
+        public string CwshoId { get; set; }
+        public List<IFormFile> Attachments { get; set; }
     }
 }

@@ -3,9 +3,9 @@
         .module('incidentUpdateApp')
         .controller('IncidentUpdateController', IncidentUpdateController);
 
-    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', '$q', 'IncidentUpdateService', 'PartAService', 'PartBService', 'PartCService', 'PartDService', 'PartEService', 'PartFService'];
+    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', '$q', 'IncidentUpdateService', 'PartAService', 'PartBService', 'PartCService', 'PartDService', 'PartEService', 'PartFService', 'PartGService'];
 
-    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, $q, IncidentUpdateService, PartAService, PartBService, PartCService, PartDService, PartEService, PartFService) {
+    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, $q, IncidentUpdateService, PartAService, PartBService, PartCService, PartDService, PartEService, PartFService, PartGService) {
         var vm = this;
 
         vm.loading = true;
@@ -23,6 +23,8 @@
         PartEService.initializePartE(vm);
 
         PartFService.initializePartF(vm);
+
+        PartGService.initializePartG(vm);
 
         PartAService.initializePartA(vm);
 
@@ -90,6 +92,12 @@
         vm.removePartFAttachment = function (index) { PartFService.removePartFAttachment(vm, index); };
         vm.removePartFRiskAttachment = function (index) { PartFService.removePartFRiskAttachment(vm, index); };
 
+        vm.canViewPartG = function () { return PartGService.canViewPartG(vm); };
+        vm.canEditPartG = function () { return PartGService.canEditPartG(vm); };
+        vm.submitPartG = function () { PartGService.submitPartG(vm); };
+        vm.revertPartGToHOD = function () { PartGService.revertPartGToHOD(vm); };
+        vm.removePartGAttachment = function (index) { PartGService.removePartGAttachment(vm, index); };
+
         init();
 
         function init() {
@@ -111,7 +119,8 @@
                         PartCService.loadPartCData(vm),
                         PartDService.loadPartDData(vm, getCurrentDate),
                         PartEService.loadPartEData(vm, getCurrentDate),
-                        PartFService.loadPartFData(vm, getCurrentDate)
+                        PartFService.loadPartFData(vm, getCurrentDate),
+                        PartGService.loadPartGData(vm, getCurrentDate)
                     ]);
                 })
                 .catch(function (error) {

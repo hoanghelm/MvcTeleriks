@@ -1,0 +1,178 @@
+@* Part G - Verification by WSHO *@
+
+<div class="bg-white shadow-md rounded-lg p-6">
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part G - Verification by WSHO</h3>
+    </div>
+
+    <div ng-show="vm.partG.validationMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ vm.partG.validationMessage }}
+    </div>
+
+    <div ng-show="vm.partG.successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        {{ vm.partG.successMessage }}
+    </div>
+
+    <form name="partGForm" novalidate>
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Verification Details</legend>
+
+            <div class="space-y-6">
+                <div class="form-group">
+                    <label for="partG_comments" class="block text-sm font-medium text-gray-700 mb-1 required">
+                        Review & Comment
+                    </label>
+                    <textarea kendo-text-area
+                              k-ng-model="vm.partG.comments"
+                              k-rows="6"
+                              id="partG_comments"
+                              name="partGComments"
+                              style="width: 100%;"
+                              k-enable="!vm.partG.isReadOnly"
+                              maxlength="4000"
+                              required></textarea>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-red-600 text-sm" ng-show="!vm.partG.isReadOnly && partGForm.partGComments.$touched && partGForm.partGComments.$invalid">
+                            Review & Comment is required
+                        </span>
+                        <span class="text-sm text-gray-500">{{ vm.partG.comments ? vm.partG.comments.length : 0 }} / 4000 characters</span>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="!vm.partG.isReadOnly">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Attach Document(s)</label>
+                    <input type="file"
+                           id="partG_fileUpload"
+                           multiple
+                           class="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-white focus:outline-none" />
+                    <p class="mt-1 text-sm text-gray-500">PDF, JPG, PNG, DOCX, XLSX files accepted</p>
+                </div>
+
+                <div ng-show="vm.partG.attachments.length > 0" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">File Name</th>
+                                <th ng-show="!vm.partG.isReadOnly" class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr ng-repeat="file in vm.partG.attachments">
+                                <td class="px-4 py-2 text-sm text-gray-900">
+                                    <a ng-if="file.filePath" href="{{ file.filePath }}" target="_blank" class="text-blue-600 hover:text-blue-800">{{ file.fileName }}</a>
+                                    <span ng-if="!file.filePath">{{ file.fileName }}</span>
+                                </td>
+                                <td ng-show="!vm.partG.isReadOnly" class="px-4 py-2 text-sm">
+                                    <button type="button"
+                                            ng-click="vm.removePartGAttachment($index)"
+                                            class="text-red-600 hover:text-red-800">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partG.submitterName || vm.currentUser.name }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Employee Number</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partG.submitterEmpId || vm.currentUser.userId }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date of Submission</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partG.submissionDate || vm.getCurrentDate() }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partG.submitterDesignation || vm.currentUser.designation }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" ng-show="!vm.partG.isReadOnly">
+                    <div class="form-group">
+                        <label for="partG_hod" class="block text-sm font-medium text-gray-700 mb-1">
+                            Name of HOD
+                        </label>
+                        <select kendo-drop-down-list
+                                k-options="vm.partG.hodOptions"
+                                k-ng-model="vm.partG.hodId"
+                                id="partG_hod"
+                                name="partGHod"
+                                class="w-full">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="partG_cwsho" class="block text-sm font-medium text-gray-700 mb-1">
+                            Name of Chairman WSH
+                        </label>
+                        <select kendo-drop-down-list
+                                k-options="vm.partG.cwshoOptions"
+                                k-ng-model="vm.partG.cwshoId"
+                                id="partG_cwsho"
+                                name="partGCwsho"
+                                class="w-full">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partG.isReadOnly">
+                    <button type="button"
+                            ng-click="vm.revertPartGToHOD()"
+                            ng-disabled="vm.partG.isSubmitting"
+                            class="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <span ng-show="!vm.partG.isSubmitting">Revert to HOD</span>
+                        <span ng-show="vm.partG.isSubmitting">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Processing...
+                        </span>
+                    </button>
+                    <button type="button"
+                            ng-click="vm.submitPartG()"
+                            ng-disabled="vm.partG.isSubmitting"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <span ng-show="!vm.partG.isSubmitting">Submit to Chairman WSH</span>
+                        <span ng-show="vm.partG.isSubmitting">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Submitting...
+                        </span>
+                    </button>
+                </div>
+
+                <div class="mt-6" ng-show="vm.getWorkflowsByAction('07').length > 0">
+                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">To</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date of Submission</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr ng-repeat="workflow in vm.getWorkflowsByAction('07')">
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div ng-bind-html="workflow.toName || 'N/A'"></div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div ng-bind-html="workflow.toDesignation || 'N/A'"></div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    {{workflow.date | date:'dd-MMM-yyyy HH:mm' || 'N/A'}}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div>{{ workflow.remarks }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>

@@ -46,7 +46,9 @@
             getPartECopyToList: getPartECopyToList,
             submitPartE: submitPartE,
             revertPartEToWSHO: revertPartEToWSHO,
-            submitPartF: submitPartF
+            submitPartF: submitPartF,
+            submitPartG: submitPartG,
+            revertPartGToHOD: revertPartGToHOD
         };
 
         return service;
@@ -341,6 +343,24 @@
 
         function submitPartF(formData) {
             return $http.post('/Incident/SubmitPartF', formData, {
+                transformRequest: angular.identity,
+                headers: { 'Content-Type': undefined }
+            })
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function submitPartG(formData) {
+            return $http.post('/Incident/SubmitPartG', formData, {
+                transformRequest: angular.identity,
+                headers: { 'Content-Type': undefined }
+            })
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function revertPartGToHOD(formData) {
+            return $http.post('/Incident/RevertPartGToHOD', formData, {
                 transformRequest: angular.identity,
                 headers: { 'Content-Type': undefined }
             })

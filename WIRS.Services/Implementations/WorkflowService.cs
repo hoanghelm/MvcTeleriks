@@ -1075,14 +1075,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
-                var incident = new WorkflowIncident
-                {
-                    incident_id = incidentId,
-                    status = "06",
-                    risk_assessment_review = riskAssessmentReview,
-                    risk_assessment_review_comments = comments,
-                    modified_by = userId
-                };
+                var incident = new WorkflowIncident { incident_id = incidentId };
+                var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
+                incident.status = "06";
+                incident.risk_assessment_review = riskAssessmentReview;
+                incident.risk_assessment_review_comments = comments;
+                incident.modified_by = userId;
 
                 await _workflowIncidentDataAccess.update_Incidents(incident);
 
@@ -1160,6 +1158,144 @@ namespace WIRS.Services.Implementations
             catch (Exception)
             {
                 return "ERROR_SUBMIT_PARTF";
+            }
+        }
+
+        public async Task<string> SubmitPartGAsync(string incidentId, string comments, string cwshoId, List<Microsoft.AspNetCore.Http.IFormFile> attachments, string userId)
+        {
+            try
+            {
+                var incident = new WorkflowIncident { incident_id = incidentId };
+                var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
+                incident.status = "07";
+                incident.modified_by = userId;
+
+                await _workflowIncidentDataAccess.update_Incidents(incident);
+
+                DataSet workflowDs = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                DataRow cwshoRow = dt.NewRow();
+                cwshoRow["incident_id"] = incidentId;
+                cwshoRow["actions_code"] = "07";
+                cwshoRow["actions_role"] = "CWSHO";
+                cwshoRow["from"] = userId;
+                cwshoRow["to"] = cwshoId;
+                cwshoRow["remarks"] = comments;
+                cwshoRow["Date"] = string.Empty;
+                cwshoRow["attachment"] = string.Empty;
+                dt.Rows.Add(cwshoRow);
+
+                workflowDs.Tables.Add(dt);
+
+                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                if (!string.IsNullOrEmpty(errorCode))
+                {
+                    return errorCode;
+                }
+
+                if (attachments != null && attachments.Count > 0)
+                {
+                    foreach (var file in attachments)
+                    {
+                        if (file != null && file.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                            var uploadPath = Path.Combine("wwwroot", "uploads", "incidents", incidentId);
+                            Directory.CreateDirectory(uploadPath);
+                            var filePath = Path.Combine(uploadPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                        }
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception)
+            {
+                return "ERROR_SUBMIT_PARTG";
+            }
+        }
+
+        public async Task<string> RevertPartGToHODAsync(string incidentId, string comments, string hodId, List<Microsoft.AspNetCore.Http.IFormFile> attachments, string userId)
+        {
+            try
+            {
+                var incident = new WorkflowIncident { incident_id = incidentId };
+                var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
+                incident.status = "05";
+                incident.modified_by = userId;
+
+                await _workflowIncidentDataAccess.update_Incidents(incident);
+
+                DataSet workflowDs = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                DataRow hodRow = dt.NewRow();
+                hodRow["incident_id"] = incidentId;
+                hodRow["actions_code"] = "05";
+                hodRow["actions_role"] = "HOD";
+                hodRow["from"] = userId;
+                hodRow["to"] = hodId;
+                hodRow["remarks"] = comments;
+                hodRow["Date"] = string.Empty;
+                hodRow["attachment"] = string.Empty;
+                dt.Rows.Add(hodRow);
+
+                workflowDs.Tables.Add(dt);
+
+                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                if (!string.IsNullOrEmpty(errorCode))
+                {
+                    return errorCode;
+                }
+
+                if (attachments != null && attachments.Count > 0)
+                {
+                    foreach (var file in attachments)
+                    {
+                        if (file != null && file.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                            var uploadPath = Path.Combine("wwwroot", "uploads", "incidents", incidentId);
+                            Directory.CreateDirectory(uploadPath);
+                            var filePath = Path.Combine(uploadPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                        }
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception)
+            {
+                return "ERROR_REVERT_PARTG";
             }
         }
 
