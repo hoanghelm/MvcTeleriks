@@ -737,7 +737,7 @@ namespace WIRS.Services.Implementations
                 var injuryDetailsDs = ConvertInjuryDetailsToDataSet(model);
                 var causeAnalysisDs = ConvertCauseAnalysisToDataSet(model);
                 var medicalLeavesDs = ConvertMedicalCertificatesToDataSet(model.IncidentId, model.MedicalCertificates);
-                var workflowDs = new DataSet();
+                DataSet workflowDs = new DataSet("NewDataSet");
                 var attachmentDs = new DataSet();
 
                 var errorCode = await _workflowIncidentDataAccess.submit_incident_partc(
@@ -848,17 +848,8 @@ namespace WIRS.Services.Implementations
         {
             try
             {
-                var incident = new WorkflowIncident
-                {
-                    incident_id = incidentId,
-                    status = "02",
-                    modified_by = userId
-                };
-
-                await _workflowIncidentDataAccess.update_Incidents(incident);
-
-                var workflowDs = new DataSet();
-                var dt = new DataTable();
+                DataSet workflowDs = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
                 dt.Columns.Add("incident_id", typeof(string));
                 dt.Columns.Add("actions_code", typeof(string));
                 dt.Columns.Add("actions_role", typeof(string));
@@ -875,7 +866,7 @@ namespace WIRS.Services.Implementations
                 wshoRow["from"] = userId;
                 wshoRow["to"] = wshoId;
                 wshoRow["remarks"] = comments;
-                wshoRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                wshoRow["Date"] = string.Empty;
                 wshoRow["attachment"] = string.Empty;
                 dt.Rows.Add(wshoRow);
 
@@ -892,7 +883,7 @@ namespace WIRS.Services.Implementations
                         awshoRow["from"] = userId;
                         awshoRow["to"] = awshoId;
                         awshoRow["remarks"] = string.Empty;
-                        awshoRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        awshoRow["Date"] = string.Empty;
                         awshoRow["attachment"] = string.Empty;
                         dt.Rows.Add(awshoRow);
                     }
@@ -914,17 +905,8 @@ namespace WIRS.Services.Implementations
         {
             try
             {
-                var incident = new WorkflowIncident
-                {
-                    incident_id = incidentId,
-                    status = "05",
-                    modified_by = userId
-                };
-
-                await _workflowIncidentDataAccess.update_Incidents(incident);
-
-                var workflowDs = new DataSet();
-                var dt = new DataTable();
+                DataSet workflowDs = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
                 dt.Columns.Add("incident_id", typeof(string));
                 dt.Columns.Add("actions_code", typeof(string));
                 dt.Columns.Add("actions_role", typeof(string));
@@ -945,7 +927,7 @@ namespace WIRS.Services.Implementations
                         copyToRow["from"] = userId;
                         copyToRow["to"] = emailTo;
                         copyToRow["remarks"] = string.Empty;
-                        copyToRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        copyToRow["Date"] = string.Empty;
                         copyToRow["attachment"] = string.Empty;
                         dt.Rows.Add(copyToRow);
                     }
@@ -964,7 +946,7 @@ namespace WIRS.Services.Implementations
                             copyToRow["from"] = userId;
                             copyToRow["to"] = person.EmployeeNo;
                             copyToRow["remarks"] = string.Empty;
-                            copyToRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            copyToRow["Date"] = string.Empty;
                             copyToRow["attachment"] = string.Empty;
                             dt.Rows.Add(copyToRow);
                         }
@@ -978,7 +960,7 @@ namespace WIRS.Services.Implementations
                 hodRow["from"] = userId;
                 hodRow["to"] = hodId;
                 hodRow["remarks"] = comments;
-                hodRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                hodRow["Date"] = string.Empty;
                 hodRow["attachment"] = string.Empty;
                 dt.Rows.Add(hodRow);
 
@@ -998,17 +980,9 @@ namespace WIRS.Services.Implementations
         {
             try
             {
-                var incident = new WorkflowIncident
-                {
-                    incident_id = incidentId,
-                    status = "02",
-                    modified_by = userId
-                };
+                DataSet workflowDs = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
 
-                await _workflowIncidentDataAccess.update_Incidents(incident);
-
-                var workflowDs = new DataSet();
-                var dt = new DataTable();
                 dt.Columns.Add("incident_id", typeof(string));
                 dt.Columns.Add("actions_code", typeof(string));
                 dt.Columns.Add("actions_role", typeof(string));
@@ -1029,7 +1003,7 @@ namespace WIRS.Services.Implementations
                         copyToRow["from"] = userId;
                         copyToRow["to"] = emailTo;
                         copyToRow["remarks"] = string.Empty;
-                        copyToRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        copyToRow["Date"] = string.Empty;
                         copyToRow["attachment"] = string.Empty;
                         dt.Rows.Add(copyToRow);
                     }
@@ -1048,7 +1022,7 @@ namespace WIRS.Services.Implementations
                             copyToRow["from"] = userId;
                             copyToRow["to"] = person.EmployeeNo;
                             copyToRow["remarks"] = string.Empty;
-                            copyToRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                            copyToRow["Date"] = string.Empty;
                             copyToRow["attachment"] = string.Empty;
                             dt.Rows.Add(copyToRow);
                         }
@@ -1062,7 +1036,7 @@ namespace WIRS.Services.Implementations
                 wshoRow["from"] = userId;
                 wshoRow["to"] = wshoId;
                 wshoRow["remarks"] = comments;
-                wshoRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                wshoRow["Date"] = string.Empty;
                 wshoRow["attachment"] = string.Empty;
                 dt.Rows.Add(wshoRow);
 
@@ -1079,7 +1053,7 @@ namespace WIRS.Services.Implementations
                         awshoRow["from"] = userId;
                         awshoRow["to"] = awshoId;
                         awshoRow["remarks"] = string.Empty;
-                        awshoRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        awshoRow["Date"] = string.Empty;
                         awshoRow["attachment"] = string.Empty;
                         dt.Rows.Add(awshoRow);
                     }
@@ -1094,6 +1068,98 @@ namespace WIRS.Services.Implementations
             catch (Exception)
             {
                 return "ERROR_REVERT_PARTE";
+            }
+        }
+
+        public async Task<string> SubmitPartFAsync(string incidentId, string comments, string riskAssessmentReview, string wshoId, List<Microsoft.AspNetCore.Http.IFormFile> attachments, List<Microsoft.AspNetCore.Http.IFormFile> riskAttachments, string userId)
+        {
+            try
+            {
+                var incident = new WorkflowIncident
+                {
+                    incident_id = incidentId,
+                    status = "06",
+                    risk_assessment_review = riskAssessmentReview,
+                    risk_assessment_review_comments = comments,
+                    modified_by = userId
+                };
+
+                await _workflowIncidentDataAccess.update_Incidents(incident);
+
+                DataSet workflowDs = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                DataRow wshoRow = dt.NewRow();
+                wshoRow["incident_id"] = incidentId;
+                wshoRow["actions_code"] = "06";
+                wshoRow["actions_role"] = "WSHO";
+                wshoRow["from"] = userId;
+                wshoRow["to"] = wshoId;
+                wshoRow["remarks"] = comments;
+                wshoRow["Date"] = string.Empty;
+                wshoRow["attachment"] = string.Empty;
+                dt.Rows.Add(wshoRow);
+
+                workflowDs.Tables.Add(dt);
+
+                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                if (!string.IsNullOrEmpty(errorCode))
+                {
+                    return errorCode;
+                }
+
+                if (attachments != null && attachments.Count > 0)
+                {
+                    foreach (var file in attachments)
+                    {
+                        if (file != null && file.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                            var uploadPath = Path.Combine("wwwroot", "uploads", "incidents", incidentId);
+                            Directory.CreateDirectory(uploadPath);
+                            var filePath = Path.Combine(uploadPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                        }
+                    }
+                }
+
+                if (riskAttachments != null && riskAttachments.Count > 0)
+                {
+                    foreach (var file in riskAttachments)
+                    {
+                        if (file != null && file.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                            var uploadPath = Path.Combine("wwwroot", "uploads", "incidents", incidentId, "risk");
+                            Directory.CreateDirectory(uploadPath);
+                            var filePath = Path.Combine(uploadPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                        }
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception)
+            {
+                return "ERROR_SUBMIT_PARTF";
             }
         }
 

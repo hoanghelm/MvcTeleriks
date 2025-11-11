@@ -115,6 +115,19 @@
                         <span>Head LOB Comment</span>
                     </div>
                 </button>
+
+                <button ng-show="vm.canViewPartF()"
+                        ng-click="vm.activeTab = 'F'"
+                        ng-class="{'border-blue-500 text-blue-600': vm.activeTab === 'F', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': vm.activeTab !== 'F'}"
+                        class="px-6 py-3 border-b-2 font-medium text-sm focus:outline-none transition-colors">
+                    <div class="flex items-center gap-2">
+                        <div ng-class="{'bg-blue-500 text-white': vm.activeTab === 'F', 'bg-gray-300 text-gray-700': vm.activeTab !== 'F'}"
+                             class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                            F
+                        </div>
+                        <span>Corrective Actions</span>
+                    </div>
+                </button>
             </div>
         </div>
 
@@ -144,6 +157,11 @@
             <div ng-show="vm.activeTab === 'E' && vm.canViewPartE()" class="p-6">
                 @Html.Partial("_PartE")
             </div>
+
+            <!-- Part F Content -->
+            <div ng-show="vm.activeTab === 'F' && vm.canViewPartF()" class="p-6">
+                @Html.Partial("_PartF")
+            </div>
         </div>
     </div>
 </div>
@@ -164,6 +182,7 @@
     <script src="~/js/incident/incident-update-part-c-service.js"></script>
     <script src="~/js/incident/incident-update-part-d-service.js"></script>
     <script src="~/js/incident/incident-update-part-e-service.js"></script>
+    <script src="~/js/incident/incident-update-part-f-service.js"></script>
     <script src="~/js/incident/incident-update-controller.js"></script>
 
     <script>

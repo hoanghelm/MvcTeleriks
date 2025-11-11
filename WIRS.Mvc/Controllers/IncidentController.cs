@@ -841,6 +841,62 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SubmitPartF([FromForm] PartFSubmitRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.Comments))
+                {
+                    return Json(new { success = false, message = "Provide Objective Evidence of Actions Taken is required", errorCode = "ERR-137" });
+                }
+
+                if (string.IsNullOrEmpty(request.RiskAssessmentReview))
+                {
+                    return Json(new { success = false, message = "Risk Assessment Review selection is required", errorCode = "ERR-116" });
+                }
+
+                if (string.IsNullOrEmpty(request.WshoId))
+                {
+                    return Json(new { success = false, message = "Name of WSHO is required", errorCode = "ERR-133" });
+                }
+
+                var result = await _workflowService.SubmitPartFAsync(
+                    request.IncidentId,
+                    request.Comments,
+                    request.RiskAssessmentReview,
+                    request.WshoId,
+                    request.Attachments,
+                    request.RiskAttachments,
+                    currentUser.UserId
+                );
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part F submitted successfully to WSHO", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while submitting Part F", error = ex.Message });
+            }
+        }
+
         private string ValidatePartC(PartCSaveRequest request)
         {
             if (string.IsNullOrEmpty(request.IsNegligent))
@@ -1257,5 +1313,15 @@ namespace WIRS.Mvc.Controllers
         public string HodId { get; set; }
         public List<string> EmailToList { get; set; }
         public List<CopyToPersonModel> AdditionalCopyToList { get; set; }
+    }
+
+    public class PartFSubmitRequest
+    {
+        public string IncidentId { get; set; }
+        public string Comments { get; set; }
+        public string RiskAssessmentReview { get; set; }
+        public string WshoId { get; set; }
+        public List<IFormFile> Attachments { get; set; }
+        public List<IFormFile> RiskAttachments { get; set; }
     }
 }

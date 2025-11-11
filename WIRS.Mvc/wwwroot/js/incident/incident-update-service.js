@@ -45,7 +45,8 @@
             getHeadLOBs: getHeadLOBs,
             getPartECopyToList: getPartECopyToList,
             submitPartE: submitPartE,
-            revertPartEToWSHO: revertPartEToWSHO
+            revertPartEToWSHO: revertPartEToWSHO,
+            submitPartF: submitPartF
         };
 
         return service;
@@ -334,6 +335,15 @@
 
         function revertPartEToWSHO(revertData) {
             return $http.post('/Incident/RevertPartEToWSHO', revertData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function submitPartF(formData) {
+            return $http.post('/Incident/SubmitPartF', formData, {
+                transformRequest: angular.identity,
+                headers: { 'Content-Type': undefined }
+            })
                 .then(handleSuccess)
                 .catch(handleError);
         }

@@ -1,0 +1,244 @@
+@* Part F - Corrective & Preventive Actions By HOD *@
+
+<div class="bg-white shadow-md rounded-lg p-6">
+    <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Part F - Corrective & Preventive Actions By HOD</h3>
+    </div>
+
+    <div ng-show="vm.partF.validationMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ vm.partF.validationMessage }}
+    </div>
+
+    <div ng-show="vm.partF.successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        {{ vm.partF.successMessage }}
+    </div>
+
+    <form name="partFForm" novalidate>
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Corrective & Preventive Actions</legend>
+
+            <div class="space-y-6">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Part C - Corrective and Preventive Action(s)</label>
+                    <div class="p-3 bg-white border border-gray-200 rounded">
+                        <p class="text-gray-900 whitespace-pre-wrap">{{ vm.partF.partCComments || 'N/A' }}</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Part D - Review & Comment By Chairman WSH Committee</label>
+                    <div class="p-3 bg-white border border-gray-200 rounded">
+                        <p class="text-gray-900 whitespace-pre-wrap">{{ vm.partF.partDComments || 'N/A' }}</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Part E - Review & Comment By Head LOB</label>
+                    <div class="p-3 bg-white border border-gray-200 rounded">
+                        <p class="text-gray-900 whitespace-pre-wrap">{{ vm.partF.partEComments || 'N/A' }}</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="partF_comments" class="block text-sm font-medium text-gray-700 mb-1 required">
+                        Provide Objective Evidence of Actions Taken
+                    </label>
+                    <textarea kendo-text-area
+                              k-ng-model="vm.partF.comments"
+                              k-rows="6"
+                              id="partF_comments"
+                              name="partFComments"
+                              style="width: 100%;"
+                              k-enable="!vm.partF.isReadOnly"
+                              maxlength="4000"
+                              required></textarea>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-red-600 text-sm" ng-show="!vm.partF.isReadOnly && partFForm.partFComments.$touched && partFForm.partFComments.$invalid">
+                            Provide Objective Evidence of Actions Taken is required
+                        </span>
+                        <span class="text-sm text-gray-500">{{ vm.partF.comments ? vm.partF.comments.length : 0 }} / 4000 characters</span>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="!vm.partF.isReadOnly">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Attach Document(s)</label>
+                    <input type="file"
+                           id="partF_fileUpload"
+                           multiple
+                           class="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-white focus:outline-none" />
+                    <p class="mt-1 text-sm text-gray-500">PDF, JPG, PNG, DOCX, XLSX files accepted</p>
+                </div>
+
+                <div ng-show="vm.partF.attachments.length > 0" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">File Name</th>
+                                <th ng-show="!vm.partF.isReadOnly" class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr ng-repeat="file in vm.partF.attachments">
+                                <td class="px-4 py-2 text-sm text-gray-900">
+                                    <a ng-if="file.filePath" href="{{ file.filePath }}" target="_blank" class="text-blue-600 hover:text-blue-800">{{ file.fileName }}</a>
+                                    <span ng-if="!file.filePath">{{ file.fileName }}</span>
+                                </td>
+                                <td ng-show="!vm.partF.isReadOnly" class="px-4 py-2 text-sm">
+                                    <button type="button"
+                                            ng-click="vm.removePartFAttachment($index)"
+                                            class="text-red-600 hover:text-red-800">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2 required">Risk Assessment Review</label>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <input type="radio"
+                                   id="riskReviewYes"
+                                   name="riskAssessmentReview"
+                                   ng-model="vm.partF.riskAssessmentReview"
+                                   value="Y"
+                                   ng-disabled="vm.partF.isReadOnly"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="riskReviewYes" class="ml-2 block text-sm text-gray-700">Yes</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio"
+                                   id="riskReviewNo"
+                                   name="riskAssessmentReview"
+                                   ng-model="vm.partF.riskAssessmentReview"
+                                   value="N"
+                                   ng-disabled="vm.partF.isReadOnly"
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="riskReviewNo" class="ml-2 block text-sm text-gray-700">No</label>
+                        </div>
+                    </div>
+                    <span class="text-red-600 text-sm" ng-show="!vm.partF.isReadOnly && !vm.partF.riskAssessmentReview">
+                        Risk Assessment Review selection is required
+                    </span>
+                </div>
+
+                <div class="form-group" ng-show="!vm.partF.isReadOnly">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Attach Document(s) for Risk Assessment</label>
+                    <input type="file"
+                           id="partF_riskFileUpload"
+                           multiple
+                           class="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-white focus:outline-none" />
+                    <p class="mt-1 text-sm text-gray-500">PDF, JPG, PNG, DOCX, XLSX files accepted</p>
+                </div>
+
+                <div ng-show="vm.partF.riskAttachments.length > 0" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">File Name</th>
+                                <th ng-show="!vm.partF.isReadOnly" class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr ng-repeat="file in vm.partF.riskAttachments">
+                                <td class="px-4 py-2 text-sm text-gray-900">
+                                    <a ng-if="file.filePath" href="{{ file.filePath }}" target="_blank" class="text-blue-600 hover:text-blue-800">{{ file.fileName }}</a>
+                                    <span ng-if="!file.filePath">{{ file.fileName }}</span>
+                                </td>
+                                <td ng-show="!vm.partF.isReadOnly" class="px-4 py-2 text-sm">
+                                    <button type="button"
+                                            ng-click="vm.removePartFRiskAttachment($index)"
+                                            class="text-red-600 hover:text-red-800">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partF.submitterName || vm.currentUser.name }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Employee Number</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partF.submitterEmpId || vm.currentUser.userId }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partF.submitterDesignation || vm.currentUser.designation }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date of Submission</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partF.submissionDate || vm.getCurrentDate() }}</p>
+                    </div>
+                </div>
+
+                <div class="form-group" ng-show="!vm.partF.isReadOnly">
+                    <label for="partF_wsho" class="block text-sm font-medium text-gray-700 mb-1 required">
+                        Name of WSHO
+                    </label>
+                    <select kendo-drop-down-list
+                            k-options="vm.partF.wshoOptions"
+                            k-ng-model="vm.partF.wshoId"
+                            id="partF_wsho"
+                            name="partFWsho"
+                            class="w-full"
+                            required>
+                    </select>
+                    <span class="text-red-600 text-sm" ng-show="!vm.partF.isReadOnly && partFForm.partFWsho.$touched && partFForm.partFWsho.$invalid">
+                        Name of WSHO is required
+                    </span>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partF.isReadOnly">
+                    <button type="button"
+                            ng-click="vm.submitPartF()"
+                            ng-disabled="vm.partF.isSubmitting"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <span ng-show="!vm.partF.isSubmitting">Submit to WSHO</span>
+                        <span ng-show="vm.partF.isSubmitting">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Submitting...
+                        </span>
+                    </button>
+                </div>
+
+                <div class="mt-6" ng-show="vm.getWorkflowsByAction('06').length > 0">
+                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">To</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date of Submission</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr ng-repeat="workflow in vm.getWorkflowsByAction('06')">
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div ng-bind-html="workflow.toName || 'N/A'"></div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div ng-bind-html="workflow.toDesignation || 'N/A'"></div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    {{workflow.date | date:'dd-MMM-yyyy HH:mm' || 'N/A'}}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div>{{ workflow.remarks }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
