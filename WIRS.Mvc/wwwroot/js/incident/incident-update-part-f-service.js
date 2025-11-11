@@ -217,10 +217,6 @@
                 }
             }
 
-            $timeout(function () {
-                vm.$apply();
-            });
-
             if (!isRiskAttachment) {
                 document.getElementById('partF_fileUpload').value = '';
             } else {
