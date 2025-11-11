@@ -14,77 +14,81 @@
     </div>
 
     <form name="partDForm" novalidate>
-        <div class="space-y-6">
-            <div class="form-group">
-                <label for="partD_comments" class="block text-sm font-medium text-gray-700 mb-1 required">
-                    Review & Comment
-                </label>
-                <textarea kendo-text-area
-                          k-ng-model="vm.partD.comments"
-                          k-rows="6"
-                          id="partD_comments"
-                          name="partDComments"
-                          style="width: 100%;"
-                          k-enable="!vm.partD.isReadOnly"
-                          maxlength="4000"
-                          required></textarea>
-                <div class="flex justify-between items-center mt-1">
-                    <span class="text-red-600 text-sm" ng-show="!vm.partD.isReadOnly && partDForm.partDComments.$touched && partDForm.partDComments.$invalid">
-                        Review & Comment is required
-                    </span>
-                    <span class="text-sm text-gray-500">{{ vm.partD.comments ? vm.partD.comments.length : 0 }} / 4000 characters</span>
-                </div>
-            </div>
+        <fieldset class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <legend class="text-lg font-semibold text-gray-900 px-2">Review & Comment Details</legend>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Name</label>
-                    <p class="mt-1 text-gray-900">{{ vm.partD.submitterName || vm.currentUser.name }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Employee Number</label>
-                    <p class="mt-1 text-gray-900">{{ vm.partD.submitterEmpId || vm.currentUser.userId }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Designation</label>
-                    <p class="mt-1 text-gray-900">{{ vm.partD.submitterDesignation || vm.currentUser.designation }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Date of Submission</label>
-                    <p class="mt-1 text-gray-900">{{ vm.partD.submissionDate || vm.getCurrentDate() }}</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" ng-show="!vm.partD.isReadOnly">
+            <div class="space-y-6">
                 <div class="form-group">
-                    <label for="partD_wsho" class="block text-sm font-medium text-gray-700 mb-1">
-                        Name of WSHO
+                    <label for="partD_comments" class="block text-sm font-medium text-gray-700 mb-1 required">
+                        Review & Comment
                     </label>
-                    <select kendo-drop-down-list
-                            k-options="vm.partD.wshoOptions"
-                            k-ng-model="vm.partD.wshoId"
-                            id="partD_wsho"
-                            name="partDWsho"
-                            style="width: 100%;">
-                    </select>
+                    <textarea kendo-text-area
+                              k-ng-model="vm.partD.comments"
+                              k-rows="6"
+                              id="partD_comments"
+                              name="partDComments"
+                              style="width: 100%;"
+                              k-enable="!vm.partD.isReadOnly"
+                              maxlength="4000"
+                              required></textarea>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-red-600 text-sm" ng-show="!vm.partD.isReadOnly && partDForm.partDComments.$touched && partDForm.partDComments.$invalid">
+                            Review & Comment is required
+                        </span>
+                        <span class="text-sm text-gray-500">{{ vm.partD.comments ? vm.partD.comments.length : 0 }} / 4000 characters</span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="partD_headlob" class="block text-sm font-medium text-gray-700 mb-1">
-                        Name of Head LOB
-                    </label>
-                    <select kendo-drop-down-list
-                            k-options="vm.partD.headLobOptions"
-                            k-ng-model="vm.partD.headLobId"
-                            id="partD_headlob"
-                            name="partDHeadLob"
-                            style="width: 100%;">
-                    </select>
-                </div>
-            </div>
 
-            <div class="flex justify-between space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partD.isReadOnly">
-                <div></div>
-                <div class="flex space-x-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partD.submitterName || vm.currentUser.name }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Employee Number</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partD.submitterEmpId || vm.currentUser.userId }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Designation</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partD.submitterDesignation || vm.currentUser.designation }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date of Submission</label>
+                        <p class="mt-1 text-gray-900">{{ vm.partD.submissionDate || vm.getCurrentDate() }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" ng-show="!vm.partD.isReadOnly">
+                    <div class="form-group">
+                        <label for="partD_wsho" class="block text-sm font-medium text-gray-700 mb-1">
+                            Name of WSHO
+                        </label>
+                        <select kendo-drop-down-list
+                                k-options="vm.partD.wshoOptions"
+                                k-ng-model="vm.partD.wshoId"
+                                id="partD_wsho"
+                                name="partDWsho"
+                                class="w-full">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="partD_headlob" class="block text-sm font-medium text-gray-700 mb-1">
+                            Name of Head LOB
+                        </label>
+                        <select kendo-drop-down-list
+                                k-options="vm.partD.headLobOptions"
+                                k-ng-model="vm.partD.headLobId"
+                                id="partD_headlob"
+                                name="partDHeadLob"
+                                class="w-full">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partD.isReadOnly">
                     <button type="button"
                             ng-click="vm.revertToWSHO()"
                             ng-disabled="vm.partD.isSubmitting"
@@ -104,36 +108,36 @@
                         </span>
                     </button>
                 </div>
-            </div>
 
-            <div class="mt-6" ng-show="vm.getWorkflowsByAction('04').length > 0">
-                <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">To</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date of Submission</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr ng-repeat="workflow in vm.getWorkflowsByAction('04')">
-                            <td class="px-4 py-3 text-sm text-gray-900">
-                                <div ng-bind-html="workflow.toName || 'N/A'"></div>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-gray-900">
-                                <div ng-bind-html="workflow.toDesignation || 'N/A'"></div>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-gray-900">
-                                {{workflow.date | date:'dd-MMM-yyyy HH:mm' || 'N/A'}}
-                            </td>
-                            <td class="px-4 py-3 text-sm text-gray-900">
-                                <div>{{ workflow.remarks }}</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="mt-6" ng-show="vm.getWorkflowsByAction('04').length > 0">
+                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">To</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date of Submission</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr ng-repeat="workflow in vm.getWorkflowsByAction('04')">
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div ng-bind-html="workflow.toName || 'N/A'"></div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div ng-bind-html="workflow.toDesignation || 'N/A'"></div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    {{workflow.date | date:'dd-MMM-yyyy HH:mm' || 'N/A'}}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    <div>{{ workflow.remarks }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        </fieldset>
     </form>
 </div>
