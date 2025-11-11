@@ -25,7 +25,6 @@
                 comments: '',
                 wshoId: '',
                 headLobId: '',
-                headLobName: '',
                 submitterName: '',
                 submitterEmpId: '',
                 submitterDesignation: '',
@@ -105,17 +104,15 @@
                 });
 
                 var latestWorkflow = partDWorkflows[0];
+                vm.partD.comments = latestWorkflow.remarks || '';
                 vm.partD.submitterName = latestWorkflow.fromName || '';
                 vm.partD.submitterEmpId = latestWorkflow.from || '';
                 vm.partD.submitterDesignation = latestWorkflow.fromDesignation || '';
                 vm.partD.submissionDate = latestWorkflow.date || '';
-                vm.partD.headLobId = latestWorkflow.toUserId || '';
-                vm.partD.headLobName = latestWorkflow.toName || '';
             }
         }
 
         function loadPartDReadOnlyData(vm) {
-            vm.partD.comments = vm.incident.partDComments || '';
         }
 
         function loadWSHOs(vm) {
