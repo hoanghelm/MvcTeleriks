@@ -3,9 +3,9 @@
         .module('incidentUpdateApp')
         .controller('IncidentUpdateController', IncidentUpdateController);
 
-    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', '$q', 'IncidentUpdateService', 'PartAService', 'PartBService', 'PartCService', 'PartDService'];
+    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', '$q', 'IncidentUpdateService', 'PartAService', 'PartBService', 'PartCService', 'PartDService', 'PartEService'];
 
-    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, $q, IncidentUpdateService, PartAService, PartBService, PartCService, PartDService) {
+    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, $q, IncidentUpdateService, PartAService, PartBService, PartCService, PartDService, PartEService) {
         var vm = this;
 
         vm.loading = true;
@@ -19,6 +19,8 @@
         PartCService.initializePartC(vm);
 
         PartDService.initializePartD(vm);
+
+        PartEService.initializePartE(vm);
 
         PartAService.initializePartA(vm);
 
@@ -72,6 +74,14 @@
         vm.revertToWSHO = function () { PartDService.revertToWSHO(vm); };
         vm.submitToHeadLOB = function () { PartDService.submitToHeadLOB(vm); };
 
+        vm.canViewPartE = function () { return PartEService.canViewPartE(vm); };
+        vm.canEditPartE = function () { return PartEService.canEditPartE(vm); };
+        vm.revertPartEToWSHO = function () { PartEService.revertPartEToWSHO(vm); };
+        vm.approveAndSubmitPartE = function () { PartEService.approveAndSubmitPartE(vm); };
+        vm.searchPartECopyTo = function () { PartEService.openEmployeeSearch(vm, 'copyTo'); };
+        vm.addPartECopyTo = function () { PartEService.addPartECopyTo(vm); };
+        vm.removePartECopyToPerson = function (index) { PartEService.removePartECopyToPerson(vm, index); };
+
         init();
 
         function init() {
@@ -91,7 +101,8 @@
                         PartAService.loadPartAData(vm),
                         PartBService.loadPartBData(vm),
                         PartCService.loadPartCData(vm),
-                        PartDService.loadPartDData(vm, getCurrentDate)
+                        PartDService.loadPartDData(vm, getCurrentDate),
+                        PartEService.loadPartEData(vm, getCurrentDate)
                     ]);
                 })
                 .catch(function (error) {

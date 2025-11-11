@@ -723,6 +723,124 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SubmitPartE([FromBody] PartESubmitRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.Comments))
+                {
+                    return Json(new { success = false, message = "Review & Comment is required", errorCode = "ERR-134" });
+                }
+
+                if (string.IsNullOrEmpty(request.HodId))
+                {
+                    return Json(new { success = false, message = "Name of HOD is required", errorCode = "ERR-133" });
+                }
+
+                var selectedEmailTo = request.EmailToList ?? new List<string>();
+                var additionalCopyTo = (request.AdditionalCopyToList ?? new List<CopyToPersonModel>())
+                    .Select(p => new Services.Models.CopyToPersonModel
+                    {
+                        EmployeeNo = p.EmployeeNo,
+                        Name = p.Name,
+                        Designation = p.Designation
+                    }).ToList();
+
+                var result = await _workflowService.SubmitPartEAsync(
+                    request.IncidentId,
+                    request.Comments,
+                    request.HodId,
+                    selectedEmailTo,
+                    additionalCopyTo,
+                    currentUser.UserId
+                );
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part E submitted successfully to HOD", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while submitting Part E", error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RevertPartEToWSHO([FromBody] PartESubmitRequest request)
+        {
+            try
+            {
+                var currentUser = await GetCurrentUserSessionAsync();
+                if (currentUser == null)
+                {
+                    return Json(new { success = false, message = "User not authenticated" });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.IncidentId))
+                {
+                    return Json(new { success = false, message = "Invalid request data" });
+                }
+
+                if (string.IsNullOrEmpty(request.Comments))
+                {
+                    return Json(new { success = false, message = "Review & Comment is required", errorCode = "ERR-137" });
+                }
+
+                if (string.IsNullOrEmpty(request.WshoId))
+                {
+                    return Json(new { success = false, message = "Name of WSHO is required", errorCode = "ERR-135" });
+                }
+
+                var selectedEmailTo = request.EmailToList ?? new List<string>();
+                var additionalCopyTo = (request.AdditionalCopyToList ?? new List<CopyToPersonModel>())
+                    .Select(p => new Services.Models.CopyToPersonModel
+                    {
+                        EmployeeNo = p.EmployeeNo,
+                        Name = p.Name,
+                        Designation = p.Designation
+                    }).ToList();
+
+                var result = await _workflowService.RevertPartEToWSHOAsync(
+                    request.IncidentId,
+                    request.Comments,
+                    request.WshoId,
+                    selectedEmailTo,
+                    additionalCopyTo,
+                    currentUser.UserId
+                );
+
+                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
+                {
+                    return Json(new { success = true, message = "Part E reverted successfully to WSHO", successCode = "SUC-001" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while reverting Part E", error = ex.Message });
+            }
+        }
+
         private string ValidatePartC(PartCSaveRequest request)
         {
             if (string.IsNullOrEmpty(request.IsNegligent))
@@ -1129,5 +1247,15 @@ namespace WIRS.Mvc.Controllers
         public string WshoId { get; set; }
         public string HeadLobId { get; set; }
         public string ActionType { get; set; }
+    }
+
+    public class PartESubmitRequest
+    {
+        public string IncidentId { get; set; }
+        public string Comments { get; set; }
+        public string WshoId { get; set; }
+        public string HodId { get; set; }
+        public List<string> EmailToList { get; set; }
+        public List<CopyToPersonModel> AdditionalCopyToList { get; set; }
     }
 }

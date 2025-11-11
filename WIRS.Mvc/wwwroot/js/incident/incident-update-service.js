@@ -42,7 +42,10 @@
             getPartDCopyToList: getPartDCopyToList,
             submitPartD: submitPartD,
             revertPartDToWSHO: revertPartDToWSHO,
-            getHeadLOBs: getHeadLOBs
+            getHeadLOBs: getHeadLOBs,
+            getPartECopyToList: getPartECopyToList,
+            submitPartE: submitPartE,
+            revertPartEToWSHO: revertPartEToWSHO
         };
 
         return service;
@@ -310,6 +313,27 @@
             if (departmentCode) url += '&departmentCode=' + departmentCode;
             if (locationCode) url += '&locationCode=' + locationCode;
             return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function getPartECopyToList(sectorCode, lobCode, departmentCode, locationCode) {
+            var url = '/User/GetPartACopyTo?sectorCode=' + sectorCode + '&lobCode=' + lobCode;
+            if (departmentCode) url += '&departmentCode=' + departmentCode;
+            if (locationCode) url += '&locationCode=' + locationCode;
+            return $http.get(url)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function submitPartE(partEData) {
+            return $http.post('/Incident/SubmitPartE', partEData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function revertPartEToWSHO(revertData) {
+            return $http.post('/Incident/RevertPartEToWSHO', revertData)
                 .then(handleSuccess)
                 .catch(handleError);
         }
