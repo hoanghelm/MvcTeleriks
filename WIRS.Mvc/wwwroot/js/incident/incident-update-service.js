@@ -42,7 +42,6 @@
             getPartDCopyToList: getPartDCopyToList,
             submitPartD: submitPartD,
             revertPartDToWSHO: revertPartDToWSHO,
-            submitPartDToHeadLOB: submitPartDToHeadLOB,
             getHeadLOBs: getHeadLOBs
         };
 
@@ -302,12 +301,6 @@
 
         function revertPartDToWSHO(revertData) {
             return $http.post('/Incident/RevertPartDToWSHO', revertData)
-                .then(handleSuccess)
-                .catch(handleError);
-        }
-
-        function submitPartDToHeadLOB(submitData) {
-            return $http.post('/Incident/SubmitPartDToHeadLOB', submitData)
                 .then(handleSuccess)
                 .catch(handleError);
         }

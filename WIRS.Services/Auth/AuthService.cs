@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using WIRS.DataAccess.Interfaces;
 using WIRS.Services.Interfaces;
 using WIRS.Services.Models;
@@ -38,7 +40,8 @@ namespace WIRS.Services.Auth
 		{
 			try
 			{
-				var isValid = await _userDataAccess.ValidateUsers(userId, password);
+                string encryptedPassword = EncodePasswordString(password);
+                var isValid = await _userDataAccess.ValidateUsers(userId, encryptedPassword);
 
 				if (!isValid)
 				{
@@ -337,7 +340,16 @@ namespace WIRS.Services.Auth
 			return await Task.FromResult(permissions);
 		}
 
-		private async Task<UserModel?> GetUserModelFromDataAccess(string userId)
+        public string EncodePasswordString(string pw)
+        {
+            HashAlgorithm hash = HashAlgorithm.Create("SHA1");
+            byte[] bytes = Encoding.Unicode.GetBytes(pw);
+            byte[] inArray = hash.ComputeHash(bytes);
+
+            return Convert.ToBase64String(inArray);
+        }
+
+        private async Task<UserModel?> GetUserModelFromDataAccess(string userId)
 		{
 			try
 			{

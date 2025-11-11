@@ -162,11 +162,6 @@ namespace WIRS.Services.Implementations
             }
         }
 
-        public Task<string> SubmitIncidentPartCAsync(WorkflowIncidentPartCModel model, string userId)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<DataSet> GetIncidentWorkflowsAsync(string incidentId, string status = "")
         {
             try
@@ -811,9 +806,42 @@ namespace WIRS.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<string> SubmitPartDAsync(PartDSubmitModel model, string userId)
+        public async Task<string> SubmitPartDAsync(PartDSubmitModel model, string userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                DataSet workflow = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
+
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                DataRow row = dt.NewRow();
+                row["incident_id"] = model.IncidentId;
+                row["actions_code"] = "04";
+                row["actions_role"] = "HSBU";
+                row["from"] = userId;
+                row["to"] = model.HsbuId;
+                row["remarks"] = model.Comments;
+                row["Date"] = "";
+                row["attachment"] = "";
+                dt.Rows.Add(row);
+
+                workflow.Tables.Add(dt);
+                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(model.IncidentId, workflow.GetXml());
+
+                return errorCode;
+            }
+            catch (Exception)
+            {
+                return "ERROR_SAVE_PARTC";
+            }
         }
 
         public async Task<string> RevertPartDToWSHOAsync(string incidentId, string comments, string wshoId, string userId)
@@ -879,53 +907,6 @@ namespace WIRS.Services.Implementations
             catch (Exception)
             {
                 return "ERROR_REVERT_PARTD";
-            }
-        }
-
-        public async Task<string> SubmitPartDToHeadLOBAsync(string incidentId, string comments, string headLobId, string userId)
-        {
-            try
-            {
-                var incident = new WorkflowIncident
-                {
-                    incident_id = incidentId,
-                    status = "04",
-                    modified_by = userId
-                };
-
-                await _workflowIncidentDataAccess.update_Incidents(incident);
-
-                var workflowDs = new DataSet();
-                var dt = new DataTable();
-                dt.Columns.Add("incident_id", typeof(string));
-                dt.Columns.Add("actions_code", typeof(string));
-                dt.Columns.Add("actions_role", typeof(string));
-                dt.Columns.Add("from", typeof(string));
-                dt.Columns.Add("to", typeof(string));
-                dt.Columns.Add("remarks", typeof(string));
-                dt.Columns.Add("Date", typeof(string));
-                dt.Columns.Add("attachment", typeof(string));
-
-                DataRow headLobRow = dt.NewRow();
-                headLobRow["incident_id"] = incidentId;
-                headLobRow["actions_code"] = "03";
-                headLobRow["actions_role"] = "HSBU";
-                headLobRow["from"] = userId;
-                headLobRow["to"] = headLobId;
-                headLobRow["remarks"] = comments;
-                headLobRow["Date"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                headLobRow["attachment"] = string.Empty;
-                dt.Rows.Add(headLobRow);
-
-                workflowDs.Tables.Add(dt);
-
-                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
-
-                return errorCode;
-            }
-            catch (Exception)
-            {
-                return "ERROR_SUBMIT_PARTD";
             }
         }
 

@@ -273,18 +273,6 @@ namespace WIRS.Mvc.Controllers
             {
                 string result = "";
 
-                switch (model.Action.ToUpper())
-                {
-                    case "SUBMIT_PARTC":
-                        if (model.PartCData != null)
-                        {
-                            result = await _workflowService.SubmitIncidentPartCAsync(model.PartCData, currentUser.UserId);
-                        }
-                        break;
-                    default:
-                        return Json(new { success = false, message = "Invalid workflow action" });
-                }
-
                 if (string.IsNullOrEmpty(result) || result.Contains("ERROR"))
                 {
                     return Json(new { success = false, message = "Failed to submit workflow" });
@@ -660,29 +648,19 @@ namespace WIRS.Mvc.Controllers
 
                 if (string.IsNullOrEmpty(request.Comments))
                 {
-                    return Json(new { success = false, message = "Comments are required", errorCode = "ERR-137" });
+                    return Json(new { success = false, message = "Review & Comment is required", errorCode = "ERR-137" });
                 }
 
-                if (string.IsNullOrEmpty(request.HsbuId))
+                if (string.IsNullOrEmpty(request.HeadLobId))
                 {
-                    return Json(new { success = false, message = "HSBU selection is required", errorCode = "ERR-133" });
+                    return Json(new { success = false, message = "Name of Head LOB is required", errorCode = "ERR-133" });
                 }
 
                 var partDModel = new PartDSubmitModel
                 {
                     IncidentId = request.IncidentId,
                     Comments = request.Comments,
-                    HsbuId = request.HsbuId,
-                    EmailToList = request.EmailToList ?? new List<string>(),
-                    AdditionalCopyToList = request.AdditionalCopyToList?.Select(c => new Services.Models.CopyToPersonModel()
-                    {
-                        Name = c.Name,
-                        EmployeeNo = c.EmployeeNo,
-                        Designation = c.Designation
-                    }).ToList() ?? new List<Services.Models.CopyToPersonModel>(),
-                    SubmitterName = currentUser.UserName,
-                    SubmitterEmpId = currentUser.UserId,
-                    SubmitterDesignation = string.Empty
+                    HsbuId = request.HeadLobId
                 };
 
                 var result = await _workflowService.SubmitPartDAsync(partDModel, currentUser.UserId);
@@ -703,7 +681,7 @@ namespace WIRS.Mvc.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RevertPartDToWSHO([FromBody] PartDActionRequest request)
+        public async Task<IActionResult> RevertPartDToWSHO([FromBody] PartDSubmitRequest request)
         {
             try
             {
@@ -742,49 +720,6 @@ namespace WIRS.Mvc.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "An error occurred while reverting Part D", error = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SubmitPartDToHeadLOB([FromBody] PartDActionRequest request)
-        {
-            try
-            {
-                var currentUser = await GetCurrentUserSessionAsync();
-                if (currentUser == null)
-                {
-                    return Json(new { success = false, message = "User not authenticated" });
-                }
-
-                if (request == null || string.IsNullOrEmpty(request.IncidentId))
-                {
-                    return Json(new { success = false, message = "Invalid request data" });
-                }
-
-                if (string.IsNullOrEmpty(request.Comments))
-                {
-                    return Json(new { success = false, message = "Review & Comment is required", errorCode = "ERR-137" });
-                }
-
-                if (string.IsNullOrEmpty(request.HeadLobId))
-                {
-                    return Json(new { success = false, message = "Name of Head LOB is required", errorCode = "ERR-133" });
-                }
-
-                var result = await _workflowService.SubmitPartDToHeadLOBAsync(request.IncidentId, request.Comments, request.HeadLobId, currentUser.UserId);
-
-                if (string.IsNullOrEmpty(result) || !result.Contains("ERROR"))
-                {
-                    return Json(new { success = true, message = "Part D submitted successfully to Head LOB", successCode = "SUC-001" });
-                }
-                else
-                {
-                    return Json(new { success = false, message = result });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "An error occurred while submitting Part D", error = ex.Message });
             }
         }
 
@@ -1188,15 +1123,6 @@ namespace WIRS.Mvc.Controllers
     }
 
     public class PartDSubmitRequest
-    {
-        public string IncidentId { get; set; }
-        public string Comments { get; set; }
-        public string HsbuId { get; set; }
-        public List<string> EmailToList { get; set; }
-        public List<CopyToPersonModel> AdditionalCopyToList { get; set; }
-    }
-
-    public class PartDActionRequest
     {
         public string IncidentId { get; set; }
         public string Comments { get; set; }

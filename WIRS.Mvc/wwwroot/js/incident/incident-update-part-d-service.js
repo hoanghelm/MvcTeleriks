@@ -275,7 +275,7 @@
                 actionType: 'submit'
             };
 
-            IncidentUpdateService.submitPartDToHeadLOB(submitData)
+            IncidentUpdateService.submitPartD(submitData)
                 .then(function (response) {
                     if (response.success) {
                         vm.partD.successMessage = response.message || 'Part D submitted successfully to Head LOB';
