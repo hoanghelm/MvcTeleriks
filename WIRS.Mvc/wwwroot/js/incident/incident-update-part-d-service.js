@@ -25,6 +25,7 @@
                 comments: '',
                 wshoId: '',
                 headLobId: '',
+                headLobName: '',
                 submitterName: '',
                 submitterEmpId: '',
                 submitterDesignation: '',
@@ -89,29 +90,28 @@
         }
 
         function loadPartDWorkflowData(vm) {
-            if (!vm.incident.workflows || vm.incident.workflows.length === 0) {
-                return;
+            var partDWorkflows = [];
+            if (vm.incident.workflows && vm.incident.workflows.length > 0) {
+                partDWorkflows = vm.incident.workflows.filter(function (w) {
+                    return w.actionCode === '04';
+                });
             }
 
-            var partDWorkflows = vm.incident.workflows.filter(function (w) {
-                return w.actionCode === '04';
-            });
+            if (partDWorkflows.length > 0) {
+                partDWorkflows.sort(function (a, b) {
+                    var dateA = new Date(a.date || 0);
+                    var dateB = new Date(b.date || 0);
+                    return dateB - dateA;
+                });
 
-            if (partDWorkflows.length === 0) {
-                return;
+                var latestWorkflow = partDWorkflows[0];
+                vm.partD.submitterName = latestWorkflow.fromName || '';
+                vm.partD.submitterEmpId = latestWorkflow.from || '';
+                vm.partD.submitterDesignation = latestWorkflow.fromDesignation || '';
+                vm.partD.submissionDate = latestWorkflow.date || '';
+                vm.partD.headLobId = latestWorkflow.toUserId || '';
+                vm.partD.headLobName = latestWorkflow.toName || '';
             }
-
-            partDWorkflows.sort(function (a, b) {
-                var dateA = new Date(a.submittedDate);
-                var dateB = new Date(b.submittedDate);
-                return dateB - dateA;
-            });
-
-            var latestWorkflow = partDWorkflows[0];
-            vm.partD.submitterName = latestWorkflow.fromName || '';
-            vm.partD.submitterEmpId = latestWorkflow.from || '';
-            vm.partD.submitterDesignation = latestWorkflow.fromDesignation || '';
-            vm.partD.submissionDate = latestWorkflow.submittedDate || '';
         }
 
         function loadPartDReadOnlyData(vm) {
