@@ -22,29 +22,36 @@
 
         function initializePartH(vm) {
             vm.partH = {
+                isReadOnly: false,
                 comments: '',
+                wshoId: '',
                 submitterName: '',
                 submitterEmpId: '',
-                submittedDate: '',
                 submitterDesignation: '',
-                wshoId: '',
-                wshoList: [],
-                isReadOnly: false,
+                submissionDate: '',
+                additionalCopyToList: [],
+                copyToPerson: {},
+                validationMessage: '',
+                successMessage: '',
                 isSubmitting: false,
                 workflowHistory: [],
-                copyTo: {
-                    name: '',
-                    employeeNo: '',
-                    designation: ''
-                },
-                additionalCopyToList: []
+                wshoOptions: {
+                    dataTextField: 'name',
+                    dataValueField: 'id',
+                    dataSource: new kendo.data.DataSource({ data: [] }),
+                    optionLabel: '-- Select WSHO --',
+                    valuePrimitive: true
+                }
             };
 
+            vm.wshoListPartH = [];
             vm.emailToListPartH = [];
         }
 
         function loadPartHData(vm, getCurrentDate) {
-            var deferred = $q.defer();
+            if (!canViewPartH(vm)) {
+                return $q.resolve();
+            }
 
             determinePartHMode(vm);
 
@@ -52,93 +59,103 @@
                 loadPartHWorkflowData(vm);
             }
 
-            loadWSHOs(vm).then(function () {
-                return loadPartHCopyToList(vm);
-            }).then(function () {
-                deferred.resolve();
-            }).catch(function (error) {
-                deferred.reject(error);
+            return $q.all([
+                loadWSHOs(vm),
+                loadPartHCopyToList(vm)
+            ]).then(function () {
+                if (!vm.partH.isReadOnly) {
+                    $timeout(function () {
+                        refreshKendoDropDowns(vm);
+                    }, 100);
+                }
             });
-
-            return deferred.promise;
         }
 
         function determinePartHMode(vm) {
-            var status = vm.incident.status;
-            vm.partH.isReadOnly = (status !== '07');
+            var status = parseInt(vm.incident.status);
+            if (status < 7) {
+                vm.partH.isReadOnly = true;
+                vm.partH.comments = '';
+                vm.partH.wshoId = '';
+                vm.partH.submitterName = '';
+                vm.partH.submitterEmpId = '';
+                vm.partH.submitterDesignation = '';
+                vm.partH.submissionDate = '';
+            } else if (status > 7) {
+                vm.partH.isReadOnly = true;
+            }
         }
 
         function canViewPartH(vm) {
-            var status = vm.incident.status;
-            return status === '07' || status === '08';
+            var status = parseInt(vm.incident.status);
+            return status >= 7;
         }
 
         function canEditPartH(vm) {
-            var status = vm.incident.status;
-            return status === '07';
+            var status = parseInt(vm.incident.status);
+            return status === 7;
         }
 
         function loadPartHWorkflowData(vm) {
-            var partHWorkflows = vm.incident.workflows.filter(function (w) {
-                return w.actionCode === '08' || w.actionCode === '06';
-            });
-
-            partHWorkflows.sort(function (a, b) {
-                return new Date(b.date) - new Date(a.date);
-            });
+            var partHWorkflows = [];
+            if (vm.incident.workflows && vm.incident.workflows.length > 0) {
+                partHWorkflows = vm.incident.workflows.filter(function (w) {
+                    return w.actionCode === '08' || w.actionCode === '06';
+                });
+            }
 
             if (partHWorkflows.length > 0) {
+                partHWorkflows.sort(function (a, b) {
+                    var dateA = new Date(a.date || 0);
+                    var dateB = new Date(b.date || 0);
+                    return dateB - dateA;
+                });
+
                 var latestWorkflow = partHWorkflows[0];
                 vm.partH.comments = latestWorkflow.remarks || '';
                 vm.partH.submitterName = latestWorkflow.fromName || '';
                 vm.partH.submitterEmpId = latestWorkflow.from || '';
-                vm.partH.submittedDate = latestWorkflow.date || '';
                 vm.partH.submitterDesignation = latestWorkflow.fromDesignation || '';
+                vm.partH.submissionDate = latestWorkflow.date || '';
             }
 
-            vm.partH.workflowHistory = partHWorkflows.filter(function (w) {
-                return w.actionCode === '08' || w.actionCode === '06';
-            });
+            vm.partH.workflowHistory = partHWorkflows;
         }
 
         function loadWSHOs(vm) {
-            var deferred = $q.defer();
-
             if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
-                deferred.resolve();
-                return deferred.promise;
+                return $q.resolve();
             }
 
-            IncidentUpdateService.getWSHOs(
+            return IncidentUpdateService.getWSHOs(
                 vm.incident.sbaCode,
                 vm.incident.sbuCode,
                 vm.incident.department || '',
                 vm.incident.location || ''
             ).then(function (data) {
-                vm.partH.wshoList = data || [];
-                deferred.resolve();
+                vm.wshoListPartH = data;
+                vm.partH.wshoOptions.dataSource.data(data);
+                if (data.length > 0 && vm.incident.wshoId) {
+                    vm.partH.wshoId = vm.incident.wshoId;
+                }
             }).catch(function (error) {
-                deferred.reject('Failed to load WSHOs: ' + error);
+                vm.wshoListPartH = [];
+                vm.partH.wshoOptions.dataSource.data([]);
             });
-
-            return deferred.promise;
         }
 
         function loadPartHCopyToList(vm) {
-            var deferred = $q.defer();
-
             if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
-                deferred.resolve();
-                return deferred.promise;
+                return $q.resolve();
             }
 
-            IncidentUpdateService.getPartECopyToList(
+            return IncidentUpdateService.getPartECopyToList(
                 vm.incident.sbaCode,
                 vm.incident.sbuCode,
                 vm.incident.department,
                 vm.incident.location
             ).then(function (data) {
-                vm.emailToListPartH = (data || []).map(function (person) {
+                vm.emailToListPartH = data.map(function (person) {
                     return {
                         id: person.id,
                         name: person.name,
@@ -146,147 +163,176 @@
                         selected: false
                     };
                 });
-                deferred.resolve();
             }).catch(function (error) {
-                deferred.reject('Failed to load copy to list: ' + error);
             });
+        }
 
-            return deferred.promise;
+        function refreshKendoDropDowns(vm) {
+            function refreshDropDown(elementId, dataSource, value) {
+                var widget = $('#' + elementId).data('kendoDropDownList');
+                if (widget && value) {
+                    if (dataSource && dataSource.length > 0) {
+                        widget.setDataSource(new kendo.data.DataSource({
+                            data: dataSource
+                        }));
+                        widget.value(value);
+                    }
+                }
+            }
+
+            if (vm.wshoListPartH && vm.wshoListPartH.length > 0) {
+                refreshDropDown('partH_wsho', vm.wshoListPartH, vm.partH.wshoId);
+            }
         }
 
         function revertPartHToWSHO(vm) {
-            if (vm.partH.isSubmitting) {
-                return;
-            }
+            vm.partH.validationMessage = '';
+            vm.partH.successMessage = '';
 
             if (!vm.partH.comments || vm.partH.comments.trim() === '') {
-                $window.alert('Review & Comment is required (ERR-137)');
+                vm.partH.validationMessage = 'Review & Comment is required (ERR-137)';
                 return;
             }
 
             if (!vm.partH.wshoId) {
-                $window.alert('Name of WSHO is required (ERR-133)');
+                vm.partH.validationMessage = 'Name of WSHO is required (ERR-133)';
+                return;
+            }
+
+            if (!confirm('Are you sure you want to revert to WSHO? This action cannot be undone.')) {
                 return;
             }
 
             vm.partH.isSubmitting = true;
 
-            var selectedEmailTo = vm.emailToListPartH.filter(function (p) {
-                return p.selected;
-            }).map(function (p) {
-                return p.id;
-            });
+            var selectedEmailTo = vm.emailToListPartH
+                .filter(function (person) { return person.selected; })
+                .map(function (person) { return person.id; });
 
-            var submitData = {
+            var revertData = {
                 incidentId: vm.incident.incidentId,
                 comments: vm.partH.comments,
                 wshoId: vm.partH.wshoId,
                 emailToList: selectedEmailTo,
-                additionalCopyToList: vm.partH.additionalCopyToList.map(function (p) {
-                    return {
-                        employeeNo: p.employeeNo,
-                        name: p.name,
-                        designation: p.designation
-                    };
-                })
+                additionalCopyToList: vm.partH.additionalCopyToList
             };
 
-            IncidentUpdateService.revertPartHToWSHO(submitData).then(function (response) {
-                if (response.success) {
-                    $window.alert(response.message || 'Part H reverted successfully to WSHO');
-                    $window.location.href = '/Incident/Update?id=' + vm.incident.incidentId;
-                } else {
-                    $window.alert(response.message || 'Failed to revert Part H');
+            IncidentUpdateService.revertPartHToWSHO(revertData)
+                .then(function (response) {
+                    if (response.success) {
+                        vm.partH.successMessage = response.message || 'Part H reverted successfully to WSHO';
+                        setTimeout(function () {
+                            $window.location.href = '/Home/Index';
+                        }, 2000);
+                    } else {
+                        vm.partH.validationMessage = response.message || 'Failed to revert Part H';
+                    }
+                })
+                .catch(function (error) {
+                    vm.partH.validationMessage = error.message || 'An error occurred while reverting Part H';
+                })
+                .finally(function () {
                     vm.partH.isSubmitting = false;
-                }
-            }).catch(function (error) {
-                $window.alert('Error reverting Part H: ' + (error.message || 'Unknown error'));
-                vm.partH.isSubmitting = false;
-            });
+                });
         }
 
         function closeReport(vm) {
-            if (vm.partH.isSubmitting) {
+            vm.partH.validationMessage = '';
+            vm.partH.successMessage = '';
+
+            if (!vm.partH.comments || vm.partH.comments.trim() === '') {
+                vm.partH.validationMessage = 'Review & Comment is required (ERR-137)';
                 return;
             }
 
-            if (!vm.partH.comments || vm.partH.comments.trim() === '') {
-                $window.alert('Review & Comment is required (ERR-137)');
+            if (!confirm('Are you sure you want to close the report? This action cannot be undone.')) {
                 return;
             }
 
             vm.partH.isSubmitting = true;
 
-            var selectedEmailTo = vm.emailToListPartH.filter(function (p) {
-                return p.selected;
-            }).map(function (p) {
-                return p.id;
-            });
+            var selectedEmailTo = vm.emailToListPartH
+                .filter(function (person) { return person.selected; })
+                .map(function (person) { return person.id; });
 
             var submitData = {
                 incidentId: vm.incident.incidentId,
                 comments: vm.partH.comments,
                 emailToList: selectedEmailTo,
-                additionalCopyToList: vm.partH.additionalCopyToList.map(function (p) {
-                    return {
-                        employeeNo: p.employeeNo,
-                        name: p.name,
-                        designation: p.designation
-                    };
-                })
+                additionalCopyToList: vm.partH.additionalCopyToList
             };
 
-            IncidentUpdateService.closeReport(submitData).then(function (response) {
-                if (response.success) {
-                    $window.alert(response.message || 'Report closed successfully');
-                    $window.location.href = '/Incident/Update?id=' + vm.incident.incidentId;
-                } else {
-                    $window.alert(response.message || 'Failed to close report');
+            IncidentUpdateService.closeReport(submitData)
+                .then(function (response) {
+                    if (response.success) {
+                        vm.partH.successMessage = response.message || 'Report closed successfully';
+                        setTimeout(function () {
+                            $window.location.href = '/Home/Index';
+                        }, 2000);
+                    } else {
+                        vm.partH.validationMessage = response.message || 'Failed to close report';
+                    }
+                })
+                .catch(function (error) {
+                    vm.partH.validationMessage = error.message || 'An error occurred while closing report';
+                })
+                .finally(function () {
                     vm.partH.isSubmitting = false;
-                }
-            }).catch(function (error) {
-                $window.alert('Error closing report: ' + (error.message || 'Unknown error'));
-                vm.partH.isSubmitting = false;
-            });
+                });
         }
 
         function openEmployeeSearch(vm, context) {
-            vm.partH.searchContext = context;
-            if (window.employeeSearchInstance) {
-                window.employeeSearchInstance.open();
+            if (typeof window.openEmployeeSearch === 'function') {
+                window.openEmployeeSearch('partH', function(employee) {
+                    if (context === 'copyTo') {
+                        $timeout(function() {
+                            vm.partH.copyToPerson = {
+                                name: employee.name,
+                                employeeNo: employee.empId,
+                                designation: employee.designation
+                            };
+                        });
+                    }
+                });
             }
         }
 
         function addPartHCopyTo(vm) {
-            if (!vm.partH.copyTo.name || !vm.partH.copyTo.employeeNo) {
-                $window.alert('Please search and select an employee first');
+            if (!vm.partH.copyToPerson) {
+                vm.partH.copyToPerson = {};
+            }
+
+            if (!vm.partH.copyToPerson.name || !vm.partH.copyToPerson.employeeNo) {
+                alert('Please enter name and employee number');
                 return;
             }
 
-            var exists = vm.partH.additionalCopyToList.some(function (p) {
-                return p.employeeNo === vm.partH.copyTo.employeeNo;
+            if (!vm.partH.additionalCopyToList) {
+                vm.partH.additionalCopyToList = [];
+            }
+
+            var exists = vm.partH.additionalCopyToList.some(function(p) {
+                return p.employeeNo === vm.partH.copyToPerson.employeeNo;
             });
 
             if (exists) {
-                $window.alert('This employee is already in the copy to list');
+                alert('This person is already in the copy to list');
                 return;
             }
 
             vm.partH.additionalCopyToList.push({
-                name: vm.partH.copyTo.name,
-                employeeNo: vm.partH.copyTo.employeeNo,
-                designation: vm.partH.copyTo.designation
+                name: vm.partH.copyToPerson.name,
+                employeeNo: vm.partH.copyToPerson.employeeNo,
+                designation: vm.partH.copyToPerson.designation || ''
             });
 
-            vm.partH.copyTo = {
-                name: '',
-                employeeNo: '',
-                designation: ''
-            };
+            vm.partH.copyToPerson = {};
         }
 
         function removePartHCopyToPerson(vm, index) {
-            vm.partH.additionalCopyToList.splice(index, 1);
+            if (vm.partH.additionalCopyToList && index >= 0 && index < vm.partH.additionalCopyToList.length) {
+                vm.partH.additionalCopyToList.splice(index, 1);
+            }
         }
     }
 })();
