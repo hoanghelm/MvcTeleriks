@@ -20,10 +20,10 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr ng-repeat="workflow in vm.incident.workflows">
                             <td class="px-4 py-3 text-sm text-gray-900">
-                                <div ng-bind-html="workflow.fromName || 'N/A'"></div>
+                                {{ workflow.fromName || 'N/A' }}
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-900">
-                                <div ng-bind-html="workflow.fromDesignation || 'N/A'"></div>
+                                {{ workflow.fromDesignation || 'N/A' }}
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-900">
                                 <div ng-bind-html="workflow.toName || 'N/A'"></div>
@@ -35,7 +35,7 @@
                                 {{workflow.date | date:'dd-MMM-yyyy HH:mm' || 'N/A'}}
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-900">
-                                <div>{{ workflow.remarks }}</div>
+                                {{ workflow.remarks }}
                             </td>
                         </tr>
                     </tbody>
