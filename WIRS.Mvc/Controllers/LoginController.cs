@@ -112,7 +112,7 @@ namespace WIRS.Mvc.Controllers
 			};
 		}
 
-		private async Task HandleSSOLogin(string loginid, string digest, string pageId, LoginViewModel model)
+		private async Task<IActionResult> HandleSSOLogin(string loginid, string digest, string pageId, LoginViewModel model)
 		{
 			try
 			{
@@ -128,11 +128,11 @@ namespace WIRS.Mvc.Controllers
 							await _authService.SignInUserAsync(user, HttpContext);
 							if (!string.IsNullOrEmpty(pageId))
 							{
-								RedirectToAction("ProcessPageRedirect", "Home", new { page_id = pageId });
+								return RedirectToAction("ProcessPageRedirect", "Home", new { page_id = pageId });
 							}
 							else
 							{
-								RedirectToAction("Index", "Home");
+								return RedirectToAction("Index", "Home");
 							}
 						}
 					}
@@ -148,7 +148,10 @@ namespace WIRS.Mvc.Controllers
 			}
 		}
 
-		private string GetLoginErrorMessage(LoginResult result)
+		return null;
+	}
+
+	private string GetLoginErrorMessage(LoginResult result)
 		{
 			return result.ErrorType switch
 			{
@@ -159,5 +162,4 @@ namespace WIRS.Mvc.Controllers
 				_ => "Login failed. Please try again."
 			};
 		}
-	}
 }

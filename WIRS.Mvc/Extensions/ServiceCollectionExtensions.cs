@@ -19,8 +19,7 @@ namespace WIRS.Mvc.Extensions
 
 			services.AddConfigurations(configuration);
 
-			var appSettings = configuration.GetSection("AppSettings").Get<AppSettings>();
-			var basePath = appSettings?.ApiBasePath ?? "";
+			var basePath = configuration.GetSection("AppSettings:ApiBasePath").Value ?? "";
 
 			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 				.AddCookie(options =>
