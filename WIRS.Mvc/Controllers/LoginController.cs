@@ -43,7 +43,11 @@ namespace WIRS.Mvc.Controllers
 
 			if (!string.IsNullOrEmpty(loginid) && !string.IsNullOrEmpty(digest))
 			{
-				await HandleSSOLogin(loginid, digest, page_id, model);
+				var ssoResult = await HandleSSOLogin(loginid, digest, page_id, model);
+			if (ssoResult != null)
+			{
+				return ssoResult;
+			}
 			}
 
 			return View(model);
