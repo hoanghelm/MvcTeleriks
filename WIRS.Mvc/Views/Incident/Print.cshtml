@@ -48,6 +48,22 @@
             max-width: 210mm;
             margin: 0 auto;
         }
+        #content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        #content table, #content th, #content td {
+            border: 1px solid #000 !important;
+        }
+        #content th, #content td {
+            padding: 8px;
+            text-align: left;
+        }
+        #content th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
         #pdf-viewer {
             position: fixed;
             top: 0;
@@ -76,7 +92,14 @@
                 margin: 10,
                 filename: 'Incident_' + incidentId + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    logging: false,
+                    scrollY: 0,
+                    scrollX: 0
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 

@@ -296,19 +296,21 @@ namespace WIRS.Mvc.Controllers
         }}
         table {{
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: collapse !important;
             margin: 10px 0;
+            border: 1px solid #000 !important;
         }}
-        table, th, td {{
-            border: 1px solid #ddd;
-        }}
-        th, td {{
+        table th, table td {{
+            border: 1px solid #000 !important;
             padding: 8px;
             text-align: left;
         }}
         th {{
             background-color: #f2f2f2;
             font-weight: bold;
+        }}
+        * {{
+            box-sizing: border-box;
         }}
     </style>
 </head>
