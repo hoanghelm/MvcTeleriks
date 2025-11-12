@@ -23,6 +23,8 @@ namespace WIRS.Services.Interfaces
         Task<string> SubmitPartFAsync(string incidentId, string comments, string riskAssessmentReview, string wshoId, List<Microsoft.AspNetCore.Http.IFormFile> attachments, List<Microsoft.AspNetCore.Http.IFormFile> riskAttachments, string userId);
         Task<string> SubmitPartGAsync(string incidentId, string comments, string cwshoId, List<Microsoft.AspNetCore.Http.IFormFile> attachments, string userId);
         Task<string> RevertPartGToHODAsync(string incidentId, string comments, string hodId, List<Microsoft.AspNetCore.Http.IFormFile> attachments, string userId);
+        Task<string> RevertPartHToWSHOAsync(string incidentId, string comments, string wshoId, List<string> emailToList, List<CopyToPersonModel> additionalCopyToList, string userId);
+        Task<string> CloseReportAsync(string incidentId, string comments, List<string> emailToList, List<CopyToPersonModel> additionalCopyToList, string userId);
         Task<DataSet> GetIncidentWorkflowsAsync(string incidentId, string status = "");
         Task<List<IncidentStagePermissionModel>> GetIncidentStagePermissionsAsync(string incidentId, string userId);
         Task<DataSet> SearchIncidentsAsync(string userId, string userRoleCode, IncidentSearchModel searchCriteria);

@@ -48,7 +48,9 @@
             revertPartEToWSHO: revertPartEToWSHO,
             submitPartF: submitPartF,
             submitPartG: submitPartG,
-            revertPartGToHOD: revertPartGToHOD
+            revertPartGToHOD: revertPartGToHOD,
+            revertPartHToWSHO: revertPartHToWSHO,
+            closeReport: closeReport
         };
 
         return service;
@@ -364,6 +366,18 @@
                 transformRequest: angular.identity,
                 headers: { 'Content-Type': undefined }
             })
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function revertPartHToWSHO(partHData) {
+            return $http.post('/Incident/RevertPartHToWSHO', partHData)
+                .then(handleSuccess)
+                .catch(handleError);
+        }
+
+        function closeReport(partHData) {
+            return $http.post('/Incident/CloseReport', partHData)
                 .then(handleSuccess)
                 .catch(handleError);
         }

@@ -1285,6 +1285,161 @@ namespace WIRS.Services.Implementations
             }
         }
 
+        public async Task<string> RevertPartHToWSHOAsync(string incidentId, string comments, string wshoId, List<string> emailToList, List<CopyToPersonModel> additionalCopyToList, string userId)
+        {
+            try
+            {
+                DataSet workflowDs = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                foreach (var emailTo in emailToList)
+                {
+                    DataRow copyToRow = dt.NewRow();
+                    copyToRow["incident_id"] = incidentId;
+                    copyToRow["actions_code"] = "06";
+                    copyToRow["actions_role"] = "COPYTO";
+                    copyToRow["from"] = userId;
+                    copyToRow["to"] = emailTo;
+                    copyToRow["remarks"] = string.Empty;
+                    copyToRow["Date"] = string.Empty;
+                    copyToRow["attachment"] = string.Empty;
+                    dt.Rows.Add(copyToRow);
+                }
+
+                foreach (var copyTo in additionalCopyToList)
+                {
+                    DataRow copyToRow = dt.NewRow();
+                    copyToRow["incident_id"] = incidentId;
+                    copyToRow["actions_code"] = "06";
+                    copyToRow["actions_role"] = "COPYTO";
+                    copyToRow["from"] = userId;
+                    copyToRow["to"] = copyTo.EmployeeNo;
+                    copyToRow["remarks"] = string.Empty;
+                    copyToRow["Date"] = string.Empty;
+                    copyToRow["attachment"] = string.Empty;
+                    dt.Rows.Add(copyToRow);
+                }
+
+                DataRow wshoRow = dt.NewRow();
+                wshoRow["incident_id"] = incidentId;
+                wshoRow["actions_code"] = "06";
+                wshoRow["actions_role"] = "WSHO";
+                wshoRow["from"] = userId;
+                wshoRow["to"] = wshoId;
+                wshoRow["remarks"] = comments;
+                wshoRow["Date"] = string.Empty;
+                wshoRow["attachment"] = string.Empty;
+                dt.Rows.Add(wshoRow);
+
+                var awshoId = dataset.Tables[0].Rows[0]["awsho_id"].ToString();
+                DataRow awshoRow = dt.NewRow();
+                awshoRow["incident_id"] = incidentId;
+                awshoRow["actions_code"] = "06";
+                awshoRow["actions_role"] = "A_WSHO";
+                awshoRow["from"] = userId;
+                awshoRow["to"] = awshoId;
+                awshoRow["remarks"] = string.Empty;
+                awshoRow["Date"] = string.Empty;
+                awshoRow["attachment"] = string.Empty;
+                dt.Rows.Add(awshoRow);
+
+                workflowDs.Tables.Add(dt);
+
+                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                if (!string.IsNullOrEmpty(errorCode))
+                {
+                    return errorCode;
+                }
+
+                return string.Empty;
+            }
+            catch (Exception)
+            {
+                return "ERROR_REVERT_PARTH";
+            }
+        }
+
+        public async Task<string> CloseReportAsync(string incidentId, string comments, List<string> emailToList, List<CopyToPersonModel> additionalCopyToList, string userId)
+        {
+            try
+            {
+                DataSet workflowDs = new DataSet("NewDataSet");
+                DataTable dt = new DataTable("incidents_workflows");
+                dt.Columns.Add("incident_id", typeof(string));
+                dt.Columns.Add("actions_code", typeof(string));
+                dt.Columns.Add("actions_role", typeof(string));
+                dt.Columns.Add("from", typeof(string));
+                dt.Columns.Add("to", typeof(string));
+                dt.Columns.Add("remarks", typeof(string));
+                dt.Columns.Add("Date", typeof(string));
+                dt.Columns.Add("attachment", typeof(string));
+
+                foreach (var emailTo in emailToList)
+                {
+                    DataRow copyToRow = dt.NewRow();
+                    copyToRow["incident_id"] = incidentId;
+                    copyToRow["actions_code"] = "08";
+                    copyToRow["actions_role"] = "COPYTO";
+                    copyToRow["from"] = userId;
+                    copyToRow["to"] = emailTo;
+                    copyToRow["remarks"] = string.Empty;
+                    copyToRow["Date"] = string.Empty;
+                    copyToRow["attachment"] = string.Empty;
+                    dt.Rows.Add(copyToRow);
+                }
+
+                foreach (var copyTo in additionalCopyToList)
+                {
+                    DataRow copyToRow = dt.NewRow();
+                    copyToRow["incident_id"] = incidentId;
+                    copyToRow["actions_code"] = "08";
+                    copyToRow["actions_role"] = "COPYTO";
+                    copyToRow["from"] = userId;
+                    copyToRow["to"] = copyTo.EmployeeNo;
+                    copyToRow["remarks"] = string.Empty;
+                    copyToRow["Date"] = string.Empty;
+                    copyToRow["attachment"] = string.Empty;
+                    dt.Rows.Add(copyToRow);
+                }
+
+                var createdBy = dataset.Tables[0].Rows[0]["created_by"].ToString();
+                DataRow closeRow = dt.NewRow();
+                closeRow["incident_id"] = incidentId;
+                closeRow["actions_code"] = "08";
+                closeRow["actions_role"] = "CLOSE";
+                closeRow["from"] = userId;
+                closeRow["to"] = createdBy;
+                closeRow["remarks"] = comments;
+                closeRow["Date"] = string.Empty;
+                closeRow["attachment"] = string.Empty;
+                dt.Rows.Add(closeRow);
+
+                workflowDs.Tables.Add(dt);
+
+                var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                if (!string.IsNullOrEmpty(errorCode))
+                {
+                    return errorCode;
+                }
+
+                return string.Empty;
+            }
+            catch (Exception)
+            {
+                return "ERROR_CLOSE_REPORT";
+            }
+        }
+
         private DataSet ConvertIReportToDataSet(PartCSubmitModel model)
         {
             var ds = new DataSet();

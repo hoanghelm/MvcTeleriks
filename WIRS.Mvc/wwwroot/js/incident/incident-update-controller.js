@@ -3,9 +3,9 @@
         .module('incidentUpdateApp')
         .controller('IncidentUpdateController', IncidentUpdateController);
 
-    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', '$q', 'IncidentUpdateService', 'PartAService', 'PartBService', 'PartCService', 'PartDService', 'PartEService', 'PartFService', 'PartGService'];
+    IncidentUpdateController.$inject = ['$window', '$location', '$scope', '$timeout', '$sce', '$q', 'IncidentUpdateService', 'PartAService', 'PartBService', 'PartCService', 'PartDService', 'PartEService', 'PartFService', 'PartGService', 'PartHService'];
 
-    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, $q, IncidentUpdateService, PartAService, PartBService, PartCService, PartDService, PartEService, PartFService, PartGService) {
+    function IncidentUpdateController($window, $location, $scope, $timeout, $sce, $q, IncidentUpdateService, PartAService, PartBService, PartCService, PartDService, PartEService, PartFService, PartGService, PartHService) {
         var vm = this;
 
         vm.loading = true;
@@ -25,6 +25,8 @@
         PartFService.initializePartF(vm);
 
         PartGService.initializePartG(vm);
+
+        PartHService.initializePartH(vm);
 
         PartAService.initializePartA(vm);
 
@@ -98,6 +100,14 @@
         vm.revertPartGToHOD = function () { PartGService.revertPartGToHOD(vm); };
         vm.removePartGAttachment = function (index) { PartGService.removePartGAttachment(vm, index); };
 
+        vm.canViewPartH = function () { return PartHService.canViewPartH(vm); };
+        vm.canEditPartH = function () { return PartHService.canEditPartH(vm); };
+        vm.revertPartHToWSHO = function () { PartHService.revertPartHToWSHO(vm); };
+        vm.closeReport = function () { PartHService.closeReport(vm); };
+        vm.searchPartHCopyTo = function () { PartHService.openEmployeeSearch(vm, 'copyTo'); };
+        vm.addPartHCopyTo = function () { PartHService.addPartHCopyTo(vm); };
+        vm.removePartHCopyToPerson = function (index) { PartHService.removePartHCopyToPerson(vm, index); };
+
         init();
 
         function init() {
@@ -120,7 +130,8 @@
                         PartDService.loadPartDData(vm, getCurrentDate),
                         PartEService.loadPartEData(vm, getCurrentDate),
                         PartFService.loadPartFData(vm, getCurrentDate),
-                        PartGService.loadPartGData(vm, getCurrentDate)
+                        PartGService.loadPartGData(vm, getCurrentDate),
+                        PartHService.loadPartHData(vm, getCurrentDate)
                     ]);
                 })
                 .catch(function (error) {
