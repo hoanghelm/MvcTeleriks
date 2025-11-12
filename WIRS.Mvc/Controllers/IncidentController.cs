@@ -288,27 +288,8 @@ namespace WIRS.Mvc.Controllers
     <meta charset='utf-8' />
     <title>Incident Report - {id}</title>
     <style>
-        body {{
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-            padding: 20px;
-        }}
         table {{
-            width: 100%;
-            border-collapse: collapse !important;
-            margin: 10px 0;
-            border: 1px solid #000 !important;
             page-break-inside: auto;
-        }}
-        table th, table td {{
-            border: 1px solid #000 !important;
-            padding: 8px;
-            text-align: left;
-        }}
-        th {{
-            background-color: #f2f2f2;
-            font-weight: bold;
         }}
         tr {{
             page-break-inside: avoid;
@@ -319,9 +300,6 @@ namespace WIRS.Mvc.Controllers
         }}
         tfoot {{
             display: table-footer-group;
-        }}
-        * {{
-            box-sizing: border-box;
         }}
     </style>
 </head>
