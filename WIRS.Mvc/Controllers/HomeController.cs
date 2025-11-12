@@ -40,6 +40,7 @@ namespace WIRS.Mvc.Controllers
 			var userSession = await GetCurrentUserSessionAsync();
 			if (userSession == null)
 			{
+				TempData["ErrorMessage"] = "Your session has expired. Please login again.";
 				return RedirectToAction("Index", "Login");
 			}
 

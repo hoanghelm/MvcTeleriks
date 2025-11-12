@@ -37,8 +37,9 @@ namespace WIRS.Mvc.Controllers
 
 			var model = new LoginViewModel
 			{
-				ErrorMessage = GetStatusMessage(status),
-				PageId = page_id
+				ErrorMessage = TempData["ErrorMessage"] as string ?? GetStatusMessage(status),
+				PageId = page_id,
+				UserId = TempData["UserId"] as string ?? ""
 			};
 
 			if (!string.IsNullOrEmpty(loginid) && !string.IsNullOrEmpty(digest))
@@ -59,7 +60,9 @@ namespace WIRS.Mvc.Controllers
 		{
 			if (!ModelState.IsValid)
 			{
-				return View("Index", model);
+				TempData["ErrorMessage"] = "Please fill in all required fields.";
+				TempData["UserId"] = model.UserId;
+				return RedirectToAction("Index");
 			}
 
 			try
@@ -84,14 +87,16 @@ namespace WIRS.Mvc.Controllers
 				}
 				else
 				{
-					model.ErrorMessage = GetLoginErrorMessage(loginResult);
-					return View("Index", model);
+					TempData["ErrorMessage"] = GetLoginErrorMessage(loginResult);
+					TempData["UserId"] = model.UserId;
+					return RedirectToAction("Index");
 				}
 			}
 			catch (Exception ex)
 			{
-				model.ErrorMessage = ex.Message;
-				return View("Index", model);
+				TempData["ErrorMessage"] = ex.Message;
+				TempData["UserId"] = model.UserId;
+				return RedirectToAction("Index");
 			}
 		}
 

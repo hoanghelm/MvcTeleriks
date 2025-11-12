@@ -41,11 +41,6 @@ namespace WIRS.Mvc.Extensions
 								return Task.CompletedTask;
 							}
 
-							if (context.Request.Path.StartsWithSegments("/Login"))
-							{
-								context.Response.StatusCode = 401;
-								return Task.CompletedTask;
-							}
 
 							context.Response.Redirect(context.RedirectUri);
 							return Task.CompletedTask;
