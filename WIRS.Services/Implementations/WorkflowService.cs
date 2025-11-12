@@ -1289,13 +1289,6 @@ namespace WIRS.Services.Implementations
         {
             try
             {
-                var incident = new WorkflowIncident { incident_id = incidentId };
-                var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
-                incident.status = "06";
-                incident.modified_by = userId;
-
-                await _workflowIncidentDataAccess.update_Incidents(incident);
-
                 DataSet workflowDs = new DataSet("NewDataSet");
                 DataTable dt = new DataTable("incidents_workflows");
                 dt.Columns.Add("incident_id", typeof(string));
@@ -1379,13 +1372,6 @@ namespace WIRS.Services.Implementations
         {
             try
             {
-                var incident = new WorkflowIncident { incident_id = incidentId };
-                var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
-                incident.status = "08";
-                incident.modified_by = userId;
-
-                await _workflowIncidentDataAccess.update_Incidents(incident);
-
                 DataSet workflowDs = new DataSet("NewDataSet");
                 DataTable dt = new DataTable("incidents_workflows");
                 dt.Columns.Add("incident_id", typeof(string));
