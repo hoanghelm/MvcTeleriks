@@ -299,6 +299,7 @@ namespace WIRS.Mvc.Controllers
             border-collapse: collapse !important;
             margin: 10px 0;
             border: 1px solid #000 !important;
+            page-break-inside: auto;
         }}
         table th, table td {{
             border: 1px solid #000 !important;
@@ -308,6 +309,16 @@ namespace WIRS.Mvc.Controllers
         th {{
             background-color: #f2f2f2;
             font-weight: bold;
+        }}
+        tr {{
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }}
+        thead {{
+            display: table-header-group;
+        }}
+        tfoot {{
+            display: table-footer-group;
         }}
         * {{
             box-sizing: border-box;

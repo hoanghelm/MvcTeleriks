@@ -52,6 +52,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 10px 0;
+            page-break-inside: auto;
         }
         #content table, #content th, #content td {
             border: 1px solid #000 !important;
@@ -63,6 +64,16 @@
         #content th {
             background-color: #f2f2f2;
             font-weight: bold;
+        }
+        #content tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+        #content thead {
+            display: table-header-group;
+        }
+        #content tfoot {
+            display: table-footer-group;
         }
         #pdf-viewer {
             position: fixed;
@@ -89,7 +100,7 @@
 
             var incidentId = '@ViewBag.IncidentId';
             var opt = {
-                margin: 10,
+                margin: [10, 10, 10, 10],
                 filename: 'Incident_' + incidentId + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
@@ -100,7 +111,8 @@
                     scrollY: 0,
                     scrollX: 0
                 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'], avoid: ['tr', 'td'] }
             };
 
             html2pdf().set(opt).from(element).outputPdf('blob').then(function(pdfBlob) {
