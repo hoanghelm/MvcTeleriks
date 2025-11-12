@@ -238,6 +238,46 @@ namespace WIRS.Mvc.Controllers
 
                 if (string.IsNullOrEmpty(htmlContent))
                 {
+                    ViewBag.ErrorMessage = "No print data available for this incident.";
+                    ViewBag.HtmlContent = string.Empty;
+                }
+                else
+                {
+                    ViewBag.HtmlContent = htmlContent;
+                }
+
+                ViewBag.IncidentId = id;
+                return View();
+            }
+            catch (Exception)
+            {
+                ViewBag.ErrorMessage = "An error occurred while loading the print preview.";
+                ViewBag.HtmlContent = string.Empty;
+                ViewBag.IncidentId = id;
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PrintContent(string id)
+        {
+            var currentUser = await GetCurrentUserSessionAsync();
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var htmlContent = await _workflowService.GetPrintViewHtmlAsync(id);
+
+                if (string.IsNullOrEmpty(htmlContent))
+                {
                     return Content("No print data available for this incident.");
                 }
 
