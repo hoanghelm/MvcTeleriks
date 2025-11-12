@@ -16,6 +16,12 @@ namespace WIRS.Mvc
 
             var app = builder.Build();
 
+            var basePath = builder.Configuration.GetSection("AppSettings:ApiBasePath").Value;
+            if (!string.IsNullOrEmpty(basePath))
+            {
+                app.UsePathBase(basePath);
+            }
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

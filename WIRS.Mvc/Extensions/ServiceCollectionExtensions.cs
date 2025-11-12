@@ -19,20 +19,17 @@ namespace WIRS.Mvc.Extensions
 
 			services.AddConfigurations(configuration);
 
-			var basePath = configuration.GetSection("AppSettings:ApiBasePath").Value ?? "";
-
 			services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 				.AddCookie(options =>
 				{
-					options.LoginPath = $"{basePath}/Login";
-					options.LogoutPath = $"{basePath}/Login/Logout";
-					options.AccessDeniedPath = $"{basePath}/Login";
+					options.LoginPath = "/Login";
+					options.LogoutPath = "/Login/Logout";
+					options.AccessDeniedPath = "/Login";
 					options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
 					options.SlidingExpiration = true;
 					options.Cookie.Name = "WIRS.Auth";
 					options.Cookie.HttpOnly = true;
 					options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-					options.Cookie.Path = string.IsNullOrEmpty(basePath) ? "/" : basePath;
 
 					options.Events = new CookieAuthenticationEvents
 					{
