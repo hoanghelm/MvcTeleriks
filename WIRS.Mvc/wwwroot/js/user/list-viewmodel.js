@@ -52,7 +52,6 @@ var userListViewModel = (function () {
 
     function searchUsers() {
         if (!_elements.userGrid) {
-            console.error('User grid not initialized');
             return;
         }
 
@@ -66,7 +65,7 @@ var userListViewModel = (function () {
 
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/User/SearchUsers',
             type: 'POST',
             data: JSON.stringify(searchCriteria),
@@ -125,7 +124,6 @@ var userListViewModel = (function () {
             },
             error: function (xhr, status, error) {
                 hideLoading();
-                console.error('Search error:', error);
                 TelerikNotification.error('Error searching users. Please try again.');
                 _elements.userGrid.setDataSource(new kendo.data.DataSource({ data: [] }));
             }
@@ -148,7 +146,7 @@ var userListViewModel = (function () {
     }
 
     function loadLOBsBySector(sectorCode, callback) {
-        $.get('/MasterData/GetLOBs', { sectorCode: sectorCode })
+        ApiConfig.get('/MasterData/GetLOBs', { sectorCode: sectorCode })
             .done(function (response) {
                 callback(response);
             })

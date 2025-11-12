@@ -81,8 +81,8 @@ var userCreateViewModel = (function () {
         TelerikSkeleton.showDropdownSkeleton("#ddlUserRole");
 
         var requests = [
-            $.get('/MasterData/GetUserRoles'),
-            $.get('/MasterData/GetSectors')
+            ApiConfig.get('/MasterData/GetUserRoles'),
+            ApiConfig.get('/MasterData/GetSectors')
         ];
 
         $.when.apply($, requests).done(function (userRoles, sectors) {
@@ -148,7 +148,7 @@ var userCreateViewModel = (function () {
         TelerikSkeleton.showTextboxSkeleton("#txtUserName");
         TelerikSkeleton.showTextboxSkeleton("#txtEmail");
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/User/ValidateUserExists',
             type: 'POST',
             data: JSON.stringify(userId),
@@ -269,7 +269,7 @@ var userCreateViewModel = (function () {
 
         $("#btnCreateUser").data("kendoButton").enable(false);
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/User/CreateUser',
             type: 'POST',
             data: JSON.stringify(userData),
@@ -280,7 +280,7 @@ var userCreateViewModel = (function () {
                 if (response.success) {
                     TelerikNotification.success("User created successfully!");
                     setTimeout(function () {
-                        window.location.href = '/User';
+                        window.location.href = ApiConfig.buildUrl('/User');
                     }, 2000);
                 } else {
                     TelerikNotification.error(response.message);
@@ -357,7 +357,7 @@ var userCreateViewModel = (function () {
 
     function cancelForm() {
         if (confirm("Are you sure you want to cancel? All unsaved changes will be lost.")) {
-            window.location.href = '/User';
+            window.location.href = ApiConfig.buildUrl('/User');
         }
     }
 
@@ -370,7 +370,6 @@ var userCreateViewModel = (function () {
     }
 
     function onGridError(e) {
-        console.error('Grid error:', e);
     }
 
     function onGridEdit(e) {
@@ -449,7 +448,7 @@ var userCreateViewModel = (function () {
             return;
         }
 
-        $.get('/MasterData/GetLOBs', { sectorCode: sectorCode })
+        ApiConfig.get('/MasterData/GetLOBs', { sectorCode: sectorCode })
             .done(function (response) {
                 _masterData.lobs = response;
                 callback && callback(response);
@@ -467,7 +466,7 @@ var userCreateViewModel = (function () {
             return;
         }
 
-        $.get('/MasterData/GetDepartments', { sectorCode: sectorCode, lobCode: lobCode })
+        ApiConfig.get('/MasterData/GetDepartments', { sectorCode: sectorCode, lobCode: lobCode })
             .done(function (response) {
                 _masterData.departments = response;
                 callback && callback(response);
@@ -485,7 +484,7 @@ var userCreateViewModel = (function () {
             return;
         }
 
-        $.get('/MasterData/GetLocations', { sectorCode: sectorCode, lobCode: lobCode, deptCode: deptCode })
+        ApiConfig.get('/MasterData/GetLocations', { sectorCode: sectorCode, lobCode: lobCode, deptCode: deptCode })
             .done(function (response) {
                 _masterData.locations = response;
                 callback && callback(response);

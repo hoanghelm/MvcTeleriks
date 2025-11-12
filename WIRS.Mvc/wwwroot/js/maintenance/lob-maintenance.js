@@ -129,7 +129,7 @@ var lobMaintenanceViewModel = (function () {
     function loadLOBList(sectorCode) {
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GetLOBList',
             type: 'POST',
             data: { sbaCode: sectorCode },
@@ -198,7 +198,7 @@ var lobMaintenanceViewModel = (function () {
     function generateLOBCodeDirect() {
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GenerateLOBCode',
             type: 'POST',
             data: { sbaCode: _currentSectorCode },
@@ -253,7 +253,7 @@ var lobMaintenanceViewModel = (function () {
     function loadLOBRecord(sbaCode, sbuCode) {
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GetLOBByUid',
             type: 'POST',
             data: {
@@ -307,7 +307,6 @@ var lobMaintenanceViewModel = (function () {
                         datePicker.value(dateValue);
                     }
                 } catch (e) {
-                    console.log('Date parsing error:', e);
                 }
             }
 
@@ -375,7 +374,7 @@ var lobMaintenanceViewModel = (function () {
 
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/SaveLOB',
             type: 'POST',
             contentType: 'application/json',

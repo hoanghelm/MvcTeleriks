@@ -138,7 +138,7 @@ var departmentMaintenanceViewModel = (function () {
     }
 
     function loadLOBList(sectorCode, targetDropdown) {
-        $.ajax({
+        ApiConfig.ajax({
             url: '/MasterData/GetLOBs',
             type: 'GET',
             data: { sectorCode: sectorCode },
@@ -174,7 +174,7 @@ var departmentMaintenanceViewModel = (function () {
 
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GetDepartmentList',
             type: 'POST',
             data: {
@@ -271,7 +271,7 @@ var departmentMaintenanceViewModel = (function () {
 
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GenerateDepartmentCode',
             type: 'POST',
             data: { sbuCode: formLobCode },
@@ -313,7 +313,7 @@ var departmentMaintenanceViewModel = (function () {
     function loadDepartmentRecord(codeType, sbaCode, sbuCode, departmentCode) {
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GetDepartmentByUid',
             type: 'POST',
             data: {
@@ -415,7 +415,7 @@ var departmentMaintenanceViewModel = (function () {
 
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/SaveDepartment',
             type: 'POST',
             contentType: 'application/json',

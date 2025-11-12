@@ -188,7 +188,7 @@ var locationMaintenanceViewModel = (function () {
     }
 
     function loadLOBList(sectorCode, targetDropdown) {
-        $.ajax({
+        ApiConfig.ajax({
             url: '/MasterData/GetLOBs',
             type: 'GET',
             data: { sectorCode: sectorCode },
@@ -210,7 +210,7 @@ var locationMaintenanceViewModel = (function () {
     }
 
     function loadDepartmentList(sectorCode, lobCode, targetDropdown) {
-        $.ajax({
+        ApiConfig.ajax({
             url: '/MasterData/GetDepartments',
             type: 'GET',
             data: {
@@ -246,7 +246,7 @@ var locationMaintenanceViewModel = (function () {
     function loadLocationList(sectorCode, lobCode, departmentCode) {
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GetLocationList',
             type: 'POST',
             data: {
@@ -362,7 +362,7 @@ var locationMaintenanceViewModel = (function () {
     function loadLocationRecord(sbaCode, sbuCode, departmentCode, locationCode) {
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GetLocationByUid',
             type: 'POST',
             data: {
@@ -449,7 +449,7 @@ var locationMaintenanceViewModel = (function () {
             return;
         }
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/GenerateLocationCode',
             type: 'POST',
             data: { sbuCode: formLobCode },
@@ -490,7 +490,7 @@ var locationMaintenanceViewModel = (function () {
 
         showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Maintenance/SaveLocation',
             type: 'POST',
             contentType: 'application/json',

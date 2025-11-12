@@ -34,7 +34,7 @@ var EmployeeSearchComponent = (function () {
 
         kendo.ui.progress(this.grid.element, true);
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/User/SearchEmployees',
             type: 'POST',
             contentType: 'application/json',
@@ -89,9 +89,6 @@ var EmployeeSearchComponent = (function () {
             },
             error: function (xhr, status, error) {
                 kendo.ui.progress(self.grid.element, false);
-                console.error('Error loading employees:', error);
-                console.error('Status:', status);
-                console.error('Response:', xhr.responseText);
                 TelerikNotification.error('Error loading employees. Please check console for details.');
             }
         });
@@ -176,7 +173,7 @@ function performAdvancedSearch() {
 
     kendo.ui.progress(grid.element, true);
 
-    $.ajax({
+    ApiConfig.ajax({
         url: '/User/SearchEmployees',
         type: 'POST',
         contentType: 'application/json',
@@ -229,9 +226,6 @@ function performAdvancedSearch() {
         },
         error: function (xhr, status, error) {
             kendo.ui.progress(grid.element, false);
-            console.error('Search error:', error);
-            console.error('Status:', status);
-            console.error('Response:', xhr.responseText);
             TelerikNotification.error('Error searching employees. Please check console for details.');
         }
     });

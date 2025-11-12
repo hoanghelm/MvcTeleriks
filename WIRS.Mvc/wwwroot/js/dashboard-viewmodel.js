@@ -65,7 +65,7 @@ const DashboardViewModel = {
         this.data.isLoading = true;
         this.showLoading();
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Home/GetIncidentData',
             type: 'GET',
             success: (response) => {
@@ -171,13 +171,13 @@ const DashboardViewModel = {
 
     viewIncident: function (incidentId) {
         if (incidentId) {
-            window.location.href = '/Incident/Update?id=' + encodeURIComponent(incidentId);
+            window.location.href = ApiConfig.buildUrl('/Incident/Update') + '?id=' + encodeURIComponent(incidentId);
         }
     },
 
     printIncident: function (incidentId) {
         if (incidentId) {
-            window.open('/Incident/Print?id=' + encodeURIComponent(incidentId), '_blank');
+            window.open(ApiConfig.buildUrl('/Incident/Print') + '?id=' + encodeURIComponent(incidentId), '_blank');
         }
     },
 

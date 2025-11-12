@@ -60,9 +60,9 @@ var userUpdateViewModel = (function () {
         TelerikSkeleton.showDropdownSkeleton("#ddlAccountStatus");
 
         var requests = [
-            $.get('/MasterData/GetUserRoles'),
-            $.get('/MasterData/GetSectors'),
-            $.get('/MasterData/GetAccountStatuses')
+            ApiConfig.get('/MasterData/GetUserRoles'),
+            ApiConfig.get('/MasterData/GetSectors'),
+            ApiConfig.get('/MasterData/GetAccountStatuses')
         ];
 
         $.when.apply($, requests).done(function (userRoles, sectors, accountStatuses) {
@@ -246,7 +246,7 @@ var userUpdateViewModel = (function () {
 
         $("#btnUpdateUser").data("kendoButton").enable(false);
 
-        $.ajax({
+        ApiConfig.ajax({
             url: '/User/UpdateUser',
             type: 'POST',
             data: JSON.stringify(userData),
@@ -257,7 +257,7 @@ var userUpdateViewModel = (function () {
                 if (response.success) {
                     TelerikNotification.success("User updated successfully!");
                     setTimeout(function () {
-                        window.location.href = '/User';
+                        window.location.href = ApiConfig.buildUrl('/User');
                     }, 2000);
                 } else {
                     TelerikNotification.error(response.message);
@@ -309,7 +309,7 @@ var userUpdateViewModel = (function () {
 
     function cancelForm() {
         if (confirm("Are you sure you want to cancel? All unsaved changes will be lost.")) {
-            window.location.href = '/User';
+            window.location.href = ApiConfig.buildUrl('/User');
         }
     }
 
@@ -322,7 +322,6 @@ var userUpdateViewModel = (function () {
     }
 
     function onGridError(e) {
-        console.error('Grid error:', e);
     }
 
     function editRow(e) {
@@ -432,7 +431,7 @@ var userUpdateViewModel = (function () {
             return;
         }
 
-        $.get('/MasterData/GetLOBs', { sectorCode: sectorCode })
+        ApiConfig.get('/MasterData/GetLOBs', { sectorCode: sectorCode })
             .done(function (response) {
                 _masterData.lobs = response;
                 callback && callback(response);
@@ -450,7 +449,7 @@ var userUpdateViewModel = (function () {
             return;
         }
 
-        $.get('/MasterData/GetDepartments', { sectorCode: sectorCode, lobCode: lobCode })
+        ApiConfig.get('/MasterData/GetDepartments', { sectorCode: sectorCode, lobCode: lobCode })
             .done(function (response) {
                 _masterData.departments = response;
                 callback && callback(response);
@@ -468,7 +467,7 @@ var userUpdateViewModel = (function () {
             return;
         }
 
-        $.get('/MasterData/GetLocations', { sectorCode: sectorCode, lobCode: lobCode, deptCode: deptCode })
+        ApiConfig.get('/MasterData/GetLocations', { sectorCode: sectorCode, lobCode: lobCode, deptCode: deptCode })
             .done(function (response) {
                 _masterData.locations = response;
                 callback && callback(response);

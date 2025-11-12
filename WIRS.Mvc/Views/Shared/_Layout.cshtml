@@ -40,6 +40,11 @@
     <script src="https://kendo.cdn.telerik.com/2023.3.1010/js/kendo.all.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2023.3.1010/js/kendo.aspnetmvc.min.js"></script>
     <script src="~/telerik-license.js"></script>
+    <script>
+        window.WIRS_CONFIG = window.WIRS_CONFIG || {};
+        window.WIRS_CONFIG.basePath = '@(Configuration["AppSettings:ApiBasePath"] ?? "")';
+    </script>
+    <script src="~/js/api-config.js" asp-append-version="true"></script>
 </head>
 <body>
     <nav class="sticky top-0 z-50 bg-gradient-to-r from-slate-800 to-slate-900 shadow-lg border-b border-slate-700 backdrop-blur-sm bg-opacity-95">

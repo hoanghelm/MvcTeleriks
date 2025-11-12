@@ -11,15 +11,14 @@ const MenuSystem = {
     },
 
     loadUserInfo: function() {
-        $.ajax({
+        ApiConfig.ajax({
             url: '/User/GetCurrentUser',
             type: 'GET',
             success: (response) => {
                 if (response.success) {
                     this.data.currentUser = response.user;
                     $('.user-name').text(response.user.displayName || response.user.userName || 'User');
-                    
-                    // Update user display in navigation
+
                     const userNameElements = document.querySelectorAll('.user-display-name');
                     userNameElements.forEach(el => {
                         el.textContent = response.user.displayName || response.user.userName || 'User';
@@ -27,35 +26,30 @@ const MenuSystem = {
                 }
             },
             error: () => {
-                console.log('Failed to load user info');
                 $('.user-name').text('User');
             }
         });
     },
 
     loadMenuItems: function() {
-        $.ajax({
+        ApiConfig.ajax({
             url: '/Menu/GetUserMenu',
             type: 'GET',
             success: (response) => {
-                console.log('Menu response:', response);
                 if (response.success && response.menuItems && response.menuItems.length > 0) {
                     this.data.menuItems = response.menuItems;
                     this.renderMenu();
                 } else {
-                    console.log('Failed to load menu or empty menu:', response);
                     this.loadDefaultMenu();
                 }
             },
             error: (xhr, status, error) => {
-                console.log('Menu loading error:', xhr.responseText, error);
                 this.loadDefaultMenu();
             }
         });
     },
 
     loadDefaultMenu: function() {
-        console.log('Loading default menu');
         this.data.menuItems = [
             { menuId: 1, menuName: 'Home', menuUrl: '/Home', hasChildren: false },
             { menuId: 2, menuName: 'Incident', menuUrl: '#', hasChildren: true, 
@@ -213,10 +207,10 @@ const MenuSystem = {
 
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
-        $.post('/Login/Logout', function() {
-            window.location.href = '/Login';
+        ApiConfig.post('/Login/Logout', function() {
+            window.location.href = ApiConfig.buildUrl('/Login');
         }).fail(function() {
-            window.location.href = '/Login';
+            window.location.href = ApiConfig.buildUrl('/Login');
         });
     }
 }
