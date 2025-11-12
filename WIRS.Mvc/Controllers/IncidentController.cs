@@ -238,23 +238,50 @@ namespace WIRS.Mvc.Controllers
 
                 if (string.IsNullOrEmpty(htmlContent))
                 {
-                    ViewBag.ErrorMessage = "No print data available for this incident.";
-                    ViewBag.HtmlContent = string.Empty;
-                }
-                else
-                {
-                    ViewBag.HtmlContent = htmlContent;
+                    return Content("No print data available for this incident.");
                 }
 
-                ViewBag.IncidentId = id;
-                return View();
+                var fullHtml = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Incident Report - {id}</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 20px;
+        }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }}
+        table, th, td {{
+            border: 1px solid #ddd;
+        }}
+        th, td {{
+            padding: 8px;
+            text-align: left;
+        }}
+        th {{
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }}
+    </style>
+</head>
+<body>
+    {htmlContent}
+</body>
+</html>";
+
+                return Content(fullHtml, "text/html", System.Text.Encoding.UTF8);
             }
             catch (Exception)
             {
-                ViewBag.ErrorMessage = "An error occurred while loading the print preview.";
-                ViewBag.HtmlContent = string.Empty;
-                ViewBag.IncidentId = id;
-                return View();
+                return Content("An error occurred while generating the print preview.");
             }
         }
 
