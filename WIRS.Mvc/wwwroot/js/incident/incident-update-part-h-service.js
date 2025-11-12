@@ -160,7 +160,7 @@
                         id: person.id,
                         name: person.name,
                         designation: person.designation || '',
-                        selected: false
+                        selected: true
                     };
                 });
             }).catch(function (error) {
