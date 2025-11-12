@@ -290,6 +290,10 @@ namespace WIRS.Mvc.Controllers
     <style>
         table {{
             page-break-inside: auto;
+            border-collapse: collapse;
+        }}
+        table, th, td {{
+            border: 1px solid #000 !important;
         }}
         tr {{
             page-break-inside: avoid;
