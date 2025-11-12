@@ -71,6 +71,16 @@
             }
         }
     </style>
+    <script>
+        window.onload = function() {
+            @if (!string.IsNullOrEmpty(ViewBag.HtmlContent))
+            {
+                @:setTimeout(function() {
+                @:    window.print();
+                @:}, 500);
+            }
+        };
+    </script>
 </head>
 <body>
     <div class="print-container">
