@@ -34,7 +34,6 @@
                 validationMessage: '',
                 successMessage: '',
                 isSubmitting: false,
-                workflowHistory: [],
                 wshoOptions: {
                     dataTextField: 'name',
                     dataValueField: 'id',
@@ -118,8 +117,6 @@
                 vm.partH.submitterDesignation = latestWorkflow.fromDesignation || '';
                 vm.partH.submissionDate = latestWorkflow.date || '';
             }
-
-            vm.partH.workflowHistory = partHWorkflows;
         }
 
         function loadWSHOs(vm) {
