@@ -44,10 +44,10 @@ namespace WIRS.Mvc.Controllers
 			if (!string.IsNullOrEmpty(loginid) && !string.IsNullOrEmpty(digest))
 			{
 				var ssoResult = await HandleSSOLogin(loginid, digest, page_id, model);
-			if (ssoResult != null)
-			{
-				return ssoResult;
-			}
+				if (ssoResult != null)
+				{
+					return ssoResult;
+				}
 			}
 
 			return View(model);
@@ -146,12 +146,11 @@ namespace WIRS.Mvc.Controllers
 			{
 				model.ErrorMessage = ex.Message;
 			}
+
+			return null;
 		}
 
-		return null;
-	}
-
-	private string GetLoginErrorMessage(LoginResult result)
+		private string GetLoginErrorMessage(LoginResult result)
 		{
 			return result.ErrorType switch
 			{
@@ -162,4 +161,5 @@ namespace WIRS.Mvc.Controllers
 				_ => "Login failed. Please try again."
 			};
 		}
+	}
 }
