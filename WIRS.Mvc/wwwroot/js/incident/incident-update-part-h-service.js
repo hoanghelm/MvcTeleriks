@@ -104,11 +104,16 @@
         function loadWSHOs(vm) {
             var deferred = $q.defer();
 
+            if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
+                deferred.resolve();
+                return deferred.promise;
+            }
+
             IncidentUpdateService.getWSHOs(
-                vm.incident.sectorCode,
-                vm.incident.lobCode,
-                vm.incident.departmentCode,
-                vm.incident.locationCode
+                vm.incident.sbaCode,
+                vm.incident.sbuCode,
+                vm.incident.department || '',
+                vm.incident.location || ''
             ).then(function (data) {
                 vm.partH.wshoList = data || [];
                 deferred.resolve();
@@ -122,16 +127,22 @@
         function loadPartHCopyToList(vm) {
             var deferred = $q.defer();
 
+            if (!vm.incident.sbaCode || !vm.incident.sbuCode) {
+                deferred.resolve();
+                return deferred.promise;
+            }
+
             IncidentUpdateService.getPartECopyToList(
-                vm.incident.sectorCode,
-                vm.incident.lobCode,
-                vm.incident.departmentCode,
-                vm.incident.locationCode
+                vm.incident.sbaCode,
+                vm.incident.sbuCode,
+                vm.incident.department,
+                vm.incident.location
             ).then(function (data) {
                 vm.emailToListPartH = (data || []).map(function (person) {
                     return {
-                        userId: person.userId,
+                        id: person.id,
                         name: person.name,
+                        designation: person.designation || '',
                         selected: false
                     };
                 });
@@ -163,7 +174,7 @@
             var selectedEmailTo = vm.emailToListPartH.filter(function (p) {
                 return p.selected;
             }).map(function (p) {
-                return p.userId;
+                return p.id;
             });
 
             var submitData = {
@@ -209,7 +220,7 @@
             var selectedEmailTo = vm.emailToListPartH.filter(function (p) {
                 return p.selected;
             }).map(function (p) {
-                return p.userId;
+                return p.id;
             });
 
             var submitData = {
