@@ -1,4 +1,5 @@
 using System.Data;
+using Microsoft.Extensions.Caching.Memory;
 using WIRS.DataAccess.Interfaces;
 using WIRS.Services.Interfaces;
 using WIRS.Services.Models;
@@ -9,228 +10,267 @@ namespace WIRS.Services.Implementations
     {
         private readonly ICommonFunDataAccess _commonFunDataAccess;
         private readonly IUserCredentialsDataAccess _userCredentialsDataAccess;
+        private readonly IMemoryCache _cache;
+        private static readonly TimeSpan CacheExpiration = TimeSpan.FromHours(24);
 
-        public MasterDataService(ICommonFunDataAccess commonFunDataAccess, IUserCredentialsDataAccess userCredentialsDataAccess)
+        public MasterDataService(ICommonFunDataAccess commonFunDataAccess, IUserCredentialsDataAccess userCredentialsDataAccess, IMemoryCache cache)
         {
             _commonFunDataAccess = commonFunDataAccess;
             _userCredentialsDataAccess = userCredentialsDataAccess;
+            _cache = cache;
         }
 
         public async Task<List<LookupItem>> GetUserRoles()
         {
-            try
+            return await _cache.GetOrCreateAsync("UserRoles", async entry =>
             {
-                var result = new List<LookupItem>();
-                var dataSet = await _userCredentialsDataAccess.GetAllUserRole();
-
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                entry.AbsoluteExpirationRelativeToNow = CacheExpiration;
+                try
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new LookupItem
-                        {
-                            Code = row["user_role_code"]?.ToString() ?? string.Empty,
-                            Value = row["user_role_name"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+                    var result = new List<LookupItem>();
+                    var dataSet = await _userCredentialsDataAccess.GetAllUserRole();
 
-                return result;
-            }
-            catch
-            {
-                return new List<LookupItem>();
-            }
+                    if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            result.Add(new LookupItem
+                            {
+                                Code = row["user_role_code"]?.ToString() ?? string.Empty,
+                                Value = row["user_role_name"]?.ToString() ?? string.Empty
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+                catch
+                {
+                    return new List<LookupItem>();
+                }
+            }) ?? new List<LookupItem>();
         }
 
         public async Task<List<LookupItem>> GetSectors()
         {
-            try
+            return await _cache.GetOrCreateAsync("Lookup_SBA", async entry =>
             {
-                var result = new List<LookupItem>();
-                var dataSet = await _commonFunDataAccess.GetLookUpType("SBA");
-
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                entry.AbsoluteExpirationRelativeToNow = CacheExpiration;
+                try
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new LookupItem
-                        {
-                            Code = row["lookup_code"]?.ToString() ?? string.Empty,
-                            Value = row["lookup_value"]?.ToString() ?? string.Empty,
-                            Description = row["lookup_value"]?.ToString() ?? string.Empty,
-                        });
-                    }
-                }
+                    var result = new List<LookupItem>();
+                    var dataSet = await _commonFunDataAccess.GetLookUpType("SBA");
 
-                return result;
-            }
-            catch
-            {
-                return new List<LookupItem>();
-            }
+                    if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            result.Add(new LookupItem
+                            {
+                                Code = row["lookup_code"]?.ToString() ?? string.Empty,
+                                Value = row["lookup_value"]?.ToString() ?? string.Empty,
+                                Description = row["lookup_value"]?.ToString() ?? string.Empty,
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+                catch
+                {
+                    return new List<LookupItem>();
+                }
+            }) ?? new List<LookupItem>();
         }
 
         public async Task<List<LookupItem>> GetLOBsBySector(string sectorCode)
         {
-            try
+            var cacheKey = $"LOBs_{sectorCode}";
+            return await _cache.GetOrCreateAsync(cacheKey, async entry =>
             {
-                var result = new List<LookupItem>();
-                var dataSet = await _commonFunDataAccess.Get_sbu_by_uid(sectorCode, string.Empty);
-
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                entry.AbsoluteExpirationRelativeToNow = CacheExpiration;
+                try
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new LookupItem
-                        {
-                            Code = row["sbu_code"]?.ToString() ?? string.Empty,
-                            Value = row["sbu_name"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+                    var result = new List<LookupItem>();
+                    var dataSet = await _commonFunDataAccess.Get_sbu_by_uid(sectorCode, string.Empty);
 
-                return result;
-            }
-            catch
-            {
-                return new List<LookupItem>();
-            }
+                    if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            result.Add(new LookupItem
+                            {
+                                Code = row["sbu_code"]?.ToString() ?? string.Empty,
+                                Value = row["sbu_name"]?.ToString() ?? string.Empty
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+                catch
+                {
+                    return new List<LookupItem>();
+                }
+            }) ?? new List<LookupItem>();
         }
 
         public async Task<List<LookupItem>> GetDepartmentsByLOB(string sectorCode, string lobCode)
         {
-            try
+            var cacheKey = $"Departments_{sectorCode}_{lobCode}";
+            return await _cache.GetOrCreateAsync(cacheKey, async entry =>
             {
-                var result = new List<LookupItem>();
-                var dataSet = await _commonFunDataAccess.get_active_departments(string.Empty, sectorCode, lobCode);
-
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                entry.AbsoluteExpirationRelativeToNow = CacheExpiration;
+                try
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new LookupItem
-                        {
-                            Code = row["department_code"]?.ToString() ?? string.Empty,
-                            Value = row["department_name"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+                    var result = new List<LookupItem>();
+                    var dataSet = await _commonFunDataAccess.get_active_departments(string.Empty, sectorCode, lobCode);
 
-                return result;
-            }
-            catch
-            {
-                return new List<LookupItem>();
-            }
+                    if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            result.Add(new LookupItem
+                            {
+                                Code = row["department_code"]?.ToString() ?? string.Empty,
+                                Value = row["department_name"]?.ToString() ?? string.Empty
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+                catch
+                {
+                    return new List<LookupItem>();
+                }
+            }) ?? new List<LookupItem>();
         }
 
         public async Task<List<LookupItem>> GetLocations()
         {
-            try
+            return await _cache.GetOrCreateAsync("Lookup_LOCATION", async entry =>
             {
-                var result = new List<LookupItem>();
-                var dataSet = await _commonFunDataAccess.GetLookUpType("LOCATION");
-
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                entry.AbsoluteExpirationRelativeToNow = CacheExpiration;
+                try
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new LookupItem
-                        {
-                            Code = row["lookup_code"]?.ToString() ?? string.Empty,
-                            Value = row["lookup_value"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+                    var result = new List<LookupItem>();
+                    var dataSet = await _commonFunDataAccess.GetLookUpType("LOCATION");
 
-                return result;
-            }
-            catch
-            {
-                return new List<LookupItem>();
-            }
+                    if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            result.Add(new LookupItem
+                            {
+                                Code = row["lookup_code"]?.ToString() ?? string.Empty,
+                                Value = row["lookup_value"]?.ToString() ?? string.Empty
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+                catch
+                {
+                    return new List<LookupItem>();
+                }
+            }) ?? new List<LookupItem>();
         }
 
         public async Task<List<LookupItem>> GetLocations(string sectorCode, string lobCode, string deptCode)
         {
-            try
+            var cacheKey = $"Locations_{sectorCode}_{lobCode}_{deptCode}";
+            return await _cache.GetOrCreateAsync(cacheKey, async entry =>
             {
-                var result = new List<LookupItem>();
-                var dataSet = await _commonFunDataAccess.get_active_locations(sectorCode, lobCode, deptCode);
-
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                entry.AbsoluteExpirationRelativeToNow = CacheExpiration;
+                try
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new LookupItem
-                        {
-                            Code = row["location_code"]?.ToString() ?? string.Empty,
-                            Value = row["location_name"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+                    var result = new List<LookupItem>();
+                    var dataSet = await _commonFunDataAccess.get_active_locations(sectorCode, lobCode, deptCode);
 
-                return result;
-            }
-            catch
-            {
-                return new List<LookupItem>();
-            }
+                    if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            result.Add(new LookupItem
+                            {
+                                Code = row["location_code"]?.ToString() ?? string.Empty,
+                                Value = row["location_name"]?.ToString() ?? string.Empty
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+                catch
+                {
+                    return new List<LookupItem>();
+                }
+            }) ?? new List<LookupItem>();
         }
 
         public async Task<List<LookupItem>> GetAccountStatuses()
         {
-            try
+            return await _cache.GetOrCreateAsync("Lookup_Account Status", async entry =>
             {
-                var result = new List<LookupItem>();
-                var dataSet = await _commonFunDataAccess.GetLookUpType("Account Status");
-
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                entry.AbsoluteExpirationRelativeToNow = CacheExpiration;
+                try
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new LookupItem
-                        {
-                            Code = row["lookup_code"]?.ToString() ?? string.Empty,
-                            Value = row["lookup_value"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+                    var result = new List<LookupItem>();
+                    var dataSet = await _commonFunDataAccess.GetLookUpType("Account Status");
 
-                return result;
-            }
-            catch
-            {
-                return new List<LookupItem>();
-            }
+                    if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            result.Add(new LookupItem
+                            {
+                                Code = row["lookup_code"]?.ToString() ?? string.Empty,
+                                Value = row["lookup_value"]?.ToString() ?? string.Empty
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+                catch
+                {
+                    return new List<LookupItem>();
+                }
+            }) ?? new List<LookupItem>();
         }
 
         public async Task<List<LookupItem>> GetLookup(string type)
         {
-            try
+            var cacheKey = $"Lookup_{type}";
+            return await _cache.GetOrCreateAsync(cacheKey, async entry =>
             {
-                var result = new List<LookupItem>();
-                var dataSet = await _commonFunDataAccess.GetLookUpType(type);
-
-                if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                entry.AbsoluteExpirationRelativeToNow = CacheExpiration;
+                try
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        result.Add(new LookupItem
-                        {
-                            Code = row["lookup_code"]?.ToString() ?? string.Empty,
-                            Value = row["lookup_value"]?.ToString() ?? string.Empty
-                        });
-                    }
-                }
+                    var result = new List<LookupItem>();
+                    var dataSet = await _commonFunDataAccess.GetLookUpType(type);
 
-                return result;
-            }
-            catch
-            {
-                return new List<LookupItem>();
-            }
+                    if (dataSet?.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            result.Add(new LookupItem
+                            {
+                                Code = row["lookup_code"]?.ToString() ?? string.Empty,
+                                Value = row["lookup_value"]?.ToString() ?? string.Empty
+                            });
+                        }
+                    }
+
+                    return result;
+                }
+                catch
+                {
+                    return new List<LookupItem>();
+                }
+            }) ?? new List<LookupItem>();
         }
     }
 }
