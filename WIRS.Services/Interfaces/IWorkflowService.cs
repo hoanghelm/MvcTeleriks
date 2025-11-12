@@ -28,5 +28,6 @@ namespace WIRS.Services.Interfaces
         Task<DataSet> GetIncidentWorkflowsAsync(string incidentId, string status = "");
         Task<List<IncidentStagePermissionModel>> GetIncidentStagePermissionsAsync(string incidentId, string userId);
         Task<DataSet> SearchIncidentsAsync(string userId, string userRoleCode, IncidentSearchModel searchCriteria);
+        Task<string> GetPrintViewHtmlAsync(string incidentId);
     }
 }

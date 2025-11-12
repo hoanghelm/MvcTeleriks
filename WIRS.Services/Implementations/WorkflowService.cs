@@ -1909,5 +1909,30 @@ namespace WIRS.Services.Implementations
 
             return list;
         }
+
+        public async Task<string> GetPrintViewHtmlAsync(string incidentId)
+        {
+            try
+            {
+                var dataSet = await _workflowIncidentDataAccess.get_printview_incident_by_id(incidentId);
+
+                if (dataSet == null || dataSet.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
+                {
+                    return string.Empty;
+                }
+
+                var htmlContent = string.Empty;
+                foreach (DataRow row in dataSet.Tables[0].Rows)
+                {
+                    htmlContent += row["print_data"]?.ToString() ?? string.Empty;
+                }
+
+                return htmlContent;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
     }
 }

@@ -218,6 +218,46 @@ namespace WIRS.Mvc.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Print(string id)
+        {
+            var currentUser = await GetCurrentUserSessionAsync();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            try
+            {
+                var htmlContent = await _workflowService.GetPrintViewHtmlAsync(id);
+
+                if (string.IsNullOrEmpty(htmlContent))
+                {
+                    ViewBag.ErrorMessage = "No print data available for this incident.";
+                    ViewBag.HtmlContent = string.Empty;
+                }
+                else
+                {
+                    ViewBag.HtmlContent = htmlContent;
+                }
+
+                ViewBag.IncidentId = id;
+                return View();
+            }
+            catch (Exception)
+            {
+                ViewBag.ErrorMessage = "An error occurred while loading the print preview.";
+                ViewBag.HtmlContent = string.Empty;
+                ViewBag.IncidentId = id;
+                return View();
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> UpdateIncident(IncidentViewViewModel model)
         {
