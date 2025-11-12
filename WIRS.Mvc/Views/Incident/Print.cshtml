@@ -12,72 +12,108 @@
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-family: Arial, sans-serif;
+            background: #525659;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        .message {
+        .loading {
             text-align: center;
-            padding: 40px 20px;
+            color: white;
+            padding: 40px;
         }
-        .message h2 {
-            color: #333;
+        .loading h2 {
             margin-bottom: 20px;
         }
-        .message p {
-            color: #666;
-            margin-bottom: 30px;
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
-        .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #content {
+            display: none;
+            padding: 20px;
+            background: white;
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+        #pdf-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .btn:hover {
-            background: #0056b3;
+            display: none;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         window.onload = function() {
             @if (!string.IsNullOrEmpty(ViewBag.HtmlContent))
             {
-                @:setTimeout(function() {
-                @:    window.print();
-                @:}, 100);
+                @:generateAndDisplayPDF();
             }
         };
 
-        window.onafterprint = function() {
-            document.getElementById('print-message').style.display = 'block';
-        };
+        function generateAndDisplayPDF() {
+            var element = document.getElementById('content');
+            element.style.display = 'block';
+
+            var opt = {
+                margin: 10,
+                filename: 'Incident_@ViewBag.IncidentId.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).outputPdf('blob').then(function(pdfBlob) {
+                var pdfUrl = URL.createObjectURL(pdfBlob);
+
+                var pdfViewer = document.getElementById('pdf-viewer');
+                pdfViewer.src = pdfUrl;
+                pdfViewer.style.display = 'block';
+
+                document.querySelector('.loading').style.display = 'none';
+            }).catch(function(error) {
+                document.querySelector('.loading').innerHTML = '<h2>Error</h2><p>Failed to generate PDF: ' + error.message + '</p>';
+            });
+        }
     </script>
 </head>
 <body>
     @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
     {
-        <div class="message">
+        <div class="loading">
             <h2>Error</h2>
             <p>@ViewBag.ErrorMessage</p>
         </div>
     }
     else
     {
-        <div id="print-message" class="message" style="display: none;">
-            <h2>Print to PDF</h2>
-            <p>To view this report as a PDF in your browser:</p>
-            <p>1. In the print dialog, select "Save as PDF" or "Microsoft Print to PDF" as the destination<br/>
-               2. The PDF will open in your browser's PDF viewer</p>
-            <button class="btn" onclick="window.print()">Open Print Dialog Again</button>
+        <div class="loading">
+            <h2>Generating PDF Preview...</h2>
+            <div class="spinner"></div>
+            <p>Please wait while we prepare your document</p>
         </div>
 
         <div id="content">
             @Html.Raw(ViewBag.HtmlContent)
         </div>
+
+        <iframe id="pdf-viewer"></iframe>
     }
 </body>
 </html>
