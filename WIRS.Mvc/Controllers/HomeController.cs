@@ -38,6 +38,20 @@ namespace WIRS.Mvc.Controllers
 
 			await UpdateLastActivityAsync();
 			var userSession = await GetCurrentUserSessionAsync();
+
+			if (userSession == null && User.Identity.IsAuthenticated)
+			{
+				var userId = User.Identity.Name;
+				if (!string.IsNullOrEmpty(userId))
+				{
+					var user = await AuthService.RecreateSessionFromClaimsAsync(userId);
+					if (user != null)
+					{
+						userSession = await GetCurrentUserSessionAsync();
+					}
+				}
+			}
+
 			if (userSession == null)
 			{
 				TempData["ErrorMessage"] = "Your session has expired. Please login again.";

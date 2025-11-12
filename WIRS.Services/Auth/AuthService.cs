@@ -241,6 +241,42 @@ namespace WIRS.Services.Auth
 			await SetCurrentUserAsync(currentUser);
 		}
 
+		public async Task<UserSession?> RecreateSessionFromClaimsAsync(string userId)
+		{
+			try
+			{
+				var user = await GetUserModelFromDataAccess(userId);
+				if (user == null) return null;
+
+				if (user.AccountStatus == "L" || user.AccountStatus == "X")
+				{
+					return null;
+				}
+
+				var userRole = UserRoleExtensions.FromString(user.UserRole);
+				var permissions = await GetUserPermissionsAsync(user.UserId, user.UserRole);
+
+				var userSession = new UserSession
+				{
+					UserId = user.UserId,
+					UserName = user.UserName,
+					UserRole = userRole,
+					SbaName = user.SbaName,
+					SbuName = user.SbuName,
+					Designation = user.Designation,
+					Permissions = permissions
+				};
+
+				await SetCurrentUserAsync(userSession);
+
+				return userSession;
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
 		private async Task SetCurrentUserAsync(UserSession userSession)
 		{
 			var session = _httpContextAccessor.HttpContext?.Session;

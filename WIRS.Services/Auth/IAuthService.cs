@@ -20,5 +20,6 @@ namespace WIRS.Services.Auth
         Task<bool> CanViewIncidentAsync(string incidentId);
         Task<bool> CanEditIncidentAsync(string incidentId);
         Task UpdateLastActivityAsync();
+        Task<UserSession?> RecreateSessionFromClaimsAsync(string userId);
     }
 }
