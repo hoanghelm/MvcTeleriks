@@ -123,11 +123,12 @@
                 { field: 'employmentType', title: 'Employment Type', width: 150 },
                 { field: 'dateOfEmployment', title: 'Date of Employment', width: 150 },
                 {
-                    command: {
-                        text: 'Delete',
+                    command: [{
+                        name: 'remove',
+                        text: 'Remove',
                         click: deleteInjuredPerson
-                    },
-                    title: ' ',
+                    }],
+                    title: 'Action',
                     width: 100
                 }
             ],
@@ -144,11 +145,12 @@
                 { field: 'designation', title: 'Designation', width: 200 },
                 { field: 'contactNo', title: 'Contact Number', width: 150 },
                 {
-                    command: {
-                        text: 'Delete',
+                    command: [{
+                        name: 'remove',
+                        text: 'Remove',
                         click: deleteEyeWitness
-                    },
-                    title: ' ',
+                    }],
+                    title: 'Action',
                     width: 100
                 }
             ],
