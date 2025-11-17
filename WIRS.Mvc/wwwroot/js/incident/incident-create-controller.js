@@ -125,13 +125,16 @@
                 {
                     title: 'Action',
                     width: 100,
-                    template: '<button type="button" class="text-red-600 hover:text-red-800" onclick="angular.element(this).scope().vm.removeInjuredPerson(\'#= uid #\')">Remove</button>'
+                    template: function(dataItem) {
+                        return '<button type="button" class="text-red-600 hover:text-red-800" data-uid="' + dataItem.uid + '">Remove</button>';
+                    }
                 }
             ],
             selectable: false,
             scrollable: true,
             sortable: true,
-            pageable: false
+            pageable: false,
+            dataBound: onInjuredGridDataBound
         };
 
         vm.witnessGridOptions = {
@@ -143,13 +146,16 @@
                 {
                     title: 'Action',
                     width: 100,
-                    template: '<button type="button" class="text-red-600 hover:text-red-800" onclick="angular.element(this).scope().vm.removeEyeWitness(\'#= uid #\')">Remove</button>'
+                    template: function(dataItem) {
+                        return '<button type="button" class="text-red-600 hover:text-red-800" data-uid="' + dataItem.uid + '">Remove</button>';
+                    }
                 }
             ],
             selectable: false,
             scrollable: true,
             sortable: true,
-            pageable: false
+            pageable: false,
+            dataBound: onWitnessGridDataBound
         };
 
         vm.onIncidentTypeChange = onIncidentTypeChange;
@@ -166,6 +172,22 @@
         vm.cancel = cancel;
 
         init();
+
+        function onInjuredGridDataBound(e) {
+            var grid = e.sender;
+            grid.tbody.find('button[data-uid]').on('click', function() {
+                var uid = $(this).data('uid');
+                vm.removeInjuredPerson(uid);
+            });
+        }
+
+        function onWitnessGridDataBound(e) {
+            var grid = e.sender;
+            grid.tbody.find('button[data-uid]').on('click', function() {
+                var uid = $(this).data('uid');
+                vm.removeEyeWitness(uid);
+            });
+        }
 
         function init() {
             loadIncidentTypes();
@@ -361,15 +383,17 @@
         }
 
         function removeInjuredPerson(uid) {
-            var grid = vm.injuredGrid;
-            if (!grid) return;
+            $scope.$apply(function() {
+                var grid = vm.injuredGrid;
+                if (!grid) return;
 
-            var dataItem = grid.dataSource.getByUid(uid);
-            var index = vm.injuredPersons.indexOf(dataItem);
-            if (index > -1) {
-                vm.injuredPersons.splice(index, 1);
-                $scope.$apply();
-            }
+                var dataItem = grid.dataSource.getByUid(uid);
+                var index = vm.injuredPersons.indexOf(dataItem);
+                if (index > -1) {
+                    vm.injuredPersons.splice(index, 1);
+                    grid.dataSource.read();
+                }
+            });
         }
 
         function addEyeWitness() {
@@ -398,15 +422,17 @@
         }
 
         function removeEyeWitness(uid) {
-            var grid = vm.witnessGrid;
-            if (!grid) return;
+            $scope.$apply(function() {
+                var grid = vm.witnessGrid;
+                if (!grid) return;
 
-            var dataItem = grid.dataSource.getByUid(uid);
-            var index = vm.eyeWitnesses.indexOf(dataItem);
-            if (index > -1) {
-                vm.eyeWitnesses.splice(index, 1);
-                $scope.$apply();
-            }
+                var dataItem = grid.dataSource.getByUid(uid);
+                var index = vm.eyeWitnesses.indexOf(dataItem);
+                if (index > -1) {
+                    vm.eyeWitnesses.splice(index, 1);
+                    grid.dataSource.read();
+                }
+            });
         }
 
         function searchInjuredPerson() {
