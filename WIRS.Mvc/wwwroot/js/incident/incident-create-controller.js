@@ -370,10 +370,6 @@
 
             vm.injuredPerson = {};
             vm.validationMessage = '';
-
-            if (vm.injuredGrid) {
-                vm.injuredGrid.dataSource.data(vm.injuredPersons);
-            }
         }
 
         function deleteInjuredPerson(e) {
@@ -386,21 +382,9 @@
             }
         }
 
-        function removeInjuredPerson(uid) {
-            if (!vm.injuredGrid) return;
-
-            var dataItem = vm.injuredGrid.dataSource.getByUid(uid);
-            if (!dataItem) return;
-
-            var index = vm.injuredPersons.indexOf(dataItem);
-            if (index > -1) {
+        function removeInjuredPerson(index) {
+            if (index > -1 && index < vm.injuredPersons.length) {
                 vm.injuredPersons.splice(index, 1);
-            }
-
-            vm.injuredGrid.dataSource.data(vm.injuredPersons);
-
-            if (!$scope.$$phase) {
-                $scope.$apply();
             }
         }
 
@@ -413,10 +397,6 @@
             vm.eyeWitnesses.push(angular.copy(vm.eyeWitness));
             vm.eyeWitness = {};
             vm.validationMessage = '';
-
-            if (vm.witnessGrid) {
-                vm.witnessGrid.dataSource.data(vm.eyeWitnesses);
-            }
         }
 
         function deleteEyeWitness(e) {
@@ -429,21 +409,9 @@
             }
         }
 
-        function removeEyeWitness(uid) {
-            if (!vm.witnessGrid) return;
-
-            var dataItem = vm.witnessGrid.dataSource.getByUid(uid);
-            if (!dataItem) return;
-
-            var index = vm.eyeWitnesses.indexOf(dataItem);
-            if (index > -1) {
+        function removeEyeWitness(index) {
+            if (index > -1 && index < vm.eyeWitnesses.length) {
                 vm.eyeWitnesses.splice(index, 1);
-            }
-
-            vm.witnessGrid.dataSource.data(vm.eyeWitnesses);
-
-            if (!$scope.$$phase) {
-                $scope.$apply();
             }
         }
 
