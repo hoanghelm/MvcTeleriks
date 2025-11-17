@@ -175,7 +175,9 @@
 
         function onInjuredGridDataBound(e) {
             var grid = e.sender;
-            grid.tbody.find('button[data-uid]').on('click', function() {
+            grid.tbody.find('button[data-uid]').off('click').on('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
                 var uid = $(this).data('uid');
                 vm.removeInjuredPerson(uid);
             });
@@ -183,7 +185,9 @@
 
         function onWitnessGridDataBound(e) {
             var grid = e.sender;
-            grid.tbody.find('button[data-uid]').on('click', function() {
+            grid.tbody.find('button[data-uid]').off('click').on('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
                 var uid = $(this).data('uid');
                 vm.removeEyeWitness(uid);
             });
@@ -383,21 +387,20 @@
         }
 
         function removeInjuredPerson(uid) {
-            var grid = vm.injuredGrid;
-            if (!grid) return;
+            if (!vm.injuredGrid) return;
 
-            var dataSource = grid.dataSource;
-            var dataItem = dataSource.getByUid(uid);
+            var dataItem = vm.injuredGrid.dataSource.getByUid(uid);
+            if (!dataItem) return;
 
-            if (dataItem) {
-                var index = vm.injuredPersons.indexOf(dataItem);
-                if (index > -1) {
-                    vm.injuredPersons.splice(index, 1);
-                    dataSource.data(vm.injuredPersons);
-                    if (!$scope.$$phase) {
-                        $scope.$apply();
-                    }
-                }
+            var index = vm.injuredPersons.indexOf(dataItem);
+            if (index > -1) {
+                vm.injuredPersons.splice(index, 1);
+            }
+
+            vm.injuredGrid.dataSource.data(vm.injuredPersons);
+
+            if (!$scope.$$phase) {
+                $scope.$apply();
             }
         }
 
@@ -427,21 +430,20 @@
         }
 
         function removeEyeWitness(uid) {
-            var grid = vm.witnessGrid;
-            if (!grid) return;
+            if (!vm.witnessGrid) return;
 
-            var dataSource = grid.dataSource;
-            var dataItem = dataSource.getByUid(uid);
+            var dataItem = vm.witnessGrid.dataSource.getByUid(uid);
+            if (!dataItem) return;
 
-            if (dataItem) {
-                var index = vm.eyeWitnesses.indexOf(dataItem);
-                if (index > -1) {
-                    vm.eyeWitnesses.splice(index, 1);
-                    dataSource.data(vm.eyeWitnesses);
-                    if (!$scope.$$phase) {
-                        $scope.$apply();
-                    }
-                }
+            var index = vm.eyeWitnesses.indexOf(dataItem);
+            if (index > -1) {
+                vm.eyeWitnesses.splice(index, 1);
+            }
+
+            vm.witnessGrid.dataSource.data(vm.eyeWitnesses);
+
+            if (!$scope.$$phase) {
+                $scope.$apply();
             }
         }
 
