@@ -13,11 +13,16 @@ namespace WIRS.Services.Implementations
     {
         private readonly IWorkflowIncidentDataAccess _workflowIncidentDataAccess;
         private readonly IDataMapperService _dataMapper;
+        private readonly INotificationService _notificationService;
 
-        public WorkflowService(IWorkflowIncidentDataAccess workflowIncidentDataAccess, IDataMapperService dataMapper)
+        public WorkflowService(
+            IWorkflowIncidentDataAccess workflowIncidentDataAccess,
+            IDataMapperService dataMapper,
+            INotificationService notificationService)
         {
             _workflowIncidentDataAccess = workflowIncidentDataAccess;
             _dataMapper = dataMapper;
+            _notificationService = notificationService;
         }
 
         public async Task<(string incidentId, string errorCode)> CreateIncidentAsync(IncidentCreateModel model, string userId)
@@ -79,12 +84,24 @@ namespace WIRS.Services.Implementations
 
                 workflow.Tables.Add(dt);
 
-                return await _workflowIncidentDataAccess.insert_Incidents(
+                var result = await _workflowIncidentDataAccess.insert_Incidents(
                     incident,
                     incidentTypeXml,
                     injuredPersonXml,
                     eyewitnessXml,
                     workflow.GetXml());
+
+                if (string.IsNullOrEmpty(result.error_Code))
+                {
+                    await _notificationService.SendWorkflowEmailNotificationAsync(
+                        result.incident_ID,
+                        "00",
+                        "01",
+                        dt,
+                        string.Empty);
+                }
+
+                return (result.incident_ID, result.error_Code);
             }
             catch (Exception)
             {
@@ -639,7 +656,19 @@ namespace WIRS.Services.Implementations
 
                 workflow.Tables.Add(dt);
 
-                return await _workflowIncidentDataAccess.insert_incidents_workflows(incident.incident_id, workflow.GetXml());
+                var result = await _workflowIncidentDataAccess.insert_incidents_workflows(incident.incident_id, workflow.GetXml());
+
+                if (string.IsNullOrEmpty(result))
+                {
+                    await _notificationService.SendWorkflowEmailNotificationAsync(
+                        incident.incident_id,
+                        "01",
+                        "02",
+                        dt,
+                        model.ReviewComment);
+                }
+
+                return result;
             }
         }
 
@@ -714,7 +743,19 @@ namespace WIRS.Services.Implementations
 
             workflow.Tables.Add(dt);
 
-            return await _workflowIncidentDataAccess.insert_incidents_workflows(incident.incident_id, workflow.GetXml());
+            var result = await _workflowIncidentDataAccess.insert_incidents_workflows(incident.incident_id, workflow.GetXml());
+
+            if (string.IsNullOrEmpty(result))
+            {
+                await _notificationService.SendWorkflowEmailNotificationAsync(
+                    incident.incident_id,
+                    "01",
+                    "00",
+                    dt,
+                    model.ReviewComment);
+            }
+
+            return result;
         }
 
         public async Task<string> SavePartCAsync(PartCSubmitModel model, string userId)
@@ -793,6 +834,16 @@ namespace WIRS.Services.Implementations
                     attachmentDs.GetXml()
                 );
 
+                if (string.IsNullOrEmpty(errorCode))
+                {
+                    await _notificationService.SendWorkflowEmailNotificationAsync(
+                        incident.incident_id,
+                        "02",
+                        "03",
+                        workflowDs.Tables[0],
+                        model.AdditionalComments);
+                }
+
                 return errorCode;
             }
             catch (Exception)
@@ -835,6 +886,16 @@ namespace WIRS.Services.Implementations
 
                 workflow.Tables.Add(dt);
                 var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(model.IncidentId, workflow.GetXml());
+
+                if (string.IsNullOrEmpty(errorCode))
+                {
+                    await _notificationService.SendWorkflowEmailNotificationAsync(
+                        model.IncidentId,
+                        "03",
+                        "04",
+                        dt,
+                        model.Comments);
+                }
 
                 return errorCode;
             }
@@ -892,6 +953,16 @@ namespace WIRS.Services.Implementations
                 workflowDs.Tables.Add(dt);
 
                 var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                if (string.IsNullOrEmpty(errorCode))
+                {
+                    await _notificationService.SendWorkflowEmailNotificationAsync(
+                        incidentId,
+                        "03",
+                        "02",
+                        dt,
+                        comments);
+                }
 
                 return errorCode;
             }
@@ -967,6 +1038,16 @@ namespace WIRS.Services.Implementations
                 workflowDs.Tables.Add(dt);
 
                 var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
+
+                if (string.IsNullOrEmpty(errorCode))
+                {
+                    await _notificationService.SendWorkflowEmailNotificationAsync(
+                        incidentId,
+                        "04",
+                        "05",
+                        dt,
+                        comments);
+                }
 
                 return errorCode;
             }
@@ -1063,6 +1144,16 @@ namespace WIRS.Services.Implementations
 
                 var errorCode = await _workflowIncidentDataAccess.insert_incidents_workflows(incidentId, workflowDs.GetXml());
 
+                if (string.IsNullOrEmpty(errorCode))
+                {
+                    await _notificationService.SendWorkflowEmailNotificationAsync(
+                        incidentId,
+                        "04",
+                        "02",
+                        dt,
+                        comments);
+                }
+
                 return errorCode;
             }
             catch (Exception)
@@ -1114,6 +1205,13 @@ namespace WIRS.Services.Implementations
                 {
                     return errorCode;
                 }
+
+                await _notificationService.SendWorkflowEmailNotificationAsync(
+                    incidentId,
+                    "05",
+                    "06",
+                    dt,
+                    comments);
 
                 if (attachments != null && attachments.Count > 0)
                 {
@@ -1196,6 +1294,13 @@ namespace WIRS.Services.Implementations
                     return errorCode;
                 }
 
+                await _notificationService.SendWorkflowEmailNotificationAsync(
+                    incidentId,
+                    "06",
+                    "07",
+                    dt,
+                    comments);
+
                 if (attachments != null && attachments.Count > 0)
                 {
                     foreach (var file in attachments)
@@ -1257,6 +1362,13 @@ namespace WIRS.Services.Implementations
                 {
                     return errorCode;
                 }
+
+                await _notificationService.SendWorkflowEmailNotificationAsync(
+                    incidentId,
+                    "06",
+                    "05",
+                    dt,
+                    comments);
 
                 if (attachments != null && attachments.Count > 0)
                 {
@@ -1367,6 +1479,13 @@ namespace WIRS.Services.Implementations
                     return errorCode;
                 }
 
+                await _notificationService.SendWorkflowEmailNotificationAsync(
+                    incidentId,
+                    "07",
+                    "06",
+                    dt,
+                    comments);
+
                 return string.Empty;
             }
             catch (Exception)
@@ -1445,6 +1564,13 @@ namespace WIRS.Services.Implementations
                 {
                     return errorCode;
                 }
+
+                await _notificationService.SendWorkflowEmailNotificationAsync(
+                    incidentId,
+                    "07",
+                    "08",
+                    dt,
+                    comments);
 
                 return string.Empty;
             }

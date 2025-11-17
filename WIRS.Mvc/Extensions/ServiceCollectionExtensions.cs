@@ -132,6 +132,7 @@ namespace WIRS.Mvc.Extensions
 			services.AddScoped<IDataMapperService, DataMapperService>();
 			services.AddScoped<IUrlGeneratorService, UrlGeneratorService>();
 			services.AddScoped<IMenuService, MenuService>();
+			services.AddScoped<INotificationService, NotificationService>();
 
 			services.AddScoped<WIRS.Services.Auth.IAuthService, WIRS.Services.Auth.AuthService>();
 
