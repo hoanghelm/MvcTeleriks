@@ -612,7 +612,7 @@
                                 {{ vm.partC.validationMessage }}
                             </div>
 
-                            <div class="mt-6 flex justify-end space-x-4" ng-show="!vm.partC.isReadOnly">
+                            <div class="mt-6 flex justify-end space-x-4" ng-show="!vm.partC.isReadOnly && vm.canEditPartC()">
                                 <button type="button"
                                         ng-click="vm.closePartC()"
                                         ng-disabled="vm.partC.closing"

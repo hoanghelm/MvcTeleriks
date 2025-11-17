@@ -198,7 +198,7 @@
                     </span>
                 </div>
 
-                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partF.isReadOnly">
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partF.isReadOnly && vm.canEditPartF()">
                     <button type="button"
                             ng-click="vm.submitPartF()"
                             ng-disabled="vm.partF.isSubmitting"

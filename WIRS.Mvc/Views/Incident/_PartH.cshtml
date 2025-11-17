@@ -163,7 +163,7 @@
                     </div>
                 </div>
 
-                <div ng-show="!vm.partH.isReadOnly" class="flex justify-end gap-4 mt-6">
+                <div ng-show="!vm.partH.isReadOnly && vm.canEditPartH()" class="flex justify-end gap-4 mt-6">
                     <button type="button"
                             ng-click="vm.revertPartHToWSHO()"
                             class="px-6 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"

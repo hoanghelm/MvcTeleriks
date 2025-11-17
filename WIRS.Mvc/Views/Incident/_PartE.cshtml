@@ -172,7 +172,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partE.isReadOnly">
+                <div class="flex justify-end space-x-4 pt-4 border-t border-gray-200" ng-show="!vm.partE.isReadOnly && vm.canEditPartE()">
                     <button type="button"
                             ng-click="vm.revertPartEToWSHO()"
                             ng-disabled="vm.partE.isSubmitting"
