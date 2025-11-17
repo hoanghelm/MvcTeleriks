@@ -312,9 +312,43 @@
             </div>
 
             <div class="mt-6" ng-show="vm.injuredPersons.length > 0">
-                <div kendo-grid="vm.injuredGrid"
-                     k-options="vm.injuredGridOptions"
-                     k-data-source="vm.injuredPersons">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Employee No/NRIC</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Race</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Gender</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Age</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Company</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Contact No</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Nationality</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr ng-repeat="person in vm.injuredPersons">
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.name }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.employeeNo }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.race }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.gender }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.age }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.company }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.contactNo }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.nationality }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ person.designation }}</td>
+                                <td class="px-4 py-2 text-sm">
+                                    <button type="button"
+                                            ng-click="vm.removeInjuredPerson($index)"
+                                            class="text-red-600 hover:text-red-800">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -470,9 +504,33 @@
                 </div>
 
                 <div class="mt-6" ng-show="vm.eyeWitnesses.length > 0">
-                    <div kendo-grid="vm.witnessGrid"
-                         k-options="vm.witnessGridOptions"
-                         k-data-source="vm.eyeWitnesses">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 border border-gray-300">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Employee No</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Designation</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Contact Number</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 uppercase">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr ng-repeat="witness in vm.eyeWitnesses">
+                                    <td class="px-4 py-2 text-sm text-gray-900">{{ witness.name }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">{{ witness.employeeNo }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">{{ witness.designation }}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">{{ witness.contactNo }}</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <button type="button"
+                                                ng-click="vm.removeEyeWitness($index)"
+                                                class="text-red-600 hover:text-red-800">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
