@@ -125,7 +125,7 @@
                 {
                     title: 'Action',
                     width: 100,
-                    template: '<button type="button" class="text-red-600 hover:text-red-800" onclick="angular.element(this).scope().vm.removeInjuredPerson(#= uid #)">Remove</button>'
+                    template: '<button type="button" class="text-red-600 hover:text-red-800" onclick="angular.element(this).scope().vm.removeInjuredPerson(\'#= uid #\')">Remove</button>'
                 }
             ],
             selectable: false,
@@ -143,7 +143,7 @@
                 {
                     title: 'Action',
                     width: 100,
-                    template: '<button type="button" class="text-red-600 hover:text-red-800" onclick="angular.element(this).scope().vm.removeEyeWitness(#= uid #)">Remove</button>'
+                    template: '<button type="button" class="text-red-600 hover:text-red-800" onclick="angular.element(this).scope().vm.removeEyeWitness(\'#= uid #\')">Remove</button>'
                 }
             ],
             selectable: false,
