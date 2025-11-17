@@ -283,21 +283,7 @@
                 return false;
             }
 
-            if (vm.incident.createdBy === vm.currentUser.userId) {
-                return true;
-            }
-
-            if (vm.incident.workflows && vm.incident.workflows.length > 0) {
-                var userInWorkflow = vm.incident.workflows.some(function (workflow) {
-                    var toUsers = workflow.to || '';
-                    return toUsers.indexOf(vm.currentUser.userId) !== -1;
-                });
-                if (userInWorkflow) {
-                    return true;
-                }
-            }
-
-            return false;
+            return true;
         }
 
         function canUserEditPart(requiredStatus) {
@@ -309,16 +295,7 @@
                 return false;
             }
 
-            if (vm.incident.workflows && vm.incident.workflows.length > 0) {
-                var canEdit = vm.incident.workflows.some(function (workflow) {
-                    var toUsers = workflow.to || '';
-                    var actionCode = workflow.actionCode || '';
-                    return actionCode === vm.incident.status && toUsers.indexOf(vm.currentUser.userId) !== -1;
-                });
-                return canEdit;
-            }
-
-            return false;
+            return vm.incident.canEdit === true;
         }
     }
 })();

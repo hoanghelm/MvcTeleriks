@@ -113,12 +113,6 @@ namespace WIRS.Services.Implementations
         {
             try
             {
-                var canView = await CanUserViewIncidentAsync(incidentId, userId);
-                if (!canView)
-                {
-                    return null;
-                }
-
                 var workflowIncident = new WorkflowIncident { incident_id = incidentId };
                 var dataSet = await _workflowIncidentDataAccess.get_incident_by_id(workflowIncident);
                 var workflows = await this.GetIncidentWorkflowsAsync(incidentId);
@@ -145,81 +139,15 @@ namespace WIRS.Services.Implementations
 
         public async Task<bool> CanUserViewIncidentAsync(string incidentId, string userId)
         {
-            try
-            {
-                var incident = new WorkflowIncident { incident_id = incidentId };
-                var dataSet = await _workflowIncidentDataAccess.get_incident_by_id(incident);
-
-                if (dataSet == null || dataSet.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
-                {
-                    return false;
-                }
-
-                var createdBy = dataSet.Tables[0].Rows[0]["created_by"]?.ToString() ?? string.Empty;
-                if (createdBy == userId)
-                {
-                    return true;
-                }
-
-                var workflows = await GetIncidentWorkflowsAsync(incidentId);
-                if (workflows == null || workflows.Tables.Count == 0 || workflows.Tables[0].Rows.Count == 0)
-                {
-                    return false;
-                }
-
-                foreach (DataRow row in workflows.Tables[0].Rows)
-                {
-                    var toUser = row["to"]?.ToString() ?? string.Empty;
-                    if (toUser.Contains(userId))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return true;
         }
 
         public async Task<bool> CanUserEditIncidentAsync(string incidentId, string userId, string changeMode = "")
         {
             try
             {
-                var incident = new WorkflowIncident { incident_id = incidentId };
-                var dataSet = await _workflowIncidentDataAccess.get_incident_by_id(incident);
-
-                if (dataSet == null || dataSet.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
-                {
-                    return false;
-                }
-
-                var currentStatus = dataSet.Tables[0].Rows[0]["status"]?.ToString() ?? string.Empty;
-                if (string.IsNullOrEmpty(currentStatus))
-                {
-                    return false;
-                }
-
-                var workflows = await GetIncidentWorkflowsAsync(incidentId, currentStatus);
-                if (workflows == null || workflows.Tables.Count == 0 || workflows.Tables[0].Rows.Count == 0)
-                {
-                    return false;
-                }
-
-                foreach (DataRow row in workflows.Tables[0].Rows)
-                {
-                    var toUser = row["to"]?.ToString() ?? string.Empty;
-                    var actionsCode = row["actions_code"]?.ToString() ?? string.Empty;
-
-                    if (actionsCode == currentStatus && toUser.Contains(userId))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
+                var result = await _workflowIncidentDataAccess.validate_workflowuser(incidentId, userId);
+                return result?.Tables.Count > 0 && result.Tables[0].Rows.Count > 0;
             }
             catch (Exception)
             {
