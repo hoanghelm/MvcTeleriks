@@ -123,13 +123,9 @@
                 { field: 'employmentType', title: 'Employment Type', width: 150 },
                 { field: 'dateOfEmployment', title: 'Date of Employment', width: 150 },
                 {
-                    command: [{
-                        name: 'remove',
-                        text: 'Remove',
-                        click: deleteInjuredPerson
-                    }],
                     title: 'Action',
-                    width: 100
+                    width: 100,
+                    template: '<button type="button" class="text-red-600 hover:text-red-800" onclick="angular.element(this).scope().vm.removeInjuredPerson(#= uid #)">Remove</button>'
                 }
             ],
             selectable: false,
@@ -145,13 +141,9 @@
                 { field: 'designation', title: 'Designation', width: 200 },
                 { field: 'contactNo', title: 'Contact Number', width: 150 },
                 {
-                    command: [{
-                        name: 'remove',
-                        text: 'Remove',
-                        click: deleteEyeWitness
-                    }],
                     title: 'Action',
-                    width: 100
+                    width: 100,
+                    template: '<button type="button" class="text-red-600 hover:text-red-800" onclick="angular.element(this).scope().vm.removeEyeWitness(#= uid #)">Remove</button>'
                 }
             ],
             selectable: false,
@@ -166,6 +158,8 @@
         vm.onDepartmentChange = onDepartmentChange;
         vm.addInjuredPerson = addInjuredPerson;
         vm.addEyeWitness = addEyeWitness;
+        vm.removeInjuredPerson = removeInjuredPerson;
+        vm.removeEyeWitness = removeEyeWitness;
         vm.searchInjuredPerson = searchInjuredPerson;
         vm.searchEyeWitness = searchEyeWitness;
         vm.submitIncident = submitIncident;
@@ -366,6 +360,18 @@
             }
         }
 
+        function removeInjuredPerson(uid) {
+            var grid = vm.injuredGrid;
+            if (!grid) return;
+
+            var dataItem = grid.dataSource.getByUid(uid);
+            var index = vm.injuredPersons.indexOf(dataItem);
+            if (index > -1) {
+                vm.injuredPersons.splice(index, 1);
+                $scope.$apply();
+            }
+        }
+
         function addEyeWitness() {
             if (!vm.eyeWitness.name || !vm.eyeWitness.employeeNo) {
                 vm.validationMessage = 'Please enter Name and Employee Number for eye witness';
@@ -384,6 +390,18 @@
         function deleteEyeWitness(e) {
             e.preventDefault();
             var dataItem = this.dataItem($(e.currentTarget).closest('tr'));
+            var index = vm.eyeWitnesses.indexOf(dataItem);
+            if (index > -1) {
+                vm.eyeWitnesses.splice(index, 1);
+                $scope.$apply();
+            }
+        }
+
+        function removeEyeWitness(uid) {
+            var grid = vm.witnessGrid;
+            if (!grid) return;
+
+            var dataItem = grid.dataSource.getByUid(uid);
             var index = vm.eyeWitnesses.indexOf(dataItem);
             if (index > -1) {
                 vm.eyeWitnesses.splice(index, 1);
