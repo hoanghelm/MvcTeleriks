@@ -8,6 +8,7 @@ namespace WIRS.Services.Interfaces
     {
         Task<(string incidentId, string errorCode)> CreateIncidentAsync(IncidentCreateModel model, string userId);
         Task<WorkflowIncidentDetailModel?> GetIncidentByIdAsync(string incidentId, string userId);
+        Task<bool> CanUserViewIncidentAsync(string incidentId, string userId);
         Task<bool> CanUserEditIncidentAsync(string incidentId, string userId, string changeMode = "");
         Task<bool> CanUserWorkflowIncidentAsync(string incidentId, string userId);
         Task<string> UpdateIncidentAsync(WorkflowIncidentUpdateModel model, string userId);

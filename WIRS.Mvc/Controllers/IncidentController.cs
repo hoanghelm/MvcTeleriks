@@ -475,6 +475,13 @@ namespace WIRS.Mvc.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            var canView = await _workflowService.CanUserViewIncidentAsync(id, currentUser.UserId);
+            if (!canView)
+            {
+                TempData["ErrorMessage"] = "You do not have permission to view this incident.";
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 

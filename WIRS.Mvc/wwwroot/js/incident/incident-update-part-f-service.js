@@ -225,32 +225,11 @@
         }
 
         function canViewPartF(vm) {
-            if (!vm.incident || !vm.incident.status || parseInt(vm.incident.status) < 5) {
-                return false;
-            }
-
-            if (vm.isWorkflowClosed && vm.isWorkflowClosed()) {
-                var highestCode = vm.getHighestCompletedActionCode();
-                var hasPartFAction = vm.incident.workflows && vm.incident.workflows.some(function (w) {
-                    return w.actionCode === '06';
-                });
-
-                if (!hasPartFAction && parseInt(highestCode) < 6) {
-                    return false;
-                }
-            }
-
-            return true;
+            return vm.canUserViewPart('05');
         }
 
         function canEditPartF(vm) {
-            if (!vm.incident || vm.incident.status !== '05') return false;
-            if (!vm.currentUser || !vm.currentUser.userId) return false;
-
-            if (vm.incident.hodId === vm.currentUser.userId) return true;
-            if (vm.incident.wshoId === vm.currentUser.userId) return true;
-
-            return false;
+            return vm.canUserEditPart('05');
         }
 
         function submitPartF(vm) {

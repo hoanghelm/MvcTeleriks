@@ -113,15 +113,21 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canView = await CanUserViewIncidentAsync(incidentId, userId);
+                if (!canView)
+                {
+                    return null;
+                }
+
                 var workflowIncident = new WorkflowIncident { incident_id = incidentId };
                 var dataSet = await _workflowIncidentDataAccess.get_incident_by_id(workflowIncident);
                 var workflows = await this.GetIncidentWorkflowsAsync(incidentId);
-                
+
                 if (dataSet?.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
                     return null;
 
                 var incident = MapDataSetToDetailModel(dataSet, workflows);
-                
+
                 incident.CanEdit = await CanUserEditIncidentAsync(incidentId, userId);
                 incident.CanWorkflow = await CanUserWorkflowIncidentAsync(incidentId, userId);
                 incident.StagePermissions = await GetIncidentStagePermissionsAsync(incidentId, userId);
@@ -137,12 +143,83 @@ namespace WIRS.Services.Implementations
             }
         }
 
+        public async Task<bool> CanUserViewIncidentAsync(string incidentId, string userId)
+        {
+            try
+            {
+                var incident = new WorkflowIncident { incident_id = incidentId };
+                var dataSet = await _workflowIncidentDataAccess.get_incident_by_id(incident);
+
+                if (dataSet == null || dataSet.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
+                {
+                    return false;
+                }
+
+                var createdBy = dataSet.Tables[0].Rows[0]["created_by"]?.ToString() ?? string.Empty;
+                if (createdBy == userId)
+                {
+                    return true;
+                }
+
+                var workflows = await GetIncidentWorkflowsAsync(incidentId);
+                if (workflows == null || workflows.Tables.Count == 0 || workflows.Tables[0].Rows.Count == 0)
+                {
+                    return false;
+                }
+
+                foreach (DataRow row in workflows.Tables[0].Rows)
+                {
+                    var toUser = row["to"]?.ToString() ?? string.Empty;
+                    if (toUser.Contains(userId))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         public async Task<bool> CanUserEditIncidentAsync(string incidentId, string userId, string changeMode = "")
         {
             try
             {
-                var result = await _workflowIncidentDataAccess.validate_user_to_edit_inc(incidentId, userId, changeMode);
-                return result?.Tables.Count > 0 && result.Tables[0].Rows.Count > 0;
+                var incident = new WorkflowIncident { incident_id = incidentId };
+                var dataSet = await _workflowIncidentDataAccess.get_incident_by_id(incident);
+
+                if (dataSet == null || dataSet.Tables.Count == 0 || dataSet.Tables[0].Rows.Count == 0)
+                {
+                    return false;
+                }
+
+                var currentStatus = dataSet.Tables[0].Rows[0]["status"]?.ToString() ?? string.Empty;
+                if (string.IsNullOrEmpty(currentStatus))
+                {
+                    return false;
+                }
+
+                var workflows = await GetIncidentWorkflowsAsync(incidentId, currentStatus);
+                if (workflows == null || workflows.Tables.Count == 0 || workflows.Tables[0].Rows.Count == 0)
+                {
+                    return false;
+                }
+
+                foreach (DataRow row in workflows.Tables[0].Rows)
+                {
+                    var toUser = row["to"]?.ToString() ?? string.Empty;
+                    var actionsCode = row["actions_code"]?.ToString() ?? string.Empty;
+
+                    if (actionsCode == currentStatus && toUser.Contains(userId))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
             catch (Exception)
             {
@@ -582,6 +659,12 @@ namespace WIRS.Services.Implementations
 
         public async Task<string> SubmitPartBAsync(PartBSubmitModel model, string userId)
         {
+            var canEdit = await CanUserEditIncidentAsync(model.IncidentId, userId);
+            if (!canEdit)
+            {
+                return "ERR-UNAUTHORIZED";
+            }
+
             var incident = new WorkflowIncident { incident_id = model.IncidentId };
             var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
 
@@ -674,6 +757,12 @@ namespace WIRS.Services.Implementations
 
         public async Task<string> ClosePartBAsync(PartBSubmitModel model, string userId)
         {
+            var canEdit = await CanUserEditIncidentAsync(model.IncidentId, userId);
+            if (!canEdit)
+            {
+                return "ERR-UNAUTHORIZED";
+            }
+
             var incident = new WorkflowIncident { incident_id = model.IncidentId };
             var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
 
@@ -804,6 +893,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(model.IncidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 var incident = new WorkflowIncident
                 {
                     incident_id = model.IncidentId,
@@ -861,6 +956,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(model.IncidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 DataSet workflow = new DataSet("NewDataSet");
                 DataTable dt = new DataTable("incidents_workflows");
 
@@ -909,6 +1010,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(incidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 DataSet workflowDs = new DataSet("NewDataSet");
                 DataTable dt = new DataTable("incidents_workflows");
                 dt.Columns.Add("incident_id", typeof(string));
@@ -976,6 +1083,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(incidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 DataSet workflowDs = new DataSet("NewDataSet");
                 DataTable dt = new DataTable("incidents_workflows");
                 dt.Columns.Add("incident_id", typeof(string));
@@ -1061,6 +1174,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(incidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 DataSet workflowDs = new DataSet("NewDataSet");
                 DataTable dt = new DataTable("incidents_workflows");
 
@@ -1166,6 +1285,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(incidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 var incident = new WorkflowIncident { incident_id = incidentId };
                 var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
                 incident.status = "06";
@@ -1263,6 +1388,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(incidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 DataSet workflowDs = new DataSet("NewDataSet");
                 DataTable dt = new DataTable("incidents_workflows");
                 dt.Columns.Add("incident_id", typeof(string));
@@ -1332,6 +1463,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(incidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 DataSet workflowDs = new DataSet("NewDataSet");
                 DataTable dt = new DataTable("incidents_workflows");
                 dt.Columns.Add("incident_id", typeof(string));
@@ -1401,6 +1538,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(incidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 var incident = new WorkflowIncident { incident_id = incidentId };
                 var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
                 incident.status = "06";
@@ -1498,6 +1641,12 @@ namespace WIRS.Services.Implementations
         {
             try
             {
+                var canEdit = await CanUserEditIncidentAsync(incidentId, userId);
+                if (!canEdit)
+                {
+                    return "ERR-UNAUTHORIZED";
+                }
+
                 var incident = new WorkflowIncident { incident_id = incidentId };
                 var dataset = await _workflowIncidentDataAccess.get_incident_by_id(incident);
                 incident.status = "08";

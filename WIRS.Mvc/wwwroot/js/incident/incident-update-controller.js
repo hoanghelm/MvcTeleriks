@@ -37,6 +37,8 @@
         vm.isWorkflowClosed = isWorkflowClosed;
         vm.getHighestCompletedActionCode = getHighestCompletedActionCode;
         vm.cancel = cancel;
+        vm.canUserViewPart = canUserViewPart;
+        vm.canUserEditPart = canUserEditPart;
 
         vm.onIncidentTypeChange = function () { PartAService.onIncidentTypeChange(vm); };
         vm.addInjuredPerson = function () { PartAService.addInjuredPerson(vm); };
@@ -270,6 +272,53 @@
             return completedCodes.reduce(function (max, code) {
                 return (parseInt(code) || 0) > (parseInt(max) || 0) ? code : max;
             }, '00');
+        }
+
+        function canUserViewPart(minStatus) {
+            if (!vm.incident || !vm.currentUser) {
+                return false;
+            }
+
+            if (!vm.incident.status || parseInt(vm.incident.status) < parseInt(minStatus)) {
+                return false;
+            }
+
+            if (vm.incident.createdBy === vm.currentUser.userId) {
+                return true;
+            }
+
+            if (vm.incident.workflows && vm.incident.workflows.length > 0) {
+                var userInWorkflow = vm.incident.workflows.some(function (workflow) {
+                    var toUsers = workflow.to || '';
+                    return toUsers.indexOf(vm.currentUser.userId) !== -1;
+                });
+                if (userInWorkflow) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function canUserEditPart(requiredStatus) {
+            if (!vm.incident || !vm.currentUser) {
+                return false;
+            }
+
+            if (vm.incident.status !== requiredStatus) {
+                return false;
+            }
+
+            if (vm.incident.workflows && vm.incident.workflows.length > 0) {
+                var canEdit = vm.incident.workflows.some(function (workflow) {
+                    var toUsers = workflow.to || '';
+                    var actionCode = workflow.actionCode || '';
+                    return actionCode === vm.incident.status && toUsers.indexOf(vm.currentUser.userId) !== -1;
+                });
+                return canEdit;
+            }
+
+            return false;
         }
     }
 })();

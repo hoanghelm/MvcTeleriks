@@ -86,13 +86,11 @@
         }
 
         function canViewPartH(vm) {
-            var status = parseInt(vm.incident.status);
-            return status >= 7;
+            return vm.canUserViewPart('07');
         }
 
         function canEditPartH(vm) {
-            var status = parseInt(vm.incident.status);
-            return status === 7;
+            return vm.canUserEditPart('07');
         }
 
         function loadPartHWorkflowData(vm) {
