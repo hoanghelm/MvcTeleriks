@@ -368,7 +368,7 @@
             vm.validationMessage = '';
 
             if (vm.injuredGrid) {
-                vm.injuredGrid.dataSource.read();
+                vm.injuredGrid.dataSource.data(vm.injuredPersons);
             }
         }
 
@@ -390,9 +390,13 @@
             var dataItem = dataSource.getByUid(uid);
 
             if (dataItem) {
-                dataSource.remove(dataItem);
-                if (!$scope.$$phase) {
-                    $scope.$apply();
+                var index = vm.injuredPersons.indexOf(dataItem);
+                if (index > -1) {
+                    vm.injuredPersons.splice(index, 1);
+                    dataSource.data(vm.injuredPersons);
+                    if (!$scope.$$phase) {
+                        $scope.$apply();
+                    }
                 }
             }
         }
@@ -408,7 +412,7 @@
             vm.validationMessage = '';
 
             if (vm.witnessGrid) {
-                vm.witnessGrid.dataSource.read();
+                vm.witnessGrid.dataSource.data(vm.eyeWitnesses);
             }
         }
 
@@ -430,9 +434,13 @@
             var dataItem = dataSource.getByUid(uid);
 
             if (dataItem) {
-                dataSource.remove(dataItem);
-                if (!$scope.$$phase) {
-                    $scope.$apply();
+                var index = vm.eyeWitnesses.indexOf(dataItem);
+                if (index > -1) {
+                    vm.eyeWitnesses.splice(index, 1);
+                    dataSource.data(vm.eyeWitnesses);
+                    if (!$scope.$$phase) {
+                        $scope.$apply();
+                    }
                 }
             }
         }
