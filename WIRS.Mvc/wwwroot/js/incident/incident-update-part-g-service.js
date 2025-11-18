@@ -249,7 +249,7 @@
                     if (response.success) {
                         vm.partG.successMessage = response.message || 'Part G submitted successfully to Chairman WSH';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partG.validationMessage = response.message || 'Failed to submit Part G';
@@ -299,7 +299,7 @@
                     if (response.success) {
                         vm.partG.successMessage = response.message || 'Part G reverted successfully to HOD';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partG.validationMessage = response.message || 'Failed to revert Part G';

@@ -218,7 +218,7 @@
 
         function cancel() {
             if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
-                $window.location.href = '/Home/Index';
+                $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
             }
         }
 

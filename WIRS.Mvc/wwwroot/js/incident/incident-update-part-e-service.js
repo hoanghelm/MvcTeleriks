@@ -248,7 +248,7 @@
                     if (response.success) {
                         vm.partE.successMessage = response.message || 'Part E reverted successfully to WSHO';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partE.validationMessage = response.message || 'Failed to revert Part E';
@@ -299,7 +299,7 @@
                     if (response.success) {
                         vm.partE.successMessage = response.message || 'Part E submitted successfully to HOD';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partE.validationMessage = response.message || 'Failed to submit Part E';

@@ -232,7 +232,7 @@
                 .then(function (response) {
                     if (response.success) {
                         alert('Part B submitted successfully!');
-                        $window.location.href = '/Home/Index';
+                        $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                     } else {
                         vm.partB.validationMessage = response.message || 'Failed to submit Part B';
                     }
@@ -338,7 +338,7 @@
                 .then(function (response) {
                     if (response.success) {
                         alert('Part B rejected successfully. Incident report has been closed.');
-                        $window.location.href = '/Home/Index';
+                        $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                     } else {
                         vm.partB.validationMessage = response.message || 'Failed to close Part B';
                     }

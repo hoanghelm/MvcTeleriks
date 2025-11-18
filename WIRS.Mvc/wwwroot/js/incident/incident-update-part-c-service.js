@@ -512,7 +512,7 @@
                 .then(function (response) {
                     if (response.success) {
                         alert('Part C submitted successfully to Chairman WSH!');
-                        $window.location.href = '/Home/Index';
+                        $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                     } else {
                         vm.partC.validationMessage = response.message || 'Failed to submit Part C';
                     }
@@ -555,7 +555,7 @@
                 .then(function (response) {
                     if (response.success) {
                         alert('Incident closed successfully!');
-                        $window.location.href = '/Home/Index';
+                        $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                     } else {
                         vm.partC.validationMessage = response.message || 'Failed to close incident';
                     }

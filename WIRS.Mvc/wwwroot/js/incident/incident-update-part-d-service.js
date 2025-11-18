@@ -211,7 +211,7 @@
                     if (response.success) {
                         vm.partD.successMessage = response.message || 'Part D reverted successfully to WSHO';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partD.validationMessage = response.message || 'Failed to revert Part D';
@@ -257,7 +257,7 @@
                     if (response.success) {
                         vm.partD.successMessage = response.message || 'Part D submitted successfully to Head LOB';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partD.validationMessage = response.message || 'Failed to submit Part D';

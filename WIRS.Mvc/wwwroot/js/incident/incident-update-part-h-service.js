@@ -217,7 +217,7 @@
                     if (response.success) {
                         vm.partH.successMessage = response.message || 'Part H reverted successfully to WSHO';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partH.validationMessage = response.message || 'Failed to revert Part H';
@@ -262,7 +262,7 @@
                     if (response.success) {
                         vm.partH.successMessage = response.message || 'Report closed successfully';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partH.validationMessage = response.message || 'Failed to close report';

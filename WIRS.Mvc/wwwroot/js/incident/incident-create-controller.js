@@ -463,7 +463,7 @@
                     if (response.success) {
                         vm.successMessage = 'Incident report submitted successfully';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.validationMessage = response.message || 'Failed to submit incident report';
@@ -576,7 +576,7 @@
         }
 
         function cancel() {
-            $window.location.href = '/Home/Index';
+            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
         }
     }
 })();

@@ -280,7 +280,7 @@
                     if (response.success) {
                         vm.partF.successMessage = response.message || 'Part F submitted successfully to WSHO';
                         setTimeout(function () {
-                            $window.location.href = '/Home/Index';
+                            $window.location.href = (window.WIRS_CONFIG ? window.WIRS_CONFIG.basePath : '') + '/Home/Index';
                         }, 2000);
                     } else {
                         vm.partF.validationMessage = response.message || 'Failed to submit Part F';
