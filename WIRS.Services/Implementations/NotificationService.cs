@@ -152,9 +152,12 @@ namespace WIRS.Services.Implementations
                     mailMessage.Priority = MailPriority.Normal;
 
                     string smtpHost = _configuration["EmailSettings:SmtpHost"] ?? "localhost";
+                    int smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "25");
+                    bool enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"] ?? "true");
 
-                    using (var smtpClient = new SmtpClient(smtpHost))
+                    using (var smtpClient = new SmtpClient(smtpHost, smtpPort))
                     {
+                        smtpClient.EnableSsl = enableSsl;
                         await smtpClient.SendMailAsync(mailMessage);
                     }
                 }
