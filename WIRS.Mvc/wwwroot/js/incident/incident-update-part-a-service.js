@@ -255,7 +255,17 @@
                 vm.partA.incidentDate = new Date(vm.incident.incidentDate);
             }
             if (vm.incident.incidentTime) {
-                var timeParts = vm.incident.incidentTime.split(':');
+                var timeStr = vm.incident.incidentTime.toString();
+                var timeParts;
+
+                if (timeStr.indexOf(':') > -1) {
+                    timeParts = timeStr.split(':');
+                } else if (timeStr.length === 4) {
+                    timeParts = [timeStr.substring(0, 2), timeStr.substring(2, 4)];
+                } else {
+                    timeParts = [];
+                }
+
                 if (timeParts.length >= 2) {
                     var timeDate = new Date();
                     timeDate.setHours(parseInt(timeParts[0], 10));
@@ -297,7 +307,21 @@
             vm.partA.superiorEmpNo = vm.incident.superiorEmpNo || '';
             vm.partA.superiorDesignation = vm.incident.superiorDesignation || '';
 
-            if (vm.incident.createdDate || vm.incident.submittedDate) {
+            var partAWorkflows = [];
+            if (vm.incident.workflows && vm.incident.workflows.length > 0) {
+                partAWorkflows = vm.incident.workflows.filter(function (w) {
+                    return w.actionCode === '01';
+                });
+            }
+
+            if (partAWorkflows.length > 0) {
+                partAWorkflows.sort(function (a, b) {
+                    var dateA = new Date(a.date || 0);
+                    var dateB = new Date(b.date || 0);
+                    return dateB - dateA;
+                });
+                vm.partA.submittedDate = partAWorkflows[0].date ? new Date(partAWorkflows[0].date) : null;
+            } else if (vm.incident.createdDate || vm.incident.submittedDate) {
                 vm.partA.submittedDate = new Date(vm.incident.createdDate || vm.incident.submittedDate);
             }
 
