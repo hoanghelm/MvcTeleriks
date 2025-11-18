@@ -137,11 +137,19 @@ namespace WIRS.Services.Implementations
             bool enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"] ?? "false");
             string smtpUser = _configuration["EmailSettings:SmtpUser"] ?? string.Empty;
             string smtpPassword = _configuration["EmailSettings:SmtpPassword"] ?? string.Empty;
+            string itSupportEmail = _configuration["AppSettings:ITSupportEmail"] ?? string.Empty;
 
             using (var mailMessage = new MailMessage())
             {
                 mailMessage.From = new MailAddress(from);
                 mailMessage.To.Add(to);
+
+                // Add IT Support to BCC if configured
+                if (!string.IsNullOrEmpty(itSupportEmail))
+                {
+                    mailMessage.Bcc.Add(new MailAddress(itSupportEmail));
+                }
+
                 mailMessage.Subject = subject;
                 mailMessage.Body = body;
                 mailMessage.IsBodyHtml = true;

@@ -7,6 +7,7 @@ namespace WIRS.Shared.Configuration
         public int MaxLoginError { get; set; } = 3;
         public MockAdminSettings MockAdmin { get; set; } = new MockAdminSettings();
         public string ApiBasePath { get; set; } = string.Empty;
+        public string ITSupportEmail { get; set; } = string.Empty;
     }
 
     public class MockAdminSettings
