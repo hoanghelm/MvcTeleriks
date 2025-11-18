@@ -287,7 +287,15 @@
                 return false;
             }
 
-            return true;
+            if (vm.incident.canEdit === true && vm.incident.status === minStatus) {
+                return true;
+            }
+
+            if (parseInt(vm.incident.status) > parseInt(minStatus)) {
+                return true;
+            }
+
+            return false;
         }
 
         function canUserEditPart(requiredStatus) {
