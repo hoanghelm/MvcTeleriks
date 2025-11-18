@@ -132,40 +132,36 @@ namespace WIRS.Services.Implementations
 
         private async Task SendEmailAsync(string from, string to, string subject, string body)
         {
-            string smtpHost = _configuration["EmailSettings:SmtpHost"] ?? "localhost";
-            int smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "25");
-            bool enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"] ?? "false");
-            string smtpUser = _configuration["EmailSettings:SmtpUser"] ?? string.Empty;
-            string smtpPassword = _configuration["EmailSettings:SmtpPassword"] ?? string.Empty;
-            string itSupportEmail = _configuration["AppSettings:ITSupportEmail"] ?? string.Empty;
-
-            using (var mailMessage = new MailMessage())
+            try
             {
-                mailMessage.From = new MailAddress(from);
-                mailMessage.To.Add(to);
+                string itSupportEmail = _configuration["AppSettings:ITSupportEmail"] ?? string.Empty;
 
-                // Add IT Support to BCC if configured
-                if (!string.IsNullOrEmpty(itSupportEmail))
+                using (var mailMessage = new MailMessage())
                 {
-                    mailMessage.Bcc.Add(new MailAddress(itSupportEmail));
-                }
+                    mailMessage.From = new MailAddress(from);
+                    mailMessage.To.Add(new MailAddress(to));
 
-                mailMessage.Subject = subject;
-                mailMessage.Body = body;
-                mailMessage.IsBodyHtml = true;
-                mailMessage.Priority = MailPriority.Normal;
-
-                using (var smtpClient = new SmtpClient(smtpHost, smtpPort))
-                {
-                    smtpClient.EnableSsl = enableSsl;
-
-                    if (!string.IsNullOrEmpty(smtpUser) && !string.IsNullOrEmpty(smtpPassword))
+                    if (!string.IsNullOrEmpty(itSupportEmail))
                     {
-                        smtpClient.Credentials = new NetworkCredential(smtpUser, smtpPassword);
+                        mailMessage.Bcc.Add(new MailAddress(itSupportEmail));
                     }
 
-                    await smtpClient.SendMailAsync(mailMessage);
+                    mailMessage.Subject = subject;
+                    mailMessage.Body = body;
+                    mailMessage.IsBodyHtml = true;
+                    mailMessage.Priority = MailPriority.Normal;
+
+                    string smtpHost = _configuration["EmailSettings:SmtpHost"] ?? "localhost";
+
+                    using (var smtpClient = new SmtpClient(smtpHost))
+                    {
+                        await smtpClient.SendMailAsync(mailMessage);
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }
