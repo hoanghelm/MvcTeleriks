@@ -48,7 +48,7 @@ namespace WIRS.DataAccess.Mock
             table.Rows.Add(2, "Incident", "#", 2, true);
             table.Rows.Add(4, "Maintenance", "#", 4, true);
             table.Rows.Add(5, "Help", "#", 5, true);
-            table.Rows.Add(8, "Logout", GetFullUrl("/Login/Logout"), 8, false);
+            table.Rows.Add(8, "Logout", "#", 8, false);
 
             dataSet.Tables.Add(table);
             return Task.FromResult(dataSet);
@@ -70,7 +70,7 @@ namespace WIRS.DataAccess.Mock
             table.Rows.Add(2, "Incident", "#", 2, true, 0);
             table.Rows.Add(4, "Maintenance", "#", 4, true, 0);
             table.Rows.Add(5, "Help", "#", 5, true, 0);
-            table.Rows.Add(8, "Logout", GetFullUrl("/Login/Logout"), 8, false, 0);
+            table.Rows.Add(8, "Logout", "#", 8, false, 0);
 
             // Mock data - sub menus
             table.Rows.Add(21, "Create Incident Report", GetFullUrl("/Incident/Create"), 1, false, 2);
@@ -103,7 +103,7 @@ namespace WIRS.DataAccess.Mock
             table.Rows.Add(2, "Incident", "#", true);
             table.Rows.Add(4, "Maintenance", "#", true);
             table.Rows.Add(5, "Help", "#", true);
-            table.Rows.Add(8, "Logout", GetFullUrl("/Login/Logout"), true);
+            table.Rows.Add(8, "Logout", "#", true);
 
             IDataReader reader = table.CreateDataReader();
             return Task.FromResult(reader);

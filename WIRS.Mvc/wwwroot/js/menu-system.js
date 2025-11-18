@@ -69,7 +69,7 @@ const MenuSystem = {
                     { menuId: 51, menuName: 'User Guide', menuUrl: '/Help/UserGuide', hasChildren: false }
                 ]
             },
-            { menuId: 8, menuName: 'Logout', menuUrl: '/Login/Logout', hasChildren: false }
+            { menuId: 8, menuName: 'Logout', menuUrl: '#', hasChildren: false }
         ];
         this.renderMenu();
     },
@@ -141,6 +141,13 @@ const MenuSystem = {
 
     createSimpleMenu: function(item) {
         const isActive = window.location.pathname === item.menuUrl ? 'text-blue-400' : 'text-gray-300 hover:text-white';
+        if (item.menuId === 8) {
+            return `
+                <a class="px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive}" href="#" onclick="logout(); return false;">
+                    ${item.menuName}
+                </a>
+            `;
+        }
         return `
             <a class="px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive}" href="${item.menuUrl}">
                 ${item.menuName}
@@ -150,6 +157,13 @@ const MenuSystem = {
 
     createMobileSimpleMenu: function(item) {
         const isActive = window.location.pathname === item.menuUrl ? 'text-blue-400' : 'text-gray-300 hover:text-white';
+        if (item.menuId === 8) {
+            return `
+                <a class="block px-3 py-2 text-sm font-medium transition-colors ${isActive}" href="#" onclick="logout(); return false;">
+                    ${item.menuName}
+                </a>
+            `;
+        }
         return `
             <a class="block px-3 py-2 text-sm font-medium transition-colors ${isActive}" href="${item.menuUrl}">
                 ${item.menuName}
