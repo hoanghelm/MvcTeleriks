@@ -13,6 +13,7 @@
         vm.incident = {};
         vm.currentUser = {};
         vm.activeTab = 'A';
+        vm.setInitialTab = setInitialTab;
 
         PartBService.initializePartB(vm);
 
@@ -135,6 +136,9 @@
                         PartGService.loadPartGData(vm, getCurrentDate),
                         PartHService.loadPartHData(vm, getCurrentDate)
                     ]);
+                })
+                .then(function () {
+                    setInitialTab();
                 })
                 .catch(function (error) {
                     vm.error = error || 'Failed to load incident data';
@@ -296,6 +300,32 @@
             }
 
             return vm.incident.canEdit === true;
+        }
+
+        function setInitialTab() {
+            if (!vm.incident || !vm.incident.canEdit) {
+                return;
+            }
+
+            if (isWorkflowClosed()) {
+                return;
+            }
+
+            if (vm.canEditPartH && vm.canEditPartH()) {
+                vm.activeTab = 'H';
+            } else if (vm.canEditPartG && vm.canEditPartG()) {
+                vm.activeTab = 'G';
+            } else if (vm.canEditPartF && vm.canEditPartF()) {
+                vm.activeTab = 'F';
+            } else if (vm.canEditPartE && vm.canEditPartE()) {
+                vm.activeTab = 'E';
+            } else if (vm.canEditPartD && vm.canEditPartD()) {
+                vm.activeTab = 'D';
+            } else if (vm.canEditPartC && vm.canEditPartC()) {
+                vm.activeTab = 'C';
+            } else if (vm.canEditPartB && vm.canEditPartB()) {
+                vm.activeTab = 'B';
+            }
         }
     }
 })();
